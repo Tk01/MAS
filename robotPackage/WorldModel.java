@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import com.github.rinde.rinsim.geom.Point;
 
 public class WorldModel {
+	  Double BatteryLife;
+	  int maxTask;
+	  Point Location;
 	  ArrayList<Point> Robots;
 	  ArrayList<Point> ChargingStations;
-	  ArrayList<Point> Packages;
+	  Package Carried;
 }

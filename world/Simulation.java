@@ -57,14 +57,14 @@ public class Simulation {
 	        .addModel(CommModel.builder()
 	            .build())
 	        .build();
-	    /*
+	  
 	    for (Point p:RList) {
 		      simulator.register(new Robot(p,1));
 		    }
 	    for (Point p:CList) {
 		      simulator.register(new ChargingStation(p));
 		    }
-	*/
+
 		simulator.addTickListener(new TickListener() {
 		      @Override
 		      public void tick(TimeLapse time) {
