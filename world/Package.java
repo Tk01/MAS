@@ -2,6 +2,7 @@ package world;
 
 	import java.util.ArrayList;
 
+
 	import com.github.rinde.rinsim.core.TickListener;
 	import com.github.rinde.rinsim.core.TimeLapse;
 	import com.github.rinde.rinsim.core.model.comm.CommDevice;
@@ -22,11 +23,18 @@ package world;
 	 * A customer with very permissive time windows.
 	 */
 	class Package extends Parcel implements CommUser,TickListener {
+		
+		
+		Point start;
+		point end;
+		
+		
 		Package(Point startPosition, Point pDestination,
 				long pLoadingDuration, long pUnloadingDuration) {
 			super(pDestination, pLoadingDuration, TimeWindow.ALWAYS,
 					pUnloadingDuration, TimeWindow.ALWAYS, 1);
-			setStartPosition(startPosition);
+			start =startPosition;
+			end = pDestination;
 		}
 
 		@Override
@@ -56,6 +64,15 @@ package world;
 		@Override
 		public void initRoadPDP(RoadModel arg0, PDPModel arg1) {
 			// TODO Auto-generated method stub
+			
+		}
+		
+		public Point getStart (){
+			return start;
+		}
+		
+		public Point getEnd(){
+			return end;
 			
 		}
 		
