@@ -22,13 +22,15 @@ public class WorldInterface {
 	public void sendMessage( Message message) {
 		
 	}
-	public void Run(){
-		bbc.done(action,moveTo,true);
-		bbc.msg(new ArrayList<Message>());
-		bbc.run();
+	public void MoveTo(Point x){
+		
 	}
-	public void Action(Action action){
-		  
-	  }
+	public void run(){
+		if(battery > 0){
+		this.gatherInfo();
+		bbc.run();
+		model.batteryDrop(0.05);
+		}
+	}
 
 }
