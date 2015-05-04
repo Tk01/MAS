@@ -4,8 +4,10 @@ public class CKnowledge {
 	
 	
 	
-	public Plan getLocalPlan(){
-		re
+	
+	
+	public  CKnowledge(){
+		
 	}
 
 }
