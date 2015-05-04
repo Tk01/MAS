@@ -14,8 +14,7 @@ public class Action {
 	ArrayList <String> terminationconditions;
 	ArrayList <String> failureconditions; // ex battery = 0
 	
-	public Action(String action, ){
-		
+	public Action(String action){
 		
 	}
 	
