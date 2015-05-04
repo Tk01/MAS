@@ -9,6 +9,12 @@ public class WorldModel {
 	  int maxTask;
 	  Point Location;
 	  ArrayList<Point> Robots;
-	  ArrayList<Point> ChargingStations;
+	  public ArrayList<Point> getRobots() {
+		return Robots;
+	}
+	public void setRobots(ArrayList<Point> robots) {
+		Robots = robots;
+	}
+	ArrayList<Point> ChargingStations;
 	  Package Carried;
 }

@@ -3,6 +3,9 @@ package robotPackage;
 import java.util.List;
 
 public class PBC {
+	
+	boolean chargingInPlan = true;
+	
 	public void interpret(Plan plan){
 		
 	}
