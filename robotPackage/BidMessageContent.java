@@ -1,27 +1,28 @@
 package robotPackage;
 
+import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.MessageContents;
 
 import world.Pack;
 
 
-public class BidMessage extends MessageContent{
+public class BidMessageContent extends MessageContent{
 	
-	String rec;
+	CommUser sender;
 	
 	double bid;
 	
 	Pack packageToDel;
 	
-	public BidMessage(String receiver, double bid, Pack packageToDeliver){
-		rec = receiver;
+	public BidMessageContent(CommUser sender, double bid, Pack packageToDeliver){
+		this.sender = sender;
 		this.bid = bid;
 		this.packageToDel = packageToDeliver;
 		
 	}
 	
-	public String getReceiver(){
-		return rec;
+	public CommUser getReceiver(){
+		return sender;
 	}
 	
 	public double getBid(){

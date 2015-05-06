@@ -2,6 +2,7 @@ package robotPackage;
 
 import java.util.ArrayList;
 
+import com.github.rinde.rinsim.core.model.comm.CommDevice;
 import com.github.rinde.rinsim.core.model.comm.Message;
 import com.github.rinde.rinsim.geom.Point;
 
@@ -10,10 +11,17 @@ public class BBC {
 	Boolean charging;
 	boolean done;
 	
+	CommDevice commDevice;
+	
+	Robot thisRobot;
+	
+	PBC pbc = new PBC();
+	
 	ArrayList<Message> messages;
 	
-	public BBC(WorldInterface worldInterface, WorldModel model) {
+	public BBC(WorldInterface worldInterface, WorldModel model, Robot robot) {
 		// TODO Auto-generated constructor stub
+		thisRobot = robot;
 	}
 
 	public void msg(Message message) {
@@ -69,21 +77,46 @@ public class BBC {
 			BidMessage bidmessage = new BidMessage(goal.getReceiver(), goal.getBid(), goal.getPackage());
 			if(model.battery() == 1) done =true;
 			return;
+			}
 		}
 
 
 	}
 	
+	//read the messages
 	private void checkMessages(){
 		for(int i = 0; i<messages.size();i++){
 			Message message = messages.get(i);
 			MessageContent content = (MessageContent) message.getContents();
 			if(content.getType().equals("DeliverPackage")){
-				DeliverPackageMessage packMessage = (DeliverPackageMessage) content;
-				pbc.doBid(packMessage.)
+				
+					sendDeliverBidMessage(message);
+					
+				
 			}
 		}
 	}
+	
+	
+
+	//Send a message
+	private void sendDeliverBidMessage(Message message){
+		DeliverPackageMessage packMessage = (DeliverPackageMessage) message.getContents();
+		
+		double bid = pbc.doBid(packMessage.getPackageToDel(), message.getSender());
+		BidMessageContent bidMessageContent;
+		if(bid> 0){
+			
+		
+			bidMessageContent = new BidMessageContent(thisRobot, bid, packMessage.getPackageToDel());
+			
+		}
+		else{
+			bidMessageContent = new BidMessageContent(thisRobot, -1, packMessage.getPackageToDel());
+			
+		}
+		
+		commDevice.send(bidMessageContent, message.getSender());
 
 
 }
