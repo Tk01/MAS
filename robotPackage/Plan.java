@@ -2,24 +2,24 @@ package robotPackage;
 
 import java.util.ArrayList;
 
-import world.Pack;
+import world.Package;
 
 import com.github.rinde.rinsim.geom.Point;
 
 public class Plan {
 	
-	ArrayList <Pack> packages;
+	ArrayList <Package> packages;
 	
 	public Plan(){
 		packages = new ArrayList();
 	}
 	
-	public void addPackage (Pack pack, int order){
+	public void addPackage (Package pack, int order){
 		packages.add(order, pack);
 		
 	}
 	
-	public double getdistanceWithNextPackage(Pack thePackage,Pack nextPackage ){
+	public double getdistanceWithNextPackage(Package thePackage,Package nextPackage ){
 		
 		
 		
@@ -51,7 +51,7 @@ public class Plan {
 		return value;
 	}
 	
-	public ArrayList<Pack> getPlan(){
+	public ArrayList<Package> getPlan(){
 		return packages;
 	}
 	
@@ -93,7 +93,7 @@ public class Plan {
 	}
 	
 	// check if the first package can be picked up before the second package considering the timewindows and the distance between the packages
-	private boolean possibleSequence(Pack firstPack, Pack secondPack){
+	private boolean possibleSequence(Package firstPack, Package secondPack){
 		boolean possible = false;
 		double distance  = getdistanceWithNextPackage(firstPack, secondPack);
 		long endWindowFirst= firstPack.getPickupTimeWindow().end;
@@ -105,6 +105,11 @@ public class Plan {
 		}
 		
 		return possible;
+	}
+
+	public void remove(Goal g) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	

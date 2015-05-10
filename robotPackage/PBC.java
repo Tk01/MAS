@@ -5,33 +5,27 @@ import java.util.List;
 
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 
-import world.Pack;
+import world.Package;
 
 public class PBC {
 	
 	PBCKB knwoledgeBase;
-	
+	BBC bbc;
 	public PBC(){
 		knwoledgeBase = new PBCKB();
 	}
 	
 	boolean chargingInPlan = true;
 	
-	public void interpret(Plan plan){
+
+	public void done(Goal g){
+		knwoledgeBase.getCurrentPlan().remove(g);
+		
+		bbc.setGoal(knwoledgeBase.getCurrentPlan().getNextgoal());
 		
 	}
-	public void done(Goal g, Plan p, Boolean b){
-		
-	}
-	
-	public void planned(Goal g,JPlan plan){
-		
-	}
-	public void evaled(List<JPlan> JLIst, Eval eval){
-		
-	}
-	
-	public double doBid(Pack pack, CommUser sender){
+
+	public double doBid(Package pack, CommUser sender){
 		
 		Plan plan = knwoledgeBase.getCurrentPlan();
 		
@@ -46,7 +40,7 @@ public class PBC {
 	}
 	
 	//Makes a list of plans with the new pack that can be possible to achieve
-	private ArrayList<Plan> generatePlans(Pack pack){
+	private ArrayList<Plan> generatePlans(Package pack){
 		ArrayList<Plan> generatedPlans = new ArrayList<Plan>();
 		Plan plan = knwoledgeBase.getCurrentPlan();
 		for(int i=0; i<plan.getPlan().size();i++){
@@ -76,6 +70,15 @@ public class PBC {
 			}
 		}
 		return bestPlan;
+	}
+	public void plan() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void plan(Charging charging) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

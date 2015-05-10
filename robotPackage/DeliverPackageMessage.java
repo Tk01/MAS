@@ -1,22 +1,22 @@
 package robotPackage;
 
-import world.Pack;
+import world.Package;
 
 public class DeliverPackageMessage extends MessageContent{
 	
 	
 
-	Pack packageToDel;
+	Package packageToDel;
 	
-	public DeliverPackageMessage(Pack packageToDeliver){
+	public DeliverPackageMessage(Package packageToDeliver){
 	this.packageToDel = packageToDeliver;	
 	}
 	
-	public Pack getPackageToDel() {
+	public Package getPackageToDel() {
 		return packageToDel;
 	}
 
-	public void setPackageToDel(Pack packageToDel) {
+	public void setPackageToDel(Package packageToDel) {
 		this.packageToDel = packageToDel;
 	}
 	

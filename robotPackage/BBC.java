@@ -10,18 +10,21 @@ public class BBC {
 	Goal goal;
 	Boolean charging;
 	boolean done;
-	
+	WorldModel model;
 	CommDevice commDevice;
-	
+
 	Robot thisRobot;
-	
+
 	PBC pbc = new PBC();
-	
+
 	ArrayList<Message> messages;
-	
+	private WorldInterface worldInterface;
+
 	public BBC(WorldInterface worldInterface, WorldModel model, Robot robot) {
 		// TODO Auto-generated constructor stub
 		thisRobot = robot;
+		this.model = model;
+		this.worldInterface =worldInterface;
 	}
 
 	public void msg(Message message) {
@@ -36,87 +39,88 @@ public class BBC {
 	public void run() {
 		if(done) pbc.done(goal);
 		else{
-			if( (model.battery() < 0.25 && goal != charging && !charging) ) pbc.plan(new Charging());
+			if( (model.battery() < 0.25 && goal.type().equals("charging") && !charging) ) pbc.plan(new Charging());
 			else{
 				if( model.messages().size() !=0) pbc.plan();
 			}
 		}
-		
+
 		checkMessages();
-		
+
 		if( goal == null){
-			model.wait();
+			worldInterface.waitMoment();
 			return;
 		}
-		if(goal.coordinate() != worldinterface.coordinate()){
-			model.moveTo(goal.coordinate());
+		if(goal.coordinates().equals(model.coordinates())){
+			model.moveTo(goal.coordinates());
 			return;
 		}
-		if(goal.type() = "pickup"){
-			model.pickup();
+		if(goal.type().equals("pickup")){
+			worldInterface.pickup();
 			done =true;
 			return;
 		}
-		if(goal.type() = "drop"){
-			model.drop();
+		if(goal.type().equals("drop")){
+			worldInterface.drop();
 			done = true;
 			return;
 		}
-		if(goal.type= "charging" && this.chargeTaken()){
-			model.wait();
+		if(goal.type().equals("charging") && model.chargeTaken()){
+			worldInterface.waitMoment();
 			return;
 		}
-		if(goal.type() = "charging"){
-			model.charge();
+		if(goal.type().equals("charging")){
+			worldInterface.charge();
 			if(model.battery() == 1) done =true;
 			return;
 		}
-		
-		if(goal.type() = "doBid"){
-			
+		/*
+		if(goal.type().equals("doBid")){
+
 			BidMessage bidmessage = new BidMessage(goal.getReceiver(), goal.getBid(), goal.getPackage());
 			if(model.battery() == 1) done =true;
 			return;
-			}
 		}
-
-
+		*/
 	}
-	
+
+
+
 	//read the messages
 	private void checkMessages(){
 		for(int i = 0; i<messages.size();i++){
 			Message message = messages.get(i);
 			MessageContent content = (MessageContent) message.getContents();
 			if(content.getType().equals("DeliverPackage")){
-				
-					sendDeliverBidMessage(message);
-					
-				
+
+				sendDeliverBidMessage(message);
+
+
 			}
 		}
 	}
-	
-	
+
+
 
 	//Send a message
 	private void sendDeliverBidMessage(Message message){
 		DeliverPackageMessage packMessage = (DeliverPackageMessage) message.getContents();
-		
+
 		double bid = pbc.doBid(packMessage.getPackageToDel(), message.getSender());
 		BidMessageContent bidMessageContent;
 		if(bid> 0){
-			
-		
+
+
 			bidMessageContent = new BidMessageContent(thisRobot, bid, packMessage.getPackageToDel());
-			
+
 		}
 		else{
 			bidMessageContent = new BidMessageContent(thisRobot, -1, packMessage.getPackageToDel());
-			
+
 		}
-		
+
 		commDevice.send(bidMessageContent, message.getSender());
 
 
+	}
 }
