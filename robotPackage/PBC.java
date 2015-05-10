@@ -9,7 +9,7 @@ import world.Pack;
 
 public class PBC {
 	
-	PBCKB knwoledgeBase;
+	PBCKB knowledgeBase;
 	
 	public PBC(){
 		knwoledgeBase = new PBCKB();
@@ -31,16 +31,21 @@ public class PBC {
 		
 	}
 	
-	public double doBid(Pack pack, CommUser sender){
+	
+	//A bid will be done when the pack can be fit in the plan and no other task is being bid on which has a better value.
+	// when no bid is done, the bid will be -1
+	public double doPreBid(Pack pack, CommUser sender){
 		
-		Plan plan = knwoledgeBase.getCurrentPlan();
 		
+		double bid = -1;
 		ArrayList<Plan> plans = generatePlans(pack);
-		double bid = 0;
-		for (int i = 0; i<plans.size();i++){
-					
+		Plan bestPlan=getBestPlan(plans);
+		double currentBestValue = knowledgeBase.getProvisionalPlan().getPlanValue();
+		double bestPlanValue = bestPlan.getPlanValue();
+		if(bestPlan != null&&bestPlanValue > currentBestValue){
+			bid = bestPlan.getPlanValue();
 		}
-		
+		  
 		return bid;
 		
 	}
@@ -61,6 +66,8 @@ public class PBC {
 		
 	}
 	
+	
+	
 	private Plan getBestPlan(ArrayList<Plan> plans){
 		Plan bestPlan = null;
 		double bestValue = -1;
@@ -76,6 +83,31 @@ public class PBC {
 			}
 		}
 		return bestPlan;
+	}
+	
+	public double checkIfBetterBid(Pack pack, double currentBestBid){
+		double bid = -1;
+		
+		ArrayList<Plan> plans = generatePlans(pack);
+		Plan bestPlan=getBestPlan(plans);
+		double currentBestValue = knwoledgeBase.getProvisionalPlan().getPlanValue();
+		double bestPlanValue = bestPlan.getPlanValue();
+		if(bestPlan != null&&bestPlanValue > currentBestValue){
+			bid = bestPlan.getPlanValue();
+		}
+		
+		if(bid == -1){
+			
+		}
+		
+		/* Add check here for negotation during the DynCNET as here the communication with the CC should start*/
+		
+		if(bid>-1 && currentBestBid < bid ){
+			bid = -1;
+			
+		}
+		
+		return bid;
 	}
 	
 }
