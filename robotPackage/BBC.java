@@ -94,25 +94,47 @@ public class BBC {
 					
 				
 			}
+			if(content.getType().equals("PreAssignment")){
+				
+				evaluatePreAssignment(message);
+				
+			
+			}
+			
+			
 		}
 	}
 	
 	
 
+	private void evaluatePreAssignment(Message message) {
+		PreAssignmentMessageContent packMessage = (PreAssignmentMessageContent) message.getContents();
+		boolean assigned = packMessage.getAssigned();
+		if(!assigned){
+			double betterBid = pbc.checkIfBetterBid(packMessage.getPackge(), packMessage.getBid());
+			if(betterbid > -1){
+				
+			}
+		}
+		
+		
+		
+	}
+
 	//Send a message
 	private void sendDeliverBidMessage(Message message){
-		DeliverPackageMessage packMessage = (DeliverPackageMessage) message.getContents();
+		DeliverPackageMessageContent packMessage = (DeliverPackageMessageContent) message.getContents();
 		
-		double bid = pbc.doBid(packMessage.getPackageToDel(), message.getSender());
-		BidMessageContent bidMessageContent;
+		double bid = pbc.doPreBid(packMessage.getPackageToDel(), message.getSender());
+		PreBidMessageContent bidMessageContent;
 		if(bid> 0){
 			
 		
-			bidMessageContent = new BidMessageContent(thisRobot, bid, packMessage.getPackageToDel());
+			bidMessageContent = new PreBidMessageContent(thisRobot, bid, packMessage.getPackageToDel());
 			
 		}
 		else{
-			bidMessageContent = new BidMessageContent(thisRobot, -1, packMessage.getPackageToDel());
+			bidMessageContent = new PreBidMessageContent(thisRobot, -1, packMessage.getPackageToDel());
 			
 		}
 		

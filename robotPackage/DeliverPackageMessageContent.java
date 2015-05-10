@@ -2,14 +2,17 @@ package robotPackage;
 
 import world.Pack;
 
-public class DeliverPackageMessage extends MessageContent{
+public class DeliverPackageMessageContent extends ContractNetMessageContent{
 	
 	
 
 	Pack packageToDel;
 	
-	public DeliverPackageMessage(Pack packageToDeliver){
+	public DeliverPackageMessageContent(Pack packageToDeliver, int contractID){
 	this.packageToDel = packageToDeliver;	
+	setType("DeliverMessage");
+	setContractID(contractID);
+	
 	}
 	
 	public Pack getPackageToDel() {

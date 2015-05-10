@@ -14,6 +14,10 @@ public class MessageContent implements MessageContents{
 		return type;
 	}
 	
+	public void setType(String type){
+		this.type = type;
+	}
+	
 	
 
 }

@@ -6,6 +6,8 @@ public class PBCKB {
 	
 	Plan provisionalPlan;
 	
+	int currentContract;
+	
 	public PBCKB(){
 		currentPlan = new Plan();
 		provisionalPlan = new Plan();

@@ -9,6 +9,9 @@ public class WorldModel {
 	  int maxTask;
 	  Point Location;
 	  ArrayList<Point> Robots;
+	  
+	  int contractID = 0;
+	  
 	  public ArrayList<Point> getRobots() {
 		return Robots;
 	}
@@ -17,4 +20,9 @@ public class WorldModel {
 	}
 	ArrayList<Point> ChargingStations;
 	  Package Carried;
+	  
+	  public int getContractID(){
+		  contractID = contractID+1;
+		  return contractID;
+	  }
 }

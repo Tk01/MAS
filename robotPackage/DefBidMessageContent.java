@@ -1,23 +1,24 @@
 package robotPackage;
 
-import com.github.rinde.rinsim.core.model.comm.CommUser;
-import com.github.rinde.rinsim.core.model.comm.MessageContents;
-
 import world.Pack;
 
+import com.github.rinde.rinsim.core.model.comm.CommUser;
 
-public class BidMessageContent extends MessageContent{
+public class DefBidMessageContent extends ContractNetMessageContent{
 	
-	CommUser sender;
+CommUser sender;
 	
 	double bid;
 	
 	Pack packageToDel;
 	
-	public BidMessageContent(CommUser sender, double bid, Pack packageToDeliver){
+	public DefBidMessageContent(CommUser sender, double bid, Pack packageToDeliver, int contractID){
 		this.sender = sender;
 		this.bid = bid;
 		this.packageToDel = packageToDeliver;
+		setType("BidMessage");
+		setContractID(contractID);
+		
 		
 	}
 	
@@ -32,7 +33,5 @@ public class BidMessageContent extends MessageContent{
 	public Pack getPackge(){
 		return packageToDel;
 	}
-	
-	
 
 }
