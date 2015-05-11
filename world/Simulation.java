@@ -71,7 +71,7 @@ public class Simulation {
 		        
 				if (time.getStartTime() > endTime) {
 		          simulator.stop();
-		        } else if (PTime.isEmpty() && time.getTime() == PTime.get(0)) {
+		        } else while (PTime.isEmpty() && time.getTime() >= PTime.get(0)) {
 		          simulator.register(new Package(PList.get(0),PLocation.get(0),SERVICE_DURATION,SERVICE_DURATION));
 		          PList.remove(0);
 		          PLocation.remove(0);
