@@ -9,32 +9,32 @@ import world.Pack;
 
 public class PBC {
 	
+
 	PBCKB knowledgeBase;
 	
+
+	BBC bbc;
+
 	public PBC(){
-		knwoledgeBase = new PBCKB();
+		knowledgeBase = new PBCKB();
 	}
 	
 	boolean chargingInPlan = true;
 	
-	public void interpret(Plan plan){
+
+	public void done(Goal g){
+		knowledgeBase.getCurrentPlan().remove(g);
+		
+		bbc.setGoal(knowledgeBase.getCurrentPlan().getNextgoal());
 		
 	}
-	public void done(Goal g, Plan p, Boolean b){
-		
-	}
-	
-	public void planned(Goal g,JPlan plan){
-		
-	}
-	public void evaled(List<JPlan> JLIst, Eval eval){
-		
-	}
+
 	
 	
 	//A bid will be done when the pack can be fit in the plan and no other task is being bid on which has a better value.
 	// when no bid is done, the bid will be -1
 	public double doPreBid(Pack pack, CommUser sender){
+
 		
 		
 		double bid = -1;
@@ -51,9 +51,9 @@ public class PBC {
 	}
 	
 	//Makes a list of plans with the new pack that can be possible to achieve
-	private ArrayList<Plan> generatePlans(Pack pack){
+	private ArrayList<Plan> generatePlans(Package pack){
 		ArrayList<Plan> generatedPlans = new ArrayList<Plan>();
-		Plan plan = knwoledgeBase.getCurrentPlan();
+		Plan plan = knowledgeBase.getCurrentPlan();
 		for(int i=0; i<plan.getPlan().size();i++){
 			Plan tempPlan = plan;
 			tempPlan.addPackage(pack, i);
@@ -84,13 +84,22 @@ public class PBC {
 		}
 		return bestPlan;
 	}
+	public void plan() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void plan(Charging charging) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	public double checkIfBetterBid(Pack pack, double currentBestBid){
 		double bid = -1;
 		
 		ArrayList<Plan> plans = generatePlans(pack);
 		Plan bestPlan=getBestPlan(plans);
-		double currentBestValue = knwoledgeBase.getProvisionalPlan().getPlanValue();
+		double currentBestValue = knowledgeBase.getProvisionalPlan().getPlanValue();
 		double bestPlanValue = bestPlan.getPlanValue();
 		if(bestPlan != null&&bestPlanValue > currentBestValue){
 			bid = bestPlan.getPlanValue();

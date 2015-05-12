@@ -1,20 +1,20 @@
 package robotPackage;
 
-import world.Pack;
+import world.Package;
 
 public class DeliverPackage extends Goal{
 	
-	private Pack packageToDel;
+	private Package packageToDel;
 	
-	public DeliverPackage(Pack packageToDeliver){
+	public DeliverPackage(Package packageToDeliver){
 		this.setPackageToDel(packageToDeliver);
 	}
 
-	public Pack getPackageToDel() {
+	public Package getPackageToDel() {
 		return packageToDel;
 	}
 
-	public void setPackageToDel(Pack packageToDel) {
+	public void setPackageToDel(Package packageToDel) {
 		this.packageToDel = packageToDel;
 	}
 	

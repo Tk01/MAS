@@ -3,7 +3,7 @@ package robotPackage;
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 
 
-import world.Pack;
+import world.Package;
 
 
 public class PreBidMessageContent extends ContractNetMessageContent{
@@ -12,9 +12,11 @@ public class PreBidMessageContent extends ContractNetMessageContent{
 	
 	double bid;
 	
-	Pack packageToDel;
+	Package packageToDel;
 	
+
 	public PreBidMessageContent(CommUser sender, double bid, Pack packageToDeliver, int contractID){
+
 		this.sender = sender;
 		this.bid = bid;
 		this.packageToDel = packageToDeliver;
@@ -31,7 +33,7 @@ public class PreBidMessageContent extends ContractNetMessageContent{
 		return bid;
 	}
 	
-	public Pack getPackge(){
+	public Package getPackge(){
 		return packageToDel;
 	}
 	

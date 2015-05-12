@@ -22,14 +22,14 @@ package world;
 	/**
 	 * A customer with very permissive time windows.
 	 */
-	public class Pack extends Parcel implements CommUser,TickListener {
+	public class Package extends Parcel implements CommUser,TickListener {
 		
 		
 		Point start;
 		Point end;
 		
 		
-		Pack(Point startPosition, Point pDestination,
+		Package(Point startPosition, Point pDestination,
 				long pLoadingDuration, long pUnloadingDuration) {
 			super(pDestination, pLoadingDuration, TimeWindow.ALWAYS,
 					pUnloadingDuration, TimeWindow.ALWAYS, 1);

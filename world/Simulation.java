@@ -72,7 +72,7 @@ public class Simulation {
 				if (time.getStartTime() > endTime) {
 		          simulator.stop();
 		        } else if (PTime.isEmpty() && time.getTime() == PTime.get(0)) {
-		          simulator.register(new Pack(PList.get(0),PLocation.get(0),SERVICE_DURATION,SERVICE_DURATION));
+		          simulator.register(new Package(PList.get(0),PLocation.get(0),SERVICE_DURATION,SERVICE_DURATION));
 		          PList.remove(0);
 		          PLocation.remove(0);
 		          PTime.remove(0);
@@ -91,7 +91,7 @@ public class Simulation {
 			            .addImageAssociation(
 			                Robot.class, "/graphics/flat/taxi-32.png")
 			            .addImageAssociation(
-			                Pack.class, "/graphics/flat/person-red-32.png")
+			                Package.class, "/graphics/flat/person-red-32.png")
 			        
 			        )
 			        .setTitleAppendix("Taxi Demo");

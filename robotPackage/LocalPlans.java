@@ -4,7 +4,7 @@ public class LocalPlans {
 	
 	Plan currentLocalPlan;
 	
-	public localPlans(){
+	public LocalPlans(){
 		currentLocalPlan = new Plan();
 	}
 
