@@ -10,6 +10,7 @@ import com.github.rinde.rinsim.core.model.comm.Message;
 
 import world.ChargingStation;
 import world.Package;
+import world.ReturnChargeContents;
 
 public class PBC {
 	
@@ -17,6 +18,7 @@ public class PBC {
 	
 	Plan currentplan;
 	Plan definitivebid;
+	CommUser defSender;
 	ArrayList<Plan> prebids;
 	WorldModel worldModel;
 
@@ -56,7 +58,11 @@ public class PBC {
 	
 	public void readMessages(){
 		
+		
+		
 		ArrayList<Message> messages = worldModel.messages();
+		
+		reserveMessages(messages);
 		
 		for(int i = 0; i<messages.size();i++){
 			Message message = messages.get(i);
@@ -74,6 +80,35 @@ public class PBC {
 		
 		callForBids(messages);
 		
+		
+		
+	}
+	
+	private void reserveMessages(ArrayList<Message> messages){
+		for(Message message:messages){
+			
+			MessageContent content = (MessageContent) message.getContents();
+			if(content.getType().equals("ChargeMessage")){
+				ReturnChargeContents chargeContent  = ((ReturnChargeContents) content);
+				if(chargeContent.isReserved() && chargeContent.hasSucceeded()){
+					for(int i =0; i<definitivebid.getPlan().size();i++){
+						Goal goal = definitivebid.getPlan().get(i);
+						String type = goal.type();
+						if(type.equals("charging") && worldModel.isReserveChargingStation() && !((ChargeGoal)goal).isReserved()){
+							((ChargeGoal)goal).setReserved(true);
+							Plan plan = definitivebid;
+							definitivebid= null;
+							doDefBid(plan, defSender );
+						}
+					}
+				}
+				if(chargeContent.isReserved() && !chargeContent.hasSucceeded()){
+					definitivebid= null;
+				}
+
+
+			}
+		}
 	}
 	
 	//The package has been def assigned to the agent so the definitive bid plan becomes the currentPlan
@@ -81,6 +116,8 @@ public class PBC {
 		if(content.assigned){
 			currentplan=definitivebid;
 			cc.negotiationAbort();
+			definitivebid = null;
+			
 			
 		}
 		else{
@@ -93,7 +130,7 @@ public class PBC {
 				
 
 			}
-			definitivebid = currentplan;
+			definitivebid = null;
 			ccOnHold = false;
 			
 		}
@@ -102,6 +139,7 @@ public class PBC {
 	
 	
 	private void preAssignment(ArrayList <Message> messages){
+		
 		ArrayList deleteMessages = new ArrayList();
 		Plan bestPlan = null;
 		double bestPlanValue=-1;
@@ -157,24 +195,33 @@ public class PBC {
 	
 	
 	private void doDefBid(Plan plan, CommUser sender){
+		if(definitivebid!= null)return;
+		definitivebid = plan;
+		defSender = sender;
 		ArrayList<Goal> goals = plan.getPlan();
+		Plan finalPlan = plan;
 		for(int i =0; i<goals.size();i++){
 			Goal goal = goals.get(i);
 			String type = goal.type();
-			if(type.equals("charging") && worldModel.isReserveChargingStation()){
-				Plan finalPlan = reserveSlotCharging(plan);
+			if(type.equals("charging") && worldModel.isReserveChargingStation() && !((ChargeGoal)goal).isReserved()){
+				bbc.sendReserveMessage(goal.startWindow, goal.endWindow);
+				return;
 			}
 		}
 		
-		double bid = plan.getBid();
+		double oldValue = currentplan.value(currentplan.getPlan());
+		double newValue = finalPlan.value(finalPlan.getPlan());
+		double bid = newValue - oldValue;
 		
 		bbc.sendDefBidMessage(sender, bid, plan.getId());
+		
+		
 		
 	}
 	
 	private Plan reserveSlotCharging(Plan plan){
 		Plan finalPlan= plan;
-		
+		//TODO
 		return finalPlan;
 	}
 	
@@ -203,7 +250,9 @@ public class PBC {
 					bidPlan = plan.isPossiblePlan(pack);
 				}
 				
-				double bid = bidPlan.getBid();
+				double oldValue = currentplan.value(currentplan.getPlan());
+				double newValue = bidPlan.value(bidPlan.getPlan());
+				double bid = newValue - oldValue;
 				bidPlan.setBidPackage(pack);
 				
 				bbc.sendPreBidMessage(message.getSender(), bid, ID);

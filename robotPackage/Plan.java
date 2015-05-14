@@ -187,7 +187,7 @@ public class Plan {
 					time=time+(long) (batterydiff/5/WorldInterface.SpendingRate)+1;
 				}
 				if(time>g.endWindow)return false;
-				if(!g.isReserved()){
+				if(!((ChargeGoal)g).isReserved()){
 					g.setEndWindow(time);
 					g.setStartWindow(timestart);					
 				}
