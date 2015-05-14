@@ -80,16 +80,18 @@ public class PBC {
 	private void defAssignment(DefAssignmentMessageContent content){
 		if(content.assigned){
 			currentplan=definitivebid;
-			cc.abort();
+			cc.negotiationAbort();
 			
 		}
 		else{
 			ArrayList <Goal> goals = definitivebid.getPlan();
 			for(int i=0; i<goals.size();i++){
+
 				if(goals.get(i).type.equals("charging")){
 					bbc.deleteChargeReservation(goals.get(i).startWindow, goals.get(i).endWindow);
 				}
 				
+
 			}
 			definitivebid = currentplan;
 			ccOnHold = false;
@@ -122,7 +124,7 @@ public class PBC {
 							deleteMessages.add(i);
 						}
 						else{
-							double planValue = plan.getPlanValue();
+							double planValue = plan.value(plan.goals);
 							if(planValue<bestPlanValue && bestPlanValue>-1){
 								bestPlanValue = planValue;
 								bestPlan = plan;
@@ -190,7 +192,7 @@ public class PBC {
 				Package pack = callForBidContent.getPackageToDel();
 				
 				
-				Plan plan  = new Plan(definitivebid.getPlan());
+				Plan plan  = new Plan(definitivebid.getPlan(), worldModel);
 				
 				Plan bidPlan = null;
 				

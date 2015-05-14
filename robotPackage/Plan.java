@@ -93,8 +93,8 @@ public class Plan {
 	public Plan isPossiblePlan(Package p){
 		ArrayList<Goal> bestPlan = null;
 		ArrayList <Goal> copyGoals = (ArrayList<Goal>) goals.clone();
-		copyGoals.add(new Goal(p.getStart(), "pickup"));
-		copyGoals.add(new Goal(p.getStart(), "drop"));
+		copyGoals.add(new Goal(p.getStart(), "pickup", p.getPickupTimeWindow()));
+		copyGoals.add(new Goal(p.getStart(), "drop", p.getDeliveryTimeWindow()));
 		Goal charged = null;
 		for(int i=0; i<copyGoals.size();i++){
 			if(copyGoals.get(i).type.equals("charging")){
@@ -179,12 +179,19 @@ public class Plan {
 			if(battery <=0) return false;
 			if(g.type().equals("charging")){
 				double batterydiff = 1-battery;
+				long timestart = time;
 				battery =1;
 				if(batterydiff/5/WorldInterface.SpendingRate==(long) (batterydiff/5/WorldInterface.SpendingRate)){
-					time=(long) (batterydiff/5/WorldInterface.SpendingRate);
+					time=time+(long) (batterydiff/5/WorldInterface.SpendingRate);
 				}else{
-					time=(long) (batterydiff/5/WorldInterface.SpendingRate)+1;
+					time=time+(long) (batterydiff/5/WorldInterface.SpendingRate)+1;
 				}
+				if(time>g.endWindow)return false;
+				if(!g.isReserved()){
+					g.setEndWindow(time);
+					g.setStartWindow(timestart);					
+				}
+				
 			}
 		}
 		double timespend = distance(newPlan.get(newPlan.size()-1).coordinates(),model.coordinates())/model.getSpeed();
@@ -208,7 +215,7 @@ public class Plan {
 	public void setBidPackage(Package bidPackage) {
 		this.bidPackage = bidPackage;
 	}
-	public Object getNextgoal() {
+	public Goal getNextgoal() {
 		// TODO Auto-generated method stub
 		return this.goals.get(0);
 	}

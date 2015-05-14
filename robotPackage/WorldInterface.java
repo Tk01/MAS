@@ -85,7 +85,7 @@ public class WorldInterface {
 		return roadModel.get().getObjectsAt(robot, world.Package.class).iterator().next();
 	}
 	public void waitMoment() {
-		model.batteryDrop(model.getTime().getTimeLeft()*SpendingRate);
+		//model.batteryDrop(model.getTime().getTimeLeft()*SpendingRate);
 		model.getTime().consume(model.getTime().getTimeLeft());
 		
 	}

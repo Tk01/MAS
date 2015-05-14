@@ -3,6 +3,7 @@ package robotPackage;
 import java.util.ArrayList;
 
 import com.github.rinde.rinsim.core.model.comm.CommDevice;
+import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.Message;
 import com.github.rinde.rinsim.geom.Point;
 
@@ -19,11 +20,10 @@ public class BBC {
 
 	ArrayList<Message> messages;
 	private WorldInterface worldInterface;
-	
-	
+
+
 
 	public BBC(WorldInterface worldInterface, WorldModel model, Robot robot) {
-		// TODO Auto-generated constructor stub
 		thisRobot = robot;
 		this.model = model;
 		this.worldInterface =worldInterface;
@@ -40,12 +40,8 @@ public class BBC {
 	}
 	public void run() {
 		if(done) pbc.done(goal);
-		else{
-			if( (model.battery() < 0.25 && goal.type().equals("charging") && !charging) ) pbc.plan("charging");
-			else{
-				if( model.messages().size() !=0) pbc.plan();
-			}
-		}
+		if( model.messages().size() !=0) pbc.readMessages();
+
 
 		checkMessages();
 
@@ -83,7 +79,7 @@ public class BBC {
 			if(model.battery() == 1) done =true;
 			return;
 		}
-		*/
+		 */
 	}
 
 
@@ -100,57 +96,34 @@ public class BBC {
 
 			}
 			if(content.getType().equals("PreAssignment")){
-				
+
 				evaluatePreAssignment(message);
-				
-			
+
+
 			}
-			
-			
+
+
 		}
 	}
+}
 
 
 
-	private void evaluatePreAssignment(Message message) {
-		PreAssignmentMessageContent packMessage = (PreAssignmentMessageContent) message.getContents();
-		boolean assigned = packMessage.getAssigned();
-		if(!assigned){
-			double betterBid = pbc.checkIfBetterBid(packMessage.getPackge(), packMessage.getBid());
-			if(betterbid > -1){
-				
-			}
-		}
-		
-		
-		
-	}
+public WorldModel getWorldModel(){
+	return model;
+}
 
-	//Send a message
-	private void sendDeliverBidMessage(Message message){
+public void setGoal(Goal nextgoal) {
+	this.goal =nextgoal;	
+}
 
-		DeliverPackageMessageContent packMessage = (DeliverPackageMessageContent) message.getContents();
-		
-		double bid = pbc.doPreBid(packMessage.getPackageToDel(), message.getSender());
-		PreBidMessageContent bidMessageContent;
-		if(bid> 0){
-			
-		
-			bidMessageContent = new PreBidMessageContent(thisRobot, bid, packMessage.getPackageToDel());
-			
-		}
-		else{
-			bidMessageContent = new PreBidMessageContent(thisRobot, -1, packMessage.getPackageToDel());
-			
+public void sendDefBidMessage(CommUser sender, double bid, Integer id) {
+	// TODO Auto-generated method stub
 
-		}
+}
 
-		commDevice.send(bidMessageContent, message.getSender());
-
-
-	}
+public void sendPreBidMessage(CommUser sender, double bid, int iD) {
+	// TODO Auto-generated method stub
 	
-	public WorldModel getWorldModel(){
-		return model;
-	}
+}
 }
