@@ -197,7 +197,7 @@ public class Plan {
 		return true;
 	}
 	public void remove(Goal g) {
-		// TODO Auto-generated method stub
+		this.goals.remove(g);
 
 	}
 
@@ -206,6 +206,10 @@ public class Plan {
 	}
 	public void setBidPackage(Package bidPackage) {
 		this.bidPackage = bidPackage;
+	}
+	public Object getNextgoal() {
+		// TODO Auto-generated method stub
+		return this.goals.get(0);
 	}
 
 
