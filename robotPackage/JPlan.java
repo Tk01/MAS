@@ -1,5 +1,8 @@
 package robotPackage;
 
-public class JPlan {
+import java.util.ArrayList;
 
+public class JPlan {
+	ArrayList<Robot> robot;
+	ArrayList<Plan> plans;
 }
