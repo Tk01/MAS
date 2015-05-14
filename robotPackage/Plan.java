@@ -11,7 +11,10 @@ public class Plan {
 
 	Integer i;
 	ArrayList <Goal> plan;
+	
+	Package bidPackage;
 
+	
 	public Plan(ArrayList <Goal> plan, Package p){
 		this.plan =plan;
 		i=maxi;
@@ -57,9 +60,7 @@ public class Plan {
 		return value;
 	}
 	
-	public ArrayList<Package> getPlan(){
-		return packages;
-	}
+
 	
 	
 	// check if the pack can be taken up in the plan by checking if in the specified timewindows it is possible to pick up the package.
@@ -116,6 +117,13 @@ public class Plan {
 	public void remove(Goal g) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public Package getBidPackage() {
+		return bidPackage;
+	}
+	public void setBidPackage(Package bidPackage) {
+		this.bidPackage = bidPackage;
 	}
 	
 	

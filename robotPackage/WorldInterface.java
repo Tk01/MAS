@@ -22,7 +22,7 @@ public class WorldInterface {
 	Point moveTo;
 	BBC bbc;
 	WorldModel model;
-	TimeLapse time;
+	
 	private Optional<RoadModel> roadModel;
 	private Optional<PDPModel> pdpModel;
 	private Robot robot;
@@ -37,16 +37,16 @@ public class WorldInterface {
 		
 	}
 	public void MoveTo(Point x){
-		MoveProgress consumed = this.roadModel.get().moveTo(robot, x, time);
-		model.batteryDrop(time.getTimeConsumed()*SpendingRate);
+		MoveProgress consumed = this.roadModel.get().moveTo(robot, x, model.getTime());
+		model.batteryDrop(model.getTime().getTimeConsumed()*SpendingRate);
 	}
 	public void run(TimeLapse time){
 		if(model.battery() > 0){
-		this.gatherInfo();
+		this.gatherInfo(time);
 		bbc.run();
 		}
 	}
-	private void gatherInfo() {
+	private void gatherInfo(TimeLapse time) {
 		model.setCoordinates(this.roadModel.get().getPosition(robot));
 		model.addMessages(translator.getUnreadMessages());
 		ArrayList<Point> list = new ArrayList<Point>();
@@ -57,32 +57,33 @@ public class WorldInterface {
 		}
 		
 		model.setRobots(list);
+		model.setTime(time);
 	}
 	public void charge() {
 		double toCharge = 1-model.battery();
 		double chargeRate = 5*this.SpendingRate;
-		double timeSpend = Math.max(toCharge/chargeRate , time.getTimeLeft());
+		double timeSpend = Math.max(toCharge/chargeRate , model.getTime().getTimeLeft());
 		model.charge(timeSpend*chargeRate);
-		time.consume((long) timeSpend);
+		model.getTime().consume((long) timeSpend);
 	}
 	public void drop() {
-		pdpModel.get().drop(robot, model.getCarriedPackage(), time);
+		pdpModel.get().drop(robot, model.getCarriedPackage(), model.getTime());
 		model.dropPackage();
-		time.consume(0);
+		model.getTime().consume(0);
 		
 	}
 	public void pickup() {
 		Package parcel = this.getPackageHere();
-		pdpModel.get().pickup(robot, parcel, time);
+		pdpModel.get().pickup(robot, parcel, model.getTime());
 		model.pickupPackage(parcel);
-		time.consume(0);
+		model.getTime().consume(0);
 	}
 	private Package getPackageHere() {
 		return roadModel.get().getObjectsAt(robot, world.Package.class).iterator().next();
 	}
 	public void waitMoment() {
-		model.batteryDrop(time.getTimeLeft()*SpendingRate);
-		time.consume(time.getTimeLeft());
+		model.batteryDrop(model.getTime().getTimeLeft()*SpendingRate);
+		model.getTime().consume(model.getTime().getTimeLeft());
 		
 	}
 

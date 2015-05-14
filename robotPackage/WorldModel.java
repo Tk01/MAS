@@ -2,6 +2,7 @@ package robotPackage;
 
 import java.util.ArrayList;
 
+import com.github.rinde.rinsim.core.TimeLapse;
 import com.github.rinde.rinsim.core.model.comm.Message;
 import com.github.rinde.rinsim.core.model.pdp.Parcel;
 import com.github.rinde.rinsim.geom.Point;
@@ -12,6 +13,8 @@ public class WorldModel {
 	Double BatteryLife;
 	int maxTask;
 	Point Location;
+	TimeLapse time;
+
 	ArrayList<Point> Robots;
 	Double battery = 1d;
 	Point ChargingStation;
@@ -83,6 +86,13 @@ public class WorldModel {
 	}
 	public void setCoordinates(Point position) {
 		this.coordinates=position;	
+	}
+	
+	public TimeLapse getTime() {
+		return time;
+	}
+	public void setTime(TimeLapse time) {
+		this.time = time;
 	}
 
 

@@ -26,6 +26,7 @@ package world;
 		
 		Long delay = 10l;
 		Long timeLastAction;
+		
 		Point start;
 		Point end;
 		
@@ -76,6 +77,23 @@ package world;
 			return end;
 			
 		}
+		
+		public Long getDelay() {
+			return delay;
+		}
+
+		public void setDelay(Long delay) {
+			this.delay = delay;
+		}
+
+		public Long getTimeLastAction() {
+			return timeLastAction;
+		}
+
+		public void setTimeLastAction(Long timeLastAction) {
+			this.timeLastAction = timeLastAction;
+		}
+
 		
 
 	}

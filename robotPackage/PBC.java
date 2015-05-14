@@ -18,9 +18,14 @@ public class PBC {
 	WorldModel worldModel;
 
 	BBC bbc;
+	
+	CC cc;
+	
+	boolean ccOnHold = false;
 
 	public PBC(){
 		worldModel = bbc.getWorldModel();
+		cc = new CC();
 		
 	}
 	
@@ -80,9 +85,12 @@ public class PBC {
 	private void defAssignment(DefAssignmentMessageContent content){
 		if(content.assigned){
 			currentplan=definitivebid;
+			cc.abort();
+			
 		}
 		else{
 			definitivebid = currentplan;
+			ccOnHold = false;
 		}
 		
 	}
@@ -94,9 +102,19 @@ public class PBC {
 			Message message = preAssignMessages.get(i);
 			PreAssignmentMessageContent content = (PreAssignmentMessageContent) message.getContents();
 			int ID = content.getContractID();
+			for(int j = 0; j<prebids.size();j++ ){
+				Plan plan = prebids.get(j);
+				if(plan.getId()==ID){
+					long timeLastAction =plan.getBidPackage().getTimeLastAction();
+					long delay  = plan.getBidPackage().getDelay();
+					if()
+				}
+			}
 		}
 	
 	}
+	
+	
 	
 	
 	
