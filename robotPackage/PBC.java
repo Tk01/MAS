@@ -77,7 +77,7 @@ public class PBC {
 			
 			}	
 		}
-		preAssignment(preAssignMessages);
+		preAssignment(messages);
 		
 	}
 	
@@ -96,20 +96,38 @@ public class PBC {
 	}
 	
 	
-	private void preAssignment(ArrayList <Message> preAssignMessages){
-		
-		for(int i= 0;i<preAssignMessages.size();i++){
-			Message message = preAssignMessages.get(i);
-			PreAssignmentMessageContent content = (PreAssignmentMessageContent) message.getContents();
-			int ID = content.getContractID();
-			for(int j = 0; j<prebids.size();j++ ){
-				Plan plan = prebids.get(j);
-				if(plan.getId()==ID){
-					long timeLastAction =plan.getBidPackage().getTimeLastAction();
-					long delay  = plan.getBidPackage().getDelay();
-					if()
+	private void preAssignment(ArrayList <Message> messages){
+		ArrayList deleteMessages = new ArrayList();
+		Plan bestPlan;
+		double bestPlanValue;
+		for(int i= 0;i<messages.size();i++){
+			Message message = messages.get(i);
+			MessageContent content = (MessageContent) message.getContents();
+			if(content.getType().equals("PreAssignment")){
+				
+				PreAssignmentMessageContent preAssignContent = (PreAssignmentMessageContent) content;
+				int ID = preAssignContent.getContractID();
+				for(int j = 0; j<prebids.size();j++ ){
+					Plan plan = prebids.get(j);
+					if(plan.getId()==ID){
+						long timeLastAction =plan.getBidPackage().getTimeLastAction();
+						long delay  = plan.getBidPackage().getDelay();
+						long lastTime = timeLastAction+delay;
+						long currentTime = worldModel.getTime().getTime();
+						if(currentTime>lastTime){
+							deleteMessages.add(i);
+						}
+						else{
+							plan.getPlanValue();
+						}
+					}
 				}
+				
 			}
+			
+		}
+		for(int i=0;i<deleteMessages.size();i++){
+			messages.remove(deleteMessages.get(i));
 		}
 	
 	}

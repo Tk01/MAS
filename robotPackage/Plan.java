@@ -10,13 +10,13 @@ public class Plan {
 	static Integer maxi=0; 
 
 	Integer i;
-	ArrayList <Goal> plan;
+	ArrayList <Goal> goals;
 	
 	Package bidPackage;
 
 	
-	public Plan(ArrayList <Goal> plan, Package p){
-		this.plan =plan;
+	public Plan(ArrayList <Goal> goals, Package p){
+		this.goals =goals;
 		i=maxi;
 		maxi++;
 	}
@@ -25,21 +25,18 @@ public class Plan {
 		
 	}
 	public ArrayList <Goal> getPlan(){
-		return plan;
+		return goals;
 	}
 	
-	public double getdistanceWithNextPackage(Package thePackage,Package nextPackage ){
+	public double distanceBetween(Goal theGoal,Goal nextGoal ){
 		
 		
+	
+		double startX = theGoal.coordinates().x;
+		double startY = theGoal.coordinates().y;
 		
-		Point start = thePackage.getStart();
-		Point end = nextPackage.getEnd();
-		
-		double startX = start.x;
-		double startY = start.y;
-		
-		double endX = end.x;
-		double endY = end.y;
+		double endX = nextGoal.coordinates().x;
+		double endY = nextGoal.coordinates().y;
 				
 		
 		double xd = endX-startX;
@@ -54,8 +51,15 @@ public class Plan {
 	//Return the utility of the plan. Is used to compare tasks that are added to the current plan. The lower the better
 	public double getPlanValue(){
 		double value=0;
-		for(int i=0; i<packages.size()-1;i++){
-			getdistanceWithNextPackage(packages.get(i), packages.get(i+1));
+		double totalDistance = 0;
+		double lostTime=0;
+		
+		for(int i=0; i<goals.size()-1;i++){
+			totaldistance  = distanceBetween(goals.get(i),goals.get(i+1);
+			
+			if(goals.get(i))
+			
+			
 		}
 		return value;
 	}
