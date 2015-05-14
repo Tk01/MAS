@@ -12,7 +12,7 @@ public class CC {
 	public void handleMessage(){
 		
 	}
-	public void negationAbort(){
+	public void negotiationAbort(){
 		
 	}
 }
