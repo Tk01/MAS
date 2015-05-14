@@ -2,13 +2,15 @@ package world;
 
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 
 
 
-import robotPackage.*;
 
+
+import robotPackage.*;
 
 import javax.annotation.Nullable;
 
@@ -31,18 +33,19 @@ public class Simulation {
  
 	
 
-	public static void main(@Nullable String[] args) {
+	public static void main(@Nullable String[] args) throws IOException {
 		// TODO sceneraio loader
-		final Point MIN_POINT = null;
-		final Point MAX_POINT = null;
-		final double VEHICLE_SPEED_KMH = 0d;
-		final ArrayList<Point> RList = null;
-		final ArrayList<Point> CList = null;
-		final ArrayList<Point> PList = null;
-		final ArrayList<Point> PLocation = null;
-		final ArrayList<Double> PTime = null;
-		final long SERVICE_DURATION =0;
-		final long endTime = 0;
+		SimulationGenerator gen = new SimulationGenerator("sim1.txt",4,0.1);
+		final Point MIN_POINT = gen.getMIN_POINT();
+		final Point MAX_POINT = gen.getMAX_POINT();
+		final double VEHICLE_SPEED_KMH = gen.getVEHICLE_SPEED_KMH();
+		final ArrayList<Point> RList = gen.getRList();
+		Point Cloc = gen.getChargeStation();
+		final ArrayList<Point> PList = gen.getPList();
+		final ArrayList<Point> PLocation = gen.getPLocation();
+		final ArrayList<Long> PTime = gen.getPTime();
+		final long SERVICE_DURATION =gen.getSERVICE_DURATION();
+		final long endTime = gen.getEndTime();
 		
 		final RoadModel roadModel =  PlaneRoadModel.builder()
 	            .setMinPoint(MIN_POINT)
@@ -59,11 +62,11 @@ public class Simulation {
 	        .build();
 	  
 	    for (Point p:RList) {
-		      simulator.register(new Robot(p,1));
+		      simulator.register(new Robot(p));
 		    }
-	    for (Point p:CList) {
-		      simulator.register(new ChargingStation(p));
-		    }
+	   
+		simulator.register(new ChargingStation(Cloc));
+		    
 
 		simulator.addTickListener(new TickListener() {
 		      @Override

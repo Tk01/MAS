@@ -10,8 +10,8 @@ import com.github.rinde.rinsim.geom.Point;
 import com.google.common.base.Optional;
 
 public class Robot extends Vehicle implements CommUser{
-	
-	public Robot(Point p, int i){
+	WorldInterface inter;
+	public Robot(){
 		
 	}
 	@Override

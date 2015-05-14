@@ -55,7 +55,7 @@ public class SimulationGenerator {
 				PTime.add( i);
 			}
 		}
-		PrintWriter writer = new PrintWriter(filename+".txt", "UTF-8");
+		PrintWriter writer = new PrintWriter(filename, "UTF-8");
 		String line="";
 		for(Point p:RList){
 			line+=p.x+","+p.y+";";
