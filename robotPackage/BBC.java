@@ -41,7 +41,7 @@ public class BBC {
 	public void run() {
 		if(done) pbc.done(goal);
 		else{
-			if( (model.battery() < 0.25 && goal.type().equals("charging") && !charging) ) pbc.plan(new Charging());
+			if( (model.battery() < 0.25 && goal.type().equals("charging") && !charging) ) pbc.plan("charging");
 			else{
 				if( model.messages().size() !=0) pbc.plan();
 			}
