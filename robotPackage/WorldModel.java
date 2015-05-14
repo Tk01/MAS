@@ -1,7 +1,7 @@
 package robotPackage;
 
 import java.util.ArrayList;
-
+import world.ChargingStation;
 import com.github.rinde.rinsim.core.TimeLapse;
 import com.github.rinde.rinsim.core.model.comm.Message;
 import com.github.rinde.rinsim.core.model.pdp.Parcel;
@@ -10,21 +10,24 @@ import com.google.common.collect.ImmutableList;
 
 public class WorldModel {
 
-	Double BatteryLife;
-	int maxTask;
-	Point Location;
-	TimeLapse time;
 
-	ArrayList<Point> Robots;
+	int maxTask=3;
+	TimeLapse time =null;
+
+	ArrayList<Point> Robots = new ArrayList<Point>();
 	Double battery = 1d;
-	Point ChargingStation;
-	world.Package Carried;
-	private ArrayList<Message> messages;
+	ChargingStation ChargingStation;
+	world.Package Carried=null;
+	private ArrayList<Message> messages= new ArrayList<Message>();
 	private Point coordinates;
-	private Parcel carriedPackage;
-
+	private double speed;
 	ArrayList<Point> ChargingStations;
 
+	public WorldModel(Point p,ChargingStation c, double s ) {
+		coordinates =p;
+		ChargingStation=c;
+		speed =s;
+	}
 	public ArrayList<Point> getRobots() {
 
 		return Robots;
@@ -33,7 +36,7 @@ public class WorldModel {
 		Robots = robots;
 	}
 
-	
+
 
 
 	public void batteryDrop(double d) {
@@ -69,30 +72,34 @@ public class WorldModel {
 	}
 	public Parcel getCarriedPackage() {
 		// TODO Auto-generated method stub
-		return carriedPackage;
+		return Carried;
 	}
 	public void pickupPackage(world.Package parcel) {
 		this.Carried =parcel;		
 	}
 	public void dropPackage() {
 		this.Carried = null;
-		
+
 	}
 	public void addMessages(ImmutableList<Message> unreadMessages) {
 		for(Message m:unreadMessages){
 			this.messages.add(m);
 		}
-		
+
 	}
 	public void setCoordinates(Point position) {
 		this.coordinates=position;	
 	}
-	
+
 	public TimeLapse getTime() {
 		return time;
 	}
 	public void setTime(TimeLapse time) {
 		this.time = time;
+	}
+	public double getSpeed() {
+		// TODO Auto-generated method stub
+		return speed;
 	}
 
 

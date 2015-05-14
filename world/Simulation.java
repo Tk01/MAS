@@ -61,12 +61,14 @@ public class Simulation {
 	            .build())
 	        .build();
 	  
-	    for (Point p:RList) {
-		      simulator.register(new Robot(p));
-		    }
+	    
 	   
-		simulator.register(new ChargingStation(Cloc));
-		    
+		ChargingStation chargingStation = new ChargingStation(Cloc);
+		simulator.register(chargingStation);
+		  
+		for (Point p:RList) {
+		      simulator.register(new Robot(p, chargingStation, VEHICLE_SPEED_KMH));
+		}
 
 		simulator.addTickListener(new TickListener() {
 		      @Override

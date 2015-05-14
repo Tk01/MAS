@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import com.github.rinde.rinsim.core.TimeLapse;
 import com.github.rinde.rinsim.core.model.comm.CommDevice;
+import com.github.rinde.rinsim.core.model.comm.CommDeviceBuilder;
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.Message;
 import com.github.rinde.rinsim.core.model.pdp.PDPModel;
@@ -15,10 +16,12 @@ import com.github.rinde.rinsim.core.model.road.MoveProgress;
 import com.github.rinde.rinsim.core.model.road.RoadModel;
 import com.github.rinde.rinsim.geom.Point;
 import com.google.common.base.Optional;
+
+import world.ChargingStation;
 import world.Package;
 public class WorldInterface {
 	private final double SpendingRate = 0.01;
-	CommDevice translator;
+	Optional<CommDevice> translator;
 	Point moveTo;
 	BBC bbc;
 	WorldModel model;
@@ -26,11 +29,11 @@ public class WorldInterface {
 	private Optional<RoadModel> roadModel;
 	private Optional<PDPModel> pdpModel;
 	private Robot robot;
-	public WorldInterface(CommDevice communication,Robot robot){
+	public WorldInterface(Robot robot, Point p, ChargingStation c, double s){
+		model = new WorldModel(p,c,s);
 		bbc = new BBC(this,model,robot);
 		this.robot = robot;
-		roadModel = Optional.absent();
-		pdpModel = Optional.absent();
+
 
 	}
 	public void sendMessage( Message message) {
@@ -48,7 +51,7 @@ public class WorldInterface {
 	}
 	private void gatherInfo(TimeLapse time) {
 		model.setCoordinates(this.roadModel.get().getPosition(robot));
-		model.addMessages(translator.getUnreadMessages());
+		model.addMessages(translator.get().getUnreadMessages());
 		ArrayList<Point> list = new ArrayList<Point>();
 		for(Robot r:roadModel.get().getObjectsAt(this.robot, Robot.class)){
 			if(!r.equals(this.robot)){
@@ -85,6 +88,22 @@ public class WorldInterface {
 		model.batteryDrop(model.getTime().getTimeLeft()*SpendingRate);
 		model.getTime().consume(model.getTime().getTimeLeft());
 		
+	}
+	public void initRoadPDP(RoadModel arg0, PDPModel arg1) {
+		roadModel = Optional.of(arg0);
+		pdpModel = Optional.of(arg1);
+		
+	}
+	public void setCommDevice(CommDeviceBuilder builder) {
+		builder.setMaxRange(10);
+
+		translator = Optional.of(builder
+				.setReliability(1)
+				.build());	
+	}
+	public WorldModel getModel() {
+		// TODO Auto-generated method stub
+		return model;
 	}
 
 

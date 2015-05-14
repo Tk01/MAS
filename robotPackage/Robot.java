@@ -1,5 +1,7 @@
 package robotPackage;
 
+import world.ChargingStation;
+
 import com.github.rinde.rinsim.core.TimeLapse;
 import com.github.rinde.rinsim.core.model.comm.CommDeviceBuilder;
 import com.github.rinde.rinsim.core.model.comm.CommUser;
@@ -11,35 +13,37 @@ import com.google.common.base.Optional;
 
 public class Robot extends Vehicle implements CommUser{
 	WorldInterface inter;
-	public Robot(){
-		
+	WorldModel model;
+	public Robot(Point location, ChargingStation chargingStation, double speed){
+		inter = new WorldInterface(this, location, chargingStation, speed);
+		model = inter.getModel();
 	}
 	@Override
 	public double getSpeed() {
 		// TODO Auto-generated method stub
-		return 0;
+		return this.model.getSpeed();
 	}
 
 	@Override
 	protected void tickImpl(TimeLapse arg0) {
-		// TODO Auto-generated method stub
+		this.inter.run(arg0);
 		
 	}
 
 	@Override
 	public void initRoadPDP(RoadModel arg0, PDPModel arg1) {
-		// TODO Auto-generated method stub
+		this.inter.initRoadPDP( arg0,  arg1);
 		
 	}
 	@Override
 	public Optional<Point> getPosition() {
-		// TODO Auto-generated method stub
-		return null;
+		return Optional.of(this.model.coordinates());
+
 	}
 	@Override
 	public void setCommDevice(CommDeviceBuilder builder) {
 		// TODO Auto-generated method stub
-		
+		this.inter.setCommDevice(builder);
 	}
 
 }
