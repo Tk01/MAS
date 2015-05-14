@@ -11,7 +11,9 @@ public class PBC {
 	
 
 	PBCKB knowledgeBase;
-	
+	Plan currentplan;
+	Plan definitivebid;
+	ArrayList<Plan> prebids;
 
 	BBC bbc;
 

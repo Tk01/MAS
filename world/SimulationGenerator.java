@@ -1,6 +1,9 @@
 package world;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -18,9 +21,27 @@ public class SimulationGenerator {
 	final ArrayList<Long> PTime = new ArrayList<Long>();
 	final long SERVICE_DURATION =0;
 	final long endTime = 10;
-	public static SimulationGenerator decode(String filename){
-		
-		return null;		
+	public  SimulationGenerator(String filename) throws IOException{
+		BufferedReader in = new BufferedReader(new FileReader(filename));
+		String[] robots = in.readLine().split(";");
+		for(String r:robots){
+			String[] split = r.split(",");
+			RList.add(new Point(Integer.parseInt(split[0]),Integer.parseInt(split[1])));
+		}
+		String[] Packages = in.readLine().split(";");
+		for(String r:Packages){
+			String[] split = r.split(",");
+			PList.add(new Point(Integer.parseInt(split[0]),Integer.parseInt(split[1])));
+		}
+		String[] Destinations = in.readLine().split(";");
+		for(String r:Destinations){
+			String[] split = r.split(",");
+			PLocation.add(new Point(Integer.parseInt(split[0]),Integer.parseInt(split[1])));
+		}
+		String[] times = in.readLine().split(";");
+		for(String r:times){
+			PTime.add(Long.parseLong(r));
+		}
 	}
 	public  SimulationGenerator(String filename, int nbRobots, double spawnchance) throws FileNotFoundException, UnsupportedEncodingException{
 		for(int i=0;i<nbRobots;i++){

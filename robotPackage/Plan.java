@@ -7,11 +7,13 @@ import world.Package;
 import com.github.rinde.rinsim.geom.Point;
 
 public class Plan {
-	
+	static Integer maxi=0; 
 	ArrayList <Package> packages;
-	
+	Integer i;
 	public Plan(){
 		packages = new ArrayList();
+		i=maxi;
+		maxi++;
 	}
 	
 	public void addPackage (Package pack, int order){
