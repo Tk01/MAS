@@ -18,13 +18,14 @@ package world;
 	import com.github.rinde.rinsim.util.TimeWindow;
 	import com.google.common.base.Optional;
 	import com.google.common.collect.ImmutableList;
-
+	
 	/**
 	 * A customer with very permissive time windows.
 	 */
 	public class Package extends Parcel implements CommUser,TickListener {
 		
-		
+		Long delay = 10l;
+		Long timeLastAction;
 		Point start;
 		Point end;
 		

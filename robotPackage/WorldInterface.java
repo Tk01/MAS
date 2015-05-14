@@ -17,7 +17,7 @@ import com.github.rinde.rinsim.geom.Point;
 import com.google.common.base.Optional;
 import world.Package;
 public class WorldInterface {
-	private final double SpendingRate = 0.05;
+	private final double SpendingRate = 0.01;
 	CommDevice translator;
 	Point moveTo;
 	BBC bbc;
@@ -60,7 +60,7 @@ public class WorldInterface {
 	}
 	public void charge() {
 		double toCharge = 1-model.battery();
-		double chargeRate = 0.05;
+		double chargeRate = 5*this.SpendingRate;
 		double timeSpend = Math.max(toCharge/chargeRate , time.getTimeLeft());
 		model.charge(timeSpend*chargeRate);
 		time.consume((long) timeSpend);

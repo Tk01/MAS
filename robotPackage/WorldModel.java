@@ -8,16 +8,7 @@ import com.github.rinde.rinsim.geom.Point;
 import com.google.common.collect.ImmutableList;
 
 public class WorldModel {
-<<<<<<< HEAD
-	  Double BatteryLife;
-	  int maxTask;
-	  Point Location;
-	  ArrayList<Point> Robots;
-	  
-	  int contractID = 0;
-	  
-	  public ArrayList<Point> getRobots() {
-=======
+
 	Double BatteryLife;
 	int maxTask;
 	Point Location;
@@ -28,11 +19,10 @@ public class WorldModel {
 	private ArrayList<Message> messages;
 	private Point coordinates;
 	private Parcel carriedPackage;
-	public ArrayList<Point> 
+
 	ArrayList<Point> ChargingStations;
-	Package Carried;
-	
-	getRobots() {
+
+	public ArrayList<Point> getRobots() {
 
 		return Robots;
 	}
@@ -41,11 +31,7 @@ public class WorldModel {
 	}
 
 	
-	  
-	  public int getContractID(){
-		  contractID = contractID+1;
-		  return contractID;
-	  }
+
 
 	public void batteryDrop(double d) {
 		battery=Math.max(battery-d, 0);
@@ -99,5 +85,5 @@ public class WorldModel {
 		this.coordinates=position;	
 	}
 
->>>>>>> origin/master
+
 }

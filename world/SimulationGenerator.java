@@ -13,7 +13,7 @@ import com.github.rinde.rinsim.geom.Point;
 public class SimulationGenerator {
 	final Point MIN_POINT = new Point(0,0);
 	final Point MAX_POINT = new Point(10,10);
-	final double VEHICLE_SPEED_KMH = 50d;
+	final double VEHICLE_SPEED_KMH = 1d;
 	final ArrayList<Point> RList = new ArrayList<Point>();
 	final Point ChargeStation = new Point(5,5);
 	final ArrayList<Point> PList = new ArrayList<Point>();
@@ -42,6 +42,7 @@ public class SimulationGenerator {
 		for(String r:times){
 			PTime.add(Long.parseLong(r));
 		}
+		in.close();
 	}
 	public  SimulationGenerator(String filename, int nbRobots, double spawnchance) throws FileNotFoundException, UnsupportedEncodingException{
 		for(int i=0;i<nbRobots;i++){

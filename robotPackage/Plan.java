@@ -8,17 +8,21 @@ import com.github.rinde.rinsim.geom.Point;
 
 public class Plan {
 	static Integer maxi=0; 
-	ArrayList <Package> packages;
+
 	Integer i;
-	public Plan(){
-		packages = new ArrayList();
+	ArrayList <Goal> plan;
+
+	public Plan(ArrayList <Goal> plan, Package p){
+		this.plan =plan;
 		i=maxi;
 		maxi++;
 	}
-	
-	public void addPackage (Package pack, int order){
-		packages.add(order, pack);
+	public Integer getId(){
+		return i;
 		
+	}
+	public ArrayList <Goal> getPlan(){
+		return plan;
 	}
 	
 	public double getdistanceWithNextPackage(Package thePackage,Package nextPackage ){
