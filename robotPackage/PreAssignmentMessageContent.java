@@ -1,6 +1,6 @@
 package robotPackage;
 
-import world.Pack;
+import world.Package;
 
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 
@@ -10,11 +10,11 @@ CommUser sender;
 	
 	double bid;
 	
-	Pack packageToDel;
+	Package packageToDel;
 	
 	boolean assigned;
 	
-	public PreAssignmentMessageContent(CommUser sender, double bid, boolean assigned, Pack packageToDeliver,int contractID){
+	public PreAssignmentMessageContent(CommUser sender, double bid, boolean assigned, Package packageToDeliver,int contractID){
 		this.sender = sender;
 		this.bid = bid;
 		this.packageToDel = packageToDeliver;
@@ -33,7 +33,7 @@ CommUser sender;
 		return bid;
 	}
 	
-	public Pack getPackge(){
+	public Package getPackge(){
 		return packageToDel;
 	}
 	

@@ -19,6 +19,8 @@ public class BBC {
 
 	ArrayList<Message> messages;
 	private WorldInterface worldInterface;
+	
+	
 
 	public BBC(WorldInterface worldInterface, WorldModel model, Robot robot) {
 		// TODO Auto-generated constructor stub
@@ -146,5 +148,9 @@ public class BBC {
 		commDevice.send(bidMessageContent, message.getSender());
 
 
+	}
+	
+	public WorldModel getWorldModel(){
+		return model;
 	}
 }
