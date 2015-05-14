@@ -121,5 +121,6 @@ public class ChargingStation implements CommUser,TickListener{
 				.build());
 		
 	}
+
 	
 }

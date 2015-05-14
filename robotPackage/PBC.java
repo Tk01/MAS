@@ -8,6 +8,7 @@ import org.jscience.geography.coordinates.Coordinates;
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.Message;
 
+import world.ChargingStation;
 import world.Package;
 
 public class PBC {
@@ -85,7 +86,9 @@ public class PBC {
 		else{
 			ArrayList <Goal> goals = definitivebid.getPlan();
 			for(int i=0; i<goals.size();i++){
-				if(goals.get(i).type.equals("charging");
+				if(goals.get(i).type.equals("charging")){
+					bbc.deleteChargeReservation(goals.get(i).startWindow, goals.get(i).endWindow);
+				}
 				
 			}
 			definitivebid = currentplan;

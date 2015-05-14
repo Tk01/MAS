@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import world.Package;
 
 import com.github.rinde.rinsim.geom.Point;
+import com.github.rinde.rinsim.util.TimeWindow;
 
 public class Plan {
 	static Integer maxi=0; 
@@ -126,7 +127,7 @@ public class Plan {
 					}
 					for(int l=0;l<newPlan.size()+1;l++){
 						if(charged==null){
-							newPlan.add(l, new ChargeGoal(model.ChargingStation.getPosition().get(), "charging", false));
+							newPlan.add(l, new ChargeGoal(model.ChargingStation.getPosition().get(), "charging",new TimeWindow(0, Long.MAX_VALUE) ,false));
 						}else{
 							newPlan.add(l, charged);
 						}
