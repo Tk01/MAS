@@ -39,6 +39,14 @@ package world;
 			end = pDestination;
 		}
 
+		public void setStart(Point start) {
+			this.start = start;
+		}
+
+		public void setEnd(Point end) {
+			this.end = end;
+		}
+
 		@Override
 		public void afterTick(TimeLapse arg0) {
 			// TODO Auto-generated method stub

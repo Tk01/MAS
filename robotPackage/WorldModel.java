@@ -22,7 +22,11 @@ public class WorldModel {
 	private Point coordinates;
 	private double speed;
 	ArrayList<Point> ChargingStations;
+	
+	
+	private boolean reserveChargingStation = false;
 
+	
 	public WorldModel(Point p,ChargingStation c, double s ) {
 		coordinates =p;
 		ChargingStation=c;
@@ -100,6 +104,13 @@ public class WorldModel {
 	public double getSpeed() {
 		// TODO Auto-generated method stub
 		return speed;
+	}
+	
+	public boolean isReserveChargingStation() {
+		return reserveChargingStation;
+	}
+	public void setReserveChargingStation(boolean reserveChargingStation) {
+		this.reserveChargingStation = reserveChargingStation;
 	}
 
 

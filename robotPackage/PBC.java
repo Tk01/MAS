@@ -3,6 +3,8 @@ package robotPackage;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jscience.geography.coordinates.Coordinates;
+
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.Message;
 
@@ -66,18 +68,10 @@ public class PBC {
 			}
 		}
 		
-		ArrayList <Message> preAssignMessages = new ArrayList();
-		for(int i = 0; i<messages.size();i++){
-			Message message = messages.get(i);
-			MessageContent content = (MessageContent) message.getContents();
-			if(content.getType().equals("PreAssignment")){
-				
-				preAssignMessages.add(message);
-				
-			
-			}	
-		}
+		
 		preAssignment(messages);
+		
+		callForBids(messages);
 		
 	}
 	
@@ -89,8 +83,14 @@ public class PBC {
 			
 		}
 		else{
+			ArrayList <Goal> goals = definitivebid.getPlan();
+			for(int i=0; i<goals.size();i++){
+				if(goals.get(i).type.equals("charging");
+				
+			}
 			definitivebid = currentplan;
 			ccOnHold = false;
+			
 		}
 		
 	}
@@ -98,8 +98,9 @@ public class PBC {
 	
 	private void preAssignment(ArrayList <Message> messages){
 		ArrayList deleteMessages = new ArrayList();
-		Plan bestPlan;
-		double bestPlanValue;
+		Plan bestPlan = null;
+		double bestPlanValue=-1;
+		CommUser sender=null;
 		for(int i= 0;i<messages.size();i++){
 			Message message = messages.get(i);
 			MessageContent content = (MessageContent) message.getContents();
@@ -118,7 +119,20 @@ public class PBC {
 							deleteMessages.add(i);
 						}
 						else{
-							plan.getPlanValue();
+							double planValue = plan.getPlanValue();
+							if(planValue<bestPlanValue && bestPlanValue>-1){
+								bestPlanValue = planValue;
+								bestPlan = plan;
+								sender = message.getSender();
+								deleteMessages.add(i);
+								
+							}
+							else if(bestPlanValue==-1){
+								bestPlanValue = planValue;
+								bestPlan = plan;
+								deleteMessages.add(i);
+							}
+							
 						}
 					}
 				}
@@ -129,122 +143,100 @@ public class PBC {
 		for(int i=0;i<deleteMessages.size();i++){
 			messages.remove(deleteMessages.get(i));
 		}
-	
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	//A bid will be done when the pack can be fit in the plan and no other task is being bid on which has a better value.
-	// when no bid is done, the bid will be -1
-	public double doPreBid(Pack pack, CommUser sender){
-
 		
-		
-		double bid = -1;
-		ArrayList<Plan> plans = generatePlans(pack);
-		Plan bestPlan=getBestPlan(plans);
-		double currentBestValue = knowledgeBase.getProvisionalPlan().getPlanValue();
-		double bestPlanValue = bestPlan.getPlanValue();
-		if(bestPlan != null&&bestPlanValue > currentBestValue){
-			bid = bestPlan.getPlanValue();
+		if(bestPlan != null){
+			doDefBid(bestPlan, sender);
 		}
-		  
-		return bid;
-		
+	
 	}
 	
-	//Makes a list of plans with the new pack that can be possible to achieve
-	private ArrayList<Plan> generatePlans(Package pack){
-		ArrayList<Plan> generatedPlans = new ArrayList<Plan>();
-		Plan plan = knowledgeBase.getCurrentPlan();
-		for(int i=0; i<plan.getPlan().size();i++){
-			Plan tempPlan = plan;
-			tempPlan.addPackage(pack, i);
-			
-			if(tempPlan.isPossiblePlan(i)){
-				generatedPlans.add(tempPlan);
+	
+	private void doDefBid(Plan plan, CommUser sender){
+		ArrayList<Goal> goals = plan.getPlan();
+		for(int i =0; i<goals.size();i++){
+			Goal goal = goals.get(i);
+			String type = goal.type();
+			if(type.equals("charging") && worldModel.isReserveChargingStation()){
+				Plan finalPlan = reserveSlotCharging(plan);
 			}
 		}
-		return generatedPlans;
 		
+		double bid = plan.getBid();
+		
+		bbc.sendDefBidMessage(sender, bid, plan.getId());
+		
+	}
+	
+	private Plan reserveSlotCharging(Plan plan){
+		Plan finalPlan= plan;
+		
+		return finalPlan;
 	}
 	
 	
 	
-	private Plan getBestPlan(ArrayList<Plan> plans){
-		Plan bestPlan = null;
-		double bestValue = -1;
-		for(int i=0; i<plans.size();i++){
-			double value = plans.get(i).getPlanValue();
-			if(value == -1){
-				bestValue = value;
-				bestPlan = plans.get(i);
+	private void callForBids(ArrayList<Message> messages){
+		
+		for(int i= 0;i<messages.size();i++){
+			Message message = messages.get(i);
+			MessageContent content = (MessageContent) message.getContents();
+			if(content.getType().equals("DeliverMessage")){
+				
+				DeliverPackageMessageContent callForBidContent = (DeliverPackageMessageContent) content;
+				int ID = callForBidContent.getContractID();
+				Package pack = callForBidContent.getPackageToDel();
+				
+				
+				Plan plan  = new Plan(definitivebid.getPlan());
+				
+				Plan bidPlan = null;
+				
+				if(worldModel.isReserveChargingStation()){
+					bidPlan = plan.isPossiblePlan(pack);
+				}
+				else{
+					bidPlan = plan.isPossiblePlan(pack);
+				}
+				
+				double bid = bidPlan.getBid();
+				bidPlan.setBidPackage(pack);
+				
+				bbc.sendPreBidMessage(message.getSender(), bid, ID);
+				
 			}
-			if(value<bestValue){
-				bestValue = value;
-				bestPlan = plans.get(i);
-			}
-		}
-		return bestPlan;
-	}
-	public void plan() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void plan(Charging charging) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	public double checkIfBetterBid(Pack pack, double currentBestBid){
-		double bid = -1;
-		
-		ArrayList<Plan> plans = generatePlans(pack);
-		Plan bestPlan=getBestPlan(plans);
-		double currentBestValue = knowledgeBase.getProvisionalPlan().getPlanValue();
-		double bestPlanValue = bestPlan.getPlanValue();
-		if(bestPlan != null&&bestPlanValue > currentBestValue){
-			bid = bestPlan.getPlanValue();
-		}
-		
-		if(bid == -1){
 			
 		}
 		
-		/* Add check here for negotation during the DynCNET as here the communication with the CC should start*/
-		
-		if(bid>-1 && currentBestBid < bid ){
-			bid = -1;
-			
-		}
-		
-		return bid;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 }
