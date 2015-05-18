@@ -273,6 +273,11 @@ public class PBC {
 		bbc.sendStartNegotiationMessage( plan);
 		
 	}
+
+	public void sendConfirmationMessage(JPlan bestJPlan) {
+		bbc.sendConfirmationMessage(bestJPlan);
+		
+	}
 	
 	
 	

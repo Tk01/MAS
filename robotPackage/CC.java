@@ -10,15 +10,15 @@ public class CC {
 	
 	private PBC pbc;
 	
-	private JPlan jplan;
+	private ArrayList<JPlan> jplans = new ArrayList<JPlan>();
 	
-	private CommUser jPlanUser;
+	
 	
 	
 	
 	public CC(){
-		jplan = null;
-		jPlanUser = null;
+		
+		
 		
 	}
 	public void startNegotiation(Plan plan){
@@ -33,17 +33,21 @@ public class CC {
 		String type = messageContent.getType();
 		
 		
-		if(type.equals("startNegotiation") && jplan == null){
+		if(type.equals("startNegotiation") && jplans.isEmpty()){
 			Plan negPlan = ((StartNegotiationMessageContent) messageContent).getPlan();
 			JPlan jointPlan = getBestJointPlan(negPlan);
-			if(jointPlan != null){
-				jplan = jointPlan;
-				pbc.sendNegotiationBidMessage(jointPlan, message.getSender());
-			}
+			jplans.add(jointPlan);
+			pbc.sendNegotiationBidMessage(jointPlan, message.getSender());
+			
 		}
 		if(type.equals("negotiationBid")){
-			if(((NegotiationBidMessageContent)messageContent).isAccepted()){
-				pbc.currentplan = this.jplan.getOwnPlan();
+			jplans.add(((NegotiationBidMessageContent)messageContent).getJointPlan());
+			
+			
+		}
+		if(type.equals("negotiationReply")){
+			if(((NegotiationReplyMessageContent)messageContent).isAccepted()){
+				pbc.currentplan = jplans.get(0).getOwnPlan();
 			}
 			
 		}
@@ -80,6 +84,21 @@ public class CC {
 	public void negotiationAbort(){
 		
 	}
+	
+	public void evaluateJPlans(){
+		JPlan bestJPlan = jplans.get(0);
+		double bestPlanValue = jplans.get(0).getOtherPlan().value(jplans.get(0).getOtherPlan().goals);
+		for(int i=1; i<jplans.size();i++){
+			double planValue = jplans.get(i).getOtherPlan().value(jplans.get(i).getOtherPlan().goals);
+			if(bestPlanValue> planValue){
+				bestJPlan = jplans.get(i);
+				bestPlanValue = planValue;
+			}
+		}
+		
+		pbc.sendConfirmationMessage(bestJPlan);
+	}
+	
 	
 	
 }

@@ -156,4 +156,9 @@ public void sendStartNegotiationMessage(Plan plan) {
 	this.worldInterface.sendMessage(new StartNegotiationMessageContent(null,plan));
 	
 }
+
+public void sendConfirmationMessage(JPlan bestJPlan) {
+	// TODO Auto-generated method stub
+	
+}
 }
