@@ -66,7 +66,7 @@ public class WorldModel {
 	public boolean chargeTaken() {
 		// TODO Auto-generated method stub
 		for(Point r:Robots){
-			if(this.coordinates.equals(ChargingStation))return true;
+			if(r.equals(ChargingStation))return true;
 		}
 		return false;
 	}

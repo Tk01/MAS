@@ -94,11 +94,11 @@ public class ChargingStation implements CommUser,TickListener{
 		this.schedule.add(new Long[]{start,end});
 	}
 	private void reserveM(long start, long end, boolean b, CommUser sender) {
-		this.device.get().send(new ReturnChargeContents(start,end,b,true), sender);
+		this.device.get().send(new ReturnChargeContents(sender,start,end,b,true), sender);
 		
 	}
 	private void checkM(long start, long end, boolean b, CommUser sender) {
-		this.device.get().send(new ReturnChargeContents(start,end,b,false), sender);
+		this.device.get().send(new ReturnChargeContents(sender,start,end,b,false), sender);
 		
 	}
 

@@ -1,10 +1,13 @@
 package robotPackage;
 
+import com.github.rinde.rinsim.core.model.comm.CommUser;
+
 public class StartNegotiationMessageContent extends MessageContent{
 	
 	Plan plan;
 	
-	public StartNegotiationMessageContent(Plan plan){
+	public StartNegotiationMessageContent(CommUser receiver, Plan plan){
+		super(receiver,"StartNegotiationMessage");
 		this.plan = plan;
 		
 	}

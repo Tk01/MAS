@@ -1,5 +1,7 @@
 package robotPackage;
 
+import com.github.rinde.rinsim.core.model.comm.CommUser;
+
 
 public class ChargeMessageContent extends MessageContent {
 	private long start;
@@ -8,12 +10,11 @@ public class ChargeMessageContent extends MessageContent {
 	private long end;
 	private String mesType;
 
-	public ChargeMessageContent(long start, long end, String mesType){
-		super();
+	public ChargeMessageContent(CommUser receiver,long start, long end, String mesType){
+		super(receiver,"ChargeMessage");
 		this.start = start;
 		this.end = end;
 		this.mesType = mesType;
-		this.setType("ChargeMessage");
 	}
 	public long getStart() {
 		return start;

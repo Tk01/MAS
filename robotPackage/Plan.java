@@ -53,10 +53,6 @@ public class Plan {
 	//Return the utility of the plan. Is used to compare tasks that are added to the current plan. The lower the better
 	public double value(ArrayList<Goal> newPlan){
 		long startTime = model.getTime().getTime();
-		int h;
-		if(goals.get(0).type().equals("drop") ){
-			h=1;
-		}
 		long time = model.getTime().getTime();
 		double battery = model.battery();
 		for(Goal g:newPlan){
@@ -92,6 +88,7 @@ public class Plan {
 	// check if the pack can be taken up in the plan by checking if in the specified timewindows it is possible to pick up the package.
 	public Plan isPossiblePlan(Package p){
 		ArrayList<Goal> bestPlan = null;
+		@SuppressWarnings("unchecked")
 		ArrayList <Goal> copyGoals = (ArrayList<Goal>) goals.clone();
 		copyGoals.add(new Goal(p.getStart(), "pickup", p.getPickupTimeWindow()));
 		copyGoals.add(new Goal(p.getStart(), "drop", p.getDeliveryTimeWindow()));
@@ -156,10 +153,7 @@ public class Plan {
 
 
 	private boolean valid(ArrayList<Goal> newPlan) {
-		int h;
-		if(goals.get(0).type().equals("drop") ){
-			h=1;
-		}
+		
 		long time = model.getTime().getTime();
 		double battery = model.battery();
 		for(Goal g:newPlan){
@@ -200,7 +194,7 @@ public class Plan {
 		else{
 			timespend2 = (long) timespend+1;
 		}
-		battery-= timespend*WorldInterface.SpendingRate;
+		battery-= timespend2*WorldInterface.SpendingRate;
 		if(battery <=0) return false;
 		return true;
 	}
@@ -216,7 +210,6 @@ public class Plan {
 		this.bidPackage = bidPackage;
 	}
 	public Goal getNextgoal() {
-		// TODO Auto-generated method stub
 		return this.goals.get(0);
 	}
 

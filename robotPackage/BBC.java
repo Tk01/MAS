@@ -16,7 +16,7 @@ public class BBC {
 
 	Robot thisRobot;
 
-	PBC pbc = new PBC();
+	PBC pbc ;
 
 	ArrayList<Message> messages;
 	private WorldInterface worldInterface;
@@ -27,11 +27,11 @@ public class BBC {
 		thisRobot = robot;
 		this.model = model;
 		this.worldInterface =worldInterface;
+		pbc= new PBC(this);
 	}
 
 	public void msg(Message message) {
 		messages.add(message);
-		// TODO Auto-generated method stub
 
 	}
 
@@ -105,9 +105,19 @@ public class BBC {
 
 		}
 	}
-}
 
 
+
+
+private void evaluatePreAssignment(Message message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+private void sendDeliverBidMessage(Message message) {
+		// TODO Auto-generated method stub
+		
+	}
 
 public WorldModel getWorldModel(){
 	return model;
@@ -118,12 +128,32 @@ public void setGoal(Goal nextgoal) {
 }
 
 public void sendDefBidMessage(CommUser sender, double bid, Integer id) {
-	// TODO Auto-generated method stub
+	this.worldInterface.sendMessage(new DefBidMessageContent(sender, bid, id));
+	
 
 }
 
 public void sendPreBidMessage(CommUser sender, double bid, int iD) {
-	// TODO Auto-generated method stub
+	this.worldInterface.sendMessage(new PreBidMessageContent(sender, bid, iD));
+	
+}
+
+public void deleteChargeReservation(long startWindow, long endWindow) {
+	this.worldInterface.sendMessage(new ChargeMessageContent(this.model.ChargingStation, startWindow, startWindow, "delete"));
+	
+}
+
+public void sendReserveMessage(long startWindow, long endWindow) {
+	this.worldInterface.sendMessage(new ChargeMessageContent(this.model.ChargingStation, startWindow, startWindow, "reserve"));	
+}
+
+public void sendNegotiationBidMessage(JPlan jointPlan, CommUser sender) {
+	this.worldInterface.sendMessage(new NegotiationBidMessageContent(sender,jointPlan));
+	
+}
+
+public void sendStartNegotiationMessage(Plan plan) {
+	this.worldInterface.sendMessage(new StartNegotiationMessageContent(null,plan));
 	
 }
 }

@@ -28,7 +28,8 @@ public class PBC {
 	
 	boolean ccOnHold = false;
 
-	public PBC(){
+	public PBC(BBC bbc){
+		this.bbc=bbc;
 		worldModel = bbc.getWorldModel();
 		cc = new CC();
 		
@@ -260,6 +261,16 @@ public class PBC {
 			}
 			
 		}
+		
+	}
+
+	public void sendNegotiationBidMessage(JPlan jointPlan, CommUser sender) {
+		bbc.sendNegotiationBidMessage( jointPlan,  sender);
+		
+	}
+
+	public void sendStartNegotiationMessage(Plan plan) {
+		bbc.sendStartNegotiationMessage( plan);
 		
 	}
 	

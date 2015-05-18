@@ -1,5 +1,7 @@
 package robotPackage;
 
+import com.github.rinde.rinsim.core.model.comm.CommUser;
+
 import world.Package;
 
 public class DeliverPackageMessageContent extends ContractNetMessageContent{
@@ -9,10 +11,9 @@ public class DeliverPackageMessageContent extends ContractNetMessageContent{
 	Package packageToDel;
 	
 
-	public DeliverPackageMessageContent(Pack packageToDeliver, int contractID){
-
+	public DeliverPackageMessageContent(CommUser receiver,Package packageToDeliver, int contractID){
+	super(receiver,"DeliverMessage");
 	this.packageToDel = packageToDeliver;	
-	setType("DeliverMessage");
 	setContractID(contractID);
 	
 	}

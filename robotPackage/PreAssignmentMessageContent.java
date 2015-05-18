@@ -15,11 +15,10 @@ CommUser sender;
 	boolean assigned;
 	
 	public PreAssignmentMessageContent(CommUser sender, double bid, boolean assigned, Package packageToDeliver,int contractID){
-		this.sender = sender;
+		super(sender,"PreAssignment");
 		this.bid = bid;
 		this.packageToDel = packageToDeliver;
 		this.assigned = assigned;
-		setType("PreAssignment");
 		setContractID(contractID);
 		
 		

@@ -67,7 +67,8 @@ public class Simulation {
 		simulator.register(chargingStation);
 		  
 		for (Point p:RList) {
-		      simulator.register(new Robot(p, chargingStation, VEHICLE_SPEED_KMH));
+		      Robot rob = new Robot(p, chargingStation, VEHICLE_SPEED_KMH);
+		      simulator.register(rob);
 		}
 
 		simulator.addTickListener(new TickListener() {
