@@ -1,20 +1,22 @@
 package robotPackage;
 
-public class NegotiationBidMessageContent extends MessageContent{
+public class NegotiationBidMessageContent extends NegotiationMessage{
 	
-	private boolean accepted;
+	private JPlan jointPlan;
 	
 	public NegotiationBidMessageContent(){
 		
 	}
 
-	public boolean isAccepted() {
-		return accepted;
+	public JPlan getJointPlan() {
+		return jointPlan;
 	}
 
-	public void setAccepted(boolean accepted) {
-		this.accepted = accepted;
+	public void setJointPlan(JPlan jointPlan) {
+		this.jointPlan = jointPlan;
 	}
+
+	
 	
 	
 

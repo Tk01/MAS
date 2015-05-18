@@ -1,6 +1,6 @@
 package robotPackage;
 
-public class StartNegotiationMessageContent extends MessageContent{
+public class StartNegotiationMessageContent extends NegotiationMessage{
 	
 	Plan plan;
 	
