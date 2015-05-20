@@ -88,7 +88,7 @@ public class Plan {
 		@SuppressWarnings("unchecked")
 		ArrayList <Goal> copyGoals = (ArrayList<Goal>) goals.clone();
 		copyGoals.add(new Goal(p.getStart(), "pickup", p.getPickupTimeWindow()));
-		copyGoals.add(new Goal(p.getStart(), "drop", p.getDeliveryTimeWindow()));
+		copyGoals.add(new Goal(p.getEnd(), "drop", p.getDeliveryTimeWindow()));
 		Goal charged = null;
 		for(int i=0; i<copyGoals.size();i++){
 			if(copyGoals.get(i).type.equals("charging")){
@@ -205,6 +205,7 @@ public class Plan {
 		this.bidPackage = bidPackage;
 	}
 	public Goal getNextgoal() {
+		if(this.goals.isEmpty())return null;
 		return this.goals.get(0);
 	}
 

@@ -16,6 +16,7 @@ public class Robot extends Vehicle implements CommUser{
 	WorldModel model;
 	public Robot(Point location, ChargingStation chargingStation, double speed){
 		setStartPosition(location);
+		setCapacity(1);
 		inter = new WorldInterface(this, location, chargingStation, speed);
 		model = inter.getModel();
 	}

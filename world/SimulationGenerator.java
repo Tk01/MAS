@@ -13,14 +13,14 @@ import com.github.rinde.rinsim.geom.Point;
 public class SimulationGenerator {
 	final Point MIN_POINT = new Point(0,0);
 	final Point MAX_POINT = new Point(10,10);
-	final double VEHICLE_SPEED_KMH = 1d;
+	final double VEHICLE_SPEED_KMH = 5000d;
 	final ArrayList<Point> RList = new ArrayList<Point>();
 	final Point ChargeStation = new Point(5,5);
 	final ArrayList<Point> PList = new ArrayList<Point>();
 	final ArrayList<Point> PLocation = new ArrayList<Point>();
 	final ArrayList<Long> PTime = new ArrayList<Long>();
 	final long SERVICE_DURATION =0;
-	final long endTime = 100*1000;
+	final long endTime = 1000*1000;
 	public  SimulationGenerator(String filename) throws IOException{
 		BufferedReader in = new BufferedReader(new FileReader(filename));
 		String[] robots = in.readLine().split(";");

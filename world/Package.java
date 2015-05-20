@@ -1,6 +1,7 @@
 package world;
 
-	import java.util.ArrayList;
+
+import java.util.ArrayList;
 
 
 
@@ -8,6 +9,7 @@ package world;
 
 
 
+import robotPackage.Robot;
 import robotPackage.DefAssignmentMessageContent;
 import robotPackage.DefBidMessageContent;
 import robotPackage.MessageContent;
@@ -35,6 +37,7 @@ import com.google.common.collect.ImmutableList;
 	 * A customer with very permissive time windows.
 	 */
 	public class Package extends Parcel implements CommUser,TickListener {
+		private PDPModel pdpModel;
 		static int contractId =0;
 		Long delay = 3000l;
 		Long timeLastAction;
@@ -152,8 +155,12 @@ import com.google.common.collect.ImmutableList;
 
 		@Override
 		public Optional<Point> getPosition() {
-			
+			if(stage ==3) {
+				for(Robot user: roadModel.getObjectsOfType(Robot.class))
+				if(pdpModel.containerContains(user, this))return Optional.of(roadModel.getPosition(user));
+			}
 			return Optional.of(roadModel.getPosition(this));
+			
 		}
 
 		@Override
@@ -169,7 +176,7 @@ import com.google.common.collect.ImmutableList;
 		@Override
 		public void initRoadPDP(RoadModel arg0, PDPModel arg1) {
 			this.roadModel=arg0;
-			
+			this.pdpModel = arg1;
 		}
 		
 		public Point getStart (){

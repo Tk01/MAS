@@ -49,8 +49,8 @@ public class BBC {
 			worldInterface.waitMoment();
 			return;
 		}
-		if(goal.coordinates().equals(model.coordinates())){
-			model.moveTo(goal.coordinates());
+		if(!goal.coordinates().equals(model.coordinates())){
+			worldInterface.MoveTo(goal.coordinates());
 			return;
 		}
 		if(goal.type().equals("pickup")){

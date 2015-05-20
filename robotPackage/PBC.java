@@ -117,6 +117,7 @@ public class PBC {
 	private void defAssignment(DefAssignmentMessageContent content){
 		if(content.assigned){
 			currentplan=definitivebid;
+			bbc.setGoal(currentplan.getNextgoal());
 			cc.negotiationAbort();
 			definitivebid = null;
 			

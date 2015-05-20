@@ -19,7 +19,7 @@ import com.google.common.base.Optional;
 import world.ChargingStation;
 import world.Package;
 public class WorldInterface {
-	static public final double SpendingRate = 0.01;
+	static public final double SpendingRate = 0.01/1000;
 	Optional<CommDevice> translator;
 	Point moveTo;
 	BBC bbc;
