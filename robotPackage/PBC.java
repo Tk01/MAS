@@ -250,12 +250,15 @@ public class PBC {
 					plan  = new Plan(currentplan.getPlan(), worldModel);
 				}
 				Plan bidPlan = null;
+				Goal pickupGoal = new Goal(pack.getStart(), "pickup", pack.getPickupTimeWindow());
+				Goal dropGoal = new Goal(pack.getEnd(), "drop", pack.getDeliveryTimeWindow());
 
 				if(worldModel.isReserveChargingStation()){
-					bidPlan = plan.isPossiblePlan(pack);
+					
+					bidPlan = plan.isPossiblePlan(pickupGoal,dropGoal);
 				}
 				else{
-					bidPlan = plan.isPossiblePlan(pack);
+					bidPlan = plan.isPossiblePlan(pickupGoal,dropGoal);
 				}
 				if(bidPlan !=null){
 				double oldValue = currentplan.value(currentplan.getPlan());
@@ -284,6 +287,11 @@ public class PBC {
 	public void sendConfirmationMessage(JPlan bestJPlan) {
 		bbc.sendConfirmationMessage(bestJPlan);
 
+	}
+
+	public void sendNegotiationReplyMessage(CommUser jPlanAgent) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

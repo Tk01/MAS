@@ -9,6 +9,9 @@ public class JPlan {
 	Plan ownPlan;
 	Plan otherPlan;
 	
+	double ownValue;
+	double otherValue;
+	
 	int negotiationID;
 	
 	CommUser JPlanAgent;
@@ -16,6 +19,38 @@ public class JPlan {
 	public JPlan(){
 		
 	}
+	
+	public JPlan(Plan ownPlan, Plan otherPlan){
+		this.ownPlan = ownPlan;
+		this.otherPlan = otherPlan;
+		
+	}
+
+	
+	
+	public double getOwnValue() {
+		return ownValue;
+	}
+
+
+
+	public void setOwnValue(double ownValue) {
+		this.ownValue = ownValue;
+	}
+
+
+
+	public double getOtherValue() {
+		return otherValue;
+	}
+
+
+
+	public void setOtherValue(double otherValue) {
+		this.otherValue = otherValue;
+	}
+
+
 
 	public Plan getOwnPlan() {
 		return ownPlan;

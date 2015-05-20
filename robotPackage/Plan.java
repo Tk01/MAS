@@ -83,13 +83,13 @@ public class Plan {
 
 
 	// check if the pack can be taken up in the plan by checking if in the specified timewindows it is possible to pick up the package.
-	public Plan isPossiblePlan(Package p){
-		if(goals.size() > 5) return null;
-		ArrayList<Goal> bestPlan = null;
+	public Plan isPossiblePlan(Goal pickupGoal, Goal dropGoal){
+		if(goals.size() > 7) return null;
+		
 		@SuppressWarnings("unchecked")
 		ArrayList <Goal> copyGoals = (ArrayList<Goal>) goals.clone();
-		copyGoals.add(new Goal(p.getStart(), "pickup", p.getPickupTimeWindow()));
-		copyGoals.add(new Goal(p.getEnd(), "drop", p.getDeliveryTimeWindow()));
+		copyGoals.add(pickupGoal);
+		copyGoals.add(dropGoal);
 		Goal charged = null;
 		for(int i=0; i<copyGoals.size();i++){
 			if(copyGoals.get(i).type.equals("charging")){
