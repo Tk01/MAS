@@ -11,16 +11,20 @@ import com.github.rinde.rinsim.core.model.comm.CommDevice;
 import com.github.rinde.rinsim.core.model.comm.CommDeviceBuilder;
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.Message;
+import com.github.rinde.rinsim.core.model.pdp.Depot;
+import com.github.rinde.rinsim.core.model.pdp.PDPModel;
+import com.github.rinde.rinsim.core.model.road.RoadModel;
 import com.github.rinde.rinsim.geom.Point;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
-public class ChargingStation implements CommUser,TickListener{
+public class ChargingStation extends Depot implements CommUser,TickListener{
 	ArrayList<Long[]> schedule = new ArrayList<Long[]>();
 	Point pos;
 	Optional<CommDevice> device;
 	public ChargingStation(Point p) {
 		// TODO Auto-generated constructor stub
+		setStartPosition(p);
 		pos = p;
 	}
 	@Override
@@ -119,6 +123,11 @@ public class ChargingStation implements CommUser,TickListener{
 		device = Optional.of(builder
 				.setReliability(1)
 				.build());
+		
+	}
+	@Override
+	public void initRoadPDP(RoadModel pRoadModel, PDPModel pPdpModel) {
+		// TODO Auto-generated method stub
 		
 	}
 

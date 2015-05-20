@@ -8,9 +8,9 @@ import com.github.rinde.rinsim.geom.Point;
 import com.github.rinde.rinsim.util.TimeWindow;
 
 public class Plan {
-	static Integer maxi=0; 
 
-	Integer i;
+
+	
 	ArrayList <Goal> goals;
 
 	Package bidPackage;
@@ -18,14 +18,10 @@ public class Plan {
 
 	public Plan(ArrayList <Goal> goals, WorldModel model){
 		this.goals =goals;
-		i=maxi;
-		maxi++;
+		
 		this.model =model;
 	}
-	public Integer getId(){
-		return i;
 
-	}
 	public ArrayList <Goal> getPlan(){
 		return goals;
 	}
@@ -52,6 +48,7 @@ public class Plan {
 
 	//Return the utility of the plan. Is used to compare tasks that are added to the current plan. The lower the better
 	public double value(ArrayList<Goal> newPlan){
+		if(newPlan.size()==0)return 0;
 		long startTime = model.getTime().getTime();
 		long time = model.getTime().getTime();
 		double battery = model.battery();
@@ -99,59 +96,57 @@ public class Plan {
 				break;
 			}
 		}
-		int h=0;
+		
 		ArrayList<Goal> newPlan = new ArrayList<Goal>();
-		if(goals.get(0).type().equals("drop") ){
-			h=1;
-			newPlan.add(goals.get(0));
+		if(goals.size()>0 && goals.get(0).type().equals("drop") ){
+			
+			newPlan.add(copyGoals.remove(0));
 		}
-		for(int i=h; i<copyGoals.size();i+=2){
-			newPlan.add(copyGoals.get(i));
-			newPlan.add(copyGoals.get(i+1));
-			for(int j=h; j<copyGoals.size();j+=2){
-				if(j==i)break;
-				newPlan.add(copyGoals.get(j));
-				newPlan.add(copyGoals.get(j+1));
-				for(int k=h; k<copyGoals.size();k+=2){
-					if(k==i || k == j)break;
-					newPlan.add(copyGoals.get(k));
-					newPlan.add(copyGoals.get(k+1));
-					if(valid(newPlan)){
-						if(bestPlan == null) bestPlan = newPlan;
-						else{
-							if(value(newPlan)>value(bestPlan)) bestPlan = newPlan;
-						}
-					}
-					for(int l=0;l<newPlan.size()+1;l++){
-						if(charged==null){
-							newPlan.add(l, new ChargeGoal(model.ChargingStation.getPosition().get(), "charging",new TimeWindow(0, Long.MAX_VALUE) ,false));
-						}else{
-							newPlan.add(l, charged);
-						}
-						
-						if(valid(newPlan)){
-							if(bestPlan == null) bestPlan = newPlan;
-							else{
-								if(value(newPlan)>value(bestPlan)) bestPlan = newPlan;
-							}
-						}
-						newPlan.remove(l);
-					}
-					newPlan.add(copyGoals.remove(k));
-					newPlan.add(copyGoals.remove(k+1));
-				}
-				newPlan.add(copyGoals.remove(j));
-				newPlan.add(copyGoals.remove(j+1));
-			}
-			newPlan.add(copyGoals.remove(i));
-			newPlan.add(copyGoals.remove(i+1));
-		}
-		return new Plan(bestPlan,model);
+		
+		return new Plan(GenerateBestPlan(copyGoals,newPlan,charged,null),model);
 	}
+	
+	
 
 
-
-
+	private ArrayList<Goal> GenerateBestPlan(ArrayList<Goal> copyGoals,
+			ArrayList<Goal> newPlan, Goal charged, ArrayList<Goal> bestplan) {
+		if(copyGoals.size() ==0){
+			if(valid(newPlan)){
+				if(bestplan == null) bestplan = newPlan;
+				else{
+					if(value(newPlan)>value(bestplan)) bestplan = newPlan;
+				}
+			}
+			for(int l=0;l<newPlan.size()+1;l++){
+				if(charged==null){
+					newPlan.add(l, new ChargeGoal(model.ChargingStation.getPosition().get(), "charging",new TimeWindow(0, Long.MAX_VALUE) ,false));
+				}else{
+					newPlan.add(l, charged);
+				}
+				
+				if(valid(newPlan)){
+					if(bestplan == null) bestplan = newPlan;
+					else{
+						if(value(newPlan)>value(bestplan)) bestplan = newPlan;
+					}
+				}
+				newPlan.remove(l);
+			}
+			return bestplan;
+		}
+		else{
+			for(int i =0;i< copyGoals.size();i+=2){
+				ArrayList<Goal> ccopyGoals = (ArrayList<Goal>) copyGoals.clone();
+				ArrayList<Goal> cnewPlan = (ArrayList<Goal>) newPlan.clone();
+				cnewPlan.add(ccopyGoals.remove(i));
+				cnewPlan.add(ccopyGoals.remove(i));
+				
+				bestplan=GenerateBestPlan(ccopyGoals,cnewPlan,charged,bestplan);
+			}
+			return bestplan;
+		}
+	}
 	private boolean valid(ArrayList<Goal> newPlan) {
 		
 		long time = model.getTime().getTime();

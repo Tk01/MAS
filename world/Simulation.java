@@ -35,7 +35,7 @@ public class Simulation {
 
 	public static void main(@Nullable String[] args) throws IOException {
 		// TODO sceneraio loader
-		SimulationGenerator gen = new SimulationGenerator("sim1.txt",4,0.1);
+		SimulationGenerator gen = new SimulationGenerator("sim1.txt",4,1);
 		final Point MIN_POINT = gen.getMIN_POINT();
 		final Point MAX_POINT = gen.getMAX_POINT();
 		final double VEHICLE_SPEED_KMH = gen.getVEHICLE_SPEED_KMH();
@@ -77,7 +77,7 @@ public class Simulation {
 		        
 				if (time.getStartTime() > endTime) {
 		          simulator.stop();
-		        } else while (PTime.isEmpty() && time.getTime() >= PTime.get(0)) {
+		        } else while (!PTime.isEmpty() && time.getTime() >= PTime.get(0)) {
 		          simulator.register(new Package(PList.get(0),PLocation.get(0),SERVICE_DURATION,SERVICE_DURATION));
 		          PList.remove(0);
 		          PLocation.remove(0);

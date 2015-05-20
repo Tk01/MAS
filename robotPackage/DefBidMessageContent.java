@@ -11,10 +11,10 @@ public class DefBidMessageContent extends ContractNetMessageContent{
 	double bid;
 	
 	
-	public DefBidMessageContent(CommUser sender, double bid, int contractID){
-		super(sender,"BidMessage");
+	public DefBidMessageContent(CommUser sender, double bid){
+		super(sender,"DefBidMessage");
 		this.bid = bid;
-		setContractID(contractID);
+
 		
 		
 	}

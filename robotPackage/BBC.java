@@ -18,7 +18,7 @@ public class BBC {
 
 	PBC pbc ;
 
-	ArrayList<Message> messages;
+	ArrayList<Message> messages = new ArrayList<Message>();
 	private WorldInterface worldInterface;
 
 
@@ -127,8 +127,8 @@ public void setGoal(Goal nextgoal) {
 	this.goal =nextgoal;	
 }
 
-public void sendDefBidMessage(CommUser sender, double bid, Integer id) {
-	this.worldInterface.sendMessage(new DefBidMessageContent(sender, bid, id));
+public void sendDefBidMessage(CommUser sender, double bid) {
+	this.worldInterface.sendMessage(new DefBidMessageContent(sender, bid));
 	
 
 }

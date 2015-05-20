@@ -15,6 +15,7 @@ public class Robot extends Vehicle implements CommUser{
 	WorldInterface inter;
 	WorldModel model;
 	public Robot(Point location, ChargingStation chargingStation, double speed){
+		setStartPosition(location);
 		inter = new WorldInterface(this, location, chargingStation, speed);
 		model = inter.getModel();
 	}
@@ -45,5 +46,6 @@ public class Robot extends Vehicle implements CommUser{
 		// TODO Auto-generated method stub
 		this.inter.setCommDevice(builder);
 	}
+	
 
 }

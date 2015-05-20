@@ -36,19 +36,20 @@ import com.google.common.collect.ImmutableList;
 	 */
 	public class Package extends Parcel implements CommUser,TickListener {
 		static int contractId =0;
-		Long delay = 10l;
+		Long delay = 3000l;
 		Long timeLastAction;
 		int mycontractId ;
 		Point start;
 		Point end;
 		Optional<CommDevice> translator;
 		private int stage =0;
-		
+		RoadModel roadModel;
 		Package(Point startPosition, Point pDestination,
 				long pLoadingDuration, long pUnloadingDuration) {
 			super(pDestination, pLoadingDuration, TimeWindow.ALWAYS,
 					pUnloadingDuration, TimeWindow.ALWAYS, 1);
 			start =startPosition;
+			setStartPosition(startPosition);
 			end = pDestination;
 			mycontractId=contractId;
 			contractId++;
@@ -80,24 +81,24 @@ import com.google.common.collect.ImmutableList;
 					time.consume(timeLastAction+delay-1-time.getStartTime());
 				}
 			}
+			ImmutableList<Message> list;
 			if(stage ==1 && time.getTimeLeft()>0){
 				if(time.getEndTime()>=timeLastAction+delay){
-					time.consume(timeLastAction+delay-1-time.getStartTime());
-					ImmutableList<Message> list = this.translator.get().getUnreadMessages();
+					list = (ImmutableList<Message>)this.translator.get().getUnreadMessages();
 					ArrayList<Message> preBidList = new ArrayList<Message>();
 					double bid = Double.MAX_VALUE;
 					CommUser bestUser = null;
 					for(Message m:list){
 						if(((MessageContent) m.getContents()).getType().equals("PreBidMessage")){
 							preBidList.add( m);
-							if(((PreBidMessageContent) m.getContents()).getBid()>bid){
+							if(((PreBidMessageContent) m.getContents()).getBid()<bid){
 								bid = ((PreBidMessageContent) m.getContents()).getBid();
 								bestUser = m.getSender();
 							}
 						}
 					}
 					for(Message m:preBidList){
-						if(m.getSender().equals(bestUser)){
+						if(m.getSender()==bestUser){
 							this.translator.get().send(new PreAssignmentMessageContent(bestUser, bid, true , this, mycontractId), m.getSender());
 						}else{
 							this.translator.get().send(new PreAssignmentMessageContent(bestUser, bid, false , this, mycontractId), m.getSender());
@@ -116,22 +117,21 @@ import com.google.common.collect.ImmutableList;
 			}
 			if(stage ==2 && time.getTimeLeft()>0){
 				if(time.getEndTime()>=timeLastAction+delay){
-					time.consume(timeLastAction+delay-1-time.getStartTime());
-					ImmutableList<Message> list = this.translator.get().getUnreadMessages();
+					list = this.translator.get().getUnreadMessages();
 					ArrayList<Message> DefBidList = new ArrayList<Message>();
 					double bid = Double.MAX_VALUE;
 					CommUser bestUser = null;
 					for(Message m:list){
 						if(((MessageContent) m.getContents()).getType().equals("DefBidMessage")){
 							DefBidList.add( m);
-							if(((DefBidMessageContent) m.getContents()).getBid()>bid){
-								bid = ((PreBidMessageContent) m.getContents()).getBid();
+							if(((DefBidMessageContent) m.getContents()).getBid()<bid){
+								bid = ((DefBidMessageContent) m.getContents()).getBid();
 								bestUser = m.getSender();
 							}
 						}
 					}
 					for(Message m:DefBidList){
-						if(m.getSender().equals(bestUser)){
+						if(m.getSender()==bestUser){
 							this.translator.get().send(new DefAssignmentMessageContent(bestUser, bid, true , mycontractId), m.getSender());
 						}else{
 							this.translator.get().send(new DefAssignmentMessageContent(bestUser, bid, false , mycontractId), m.getSender());
@@ -153,12 +153,12 @@ import com.google.common.collect.ImmutableList;
 		@Override
 		public Optional<Point> getPosition() {
 			
-			return Optional.of(new Point(5,5));
+			return Optional.of(roadModel.getPosition(this));
 		}
 
 		@Override
 		public void setCommDevice(CommDeviceBuilder builder) {
-			builder.setMaxRange(10);
+			builder.setMaxRange(20);
 
 			translator = Optional.of(builder
 					.setReliability(1)
@@ -168,7 +168,7 @@ import com.google.common.collect.ImmutableList;
 
 		@Override
 		public void initRoadPDP(RoadModel arg0, PDPModel arg1) {
-			// TODO Auto-generated method stub
+			this.roadModel=arg0;
 			
 		}
 		

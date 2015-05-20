@@ -32,8 +32,8 @@ public class WorldInterface {
 		model = new WorldModel(p,c,s);
 		bbc = new BBC(this,model,robot);
 		this.robot = robot;
-
-
+		roadModel= Optional.absent();
+		pdpModel= Optional.absent();
 	}
 
 	public void sendMessage( MessageContent MessageContent) {
@@ -100,7 +100,7 @@ public class WorldInterface {
 
 	}
 	public void setCommDevice(CommDeviceBuilder builder) {
-		builder.setMaxRange(10);
+		builder.setMaxRange(20);
 
 		translator = Optional.of(builder
 				.setReliability(1)

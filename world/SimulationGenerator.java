@@ -20,7 +20,7 @@ public class SimulationGenerator {
 	final ArrayList<Point> PLocation = new ArrayList<Point>();
 	final ArrayList<Long> PTime = new ArrayList<Long>();
 	final long SERVICE_DURATION =0;
-	final long endTime = 10;
+	final long endTime = 100*1000;
 	public  SimulationGenerator(String filename) throws IOException{
 		BufferedReader in = new BufferedReader(new FileReader(filename));
 		String[] robots = in.readLine().split(";");
@@ -48,10 +48,10 @@ public class SimulationGenerator {
 		for(int i=0;i<nbRobots;i++){
 			RList.add(new Point(Math.random()*this.MAX_POINT.x,Math.random()*this.MAX_POINT.y));
 		}
-		for(long i=0;i<endTime;i++){
+		for(long i=0;i<endTime;i=i+100000){
 			if(Math.random()<=spawnchance){
 				PList.add(new Point(Math.random()*this.MAX_POINT.x,Math.random()*this.MAX_POINT.y));
-				PList.add(new Point(Math.random()*this.MAX_POINT.x,Math.random()*this.MAX_POINT.y));
+				PLocation.add(new Point(Math.random()*this.MAX_POINT.x,Math.random()*this.MAX_POINT.y));
 				PTime.add( i);
 			}
 		}
