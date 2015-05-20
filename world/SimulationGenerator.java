@@ -13,7 +13,7 @@ import com.github.rinde.rinsim.geom.Point;
 public class SimulationGenerator {
 	final Point MIN_POINT = new Point(0,0);
 	final Point MAX_POINT = new Point(10,10);
-	final double VEHICLE_SPEED_KMH = 5000d;
+	final double VEHICLE_SPEED_KMH = 60d;
 	final ArrayList<Point> RList = new ArrayList<Point>();
 	final Point ChargeStation = new Point(5,5);
 	final ArrayList<Point> PList = new ArrayList<Point>();
@@ -48,7 +48,7 @@ public class SimulationGenerator {
 		for(int i=0;i<nbRobots;i++){
 			RList.add(new Point(Math.random()*this.MAX_POINT.x,Math.random()*this.MAX_POINT.y));
 		}
-		for(long i=0;i<endTime;i=i+100000){
+		for(long i=0;i<endTime;i=i+1000){
 			if(Math.random()<=spawnchance){
 				PList.add(new Point(Math.random()*this.MAX_POINT.x,Math.random()*this.MAX_POINT.y));
 				PLocation.add(new Point(Math.random()*this.MAX_POINT.x,Math.random()*this.MAX_POINT.y));

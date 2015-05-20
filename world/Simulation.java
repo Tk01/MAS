@@ -35,7 +35,7 @@ public class Simulation {
 
 	public static void main(@Nullable String[] args) throws IOException {
 		// TODO sceneraio loader
-		SimulationGenerator gen = new SimulationGenerator("sim1.txt",4,1);
+		SimulationGenerator gen = new SimulationGenerator("sim1.txt",2,0.1);
 		final Point MIN_POINT = gen.getMIN_POINT();
 		final Point MAX_POINT = gen.getMAX_POINT();
 		final double VEHICLE_SPEED_KMH = gen.getVEHICLE_SPEED_KMH();

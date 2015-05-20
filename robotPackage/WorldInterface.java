@@ -8,9 +8,7 @@ import java.util.ArrayList;
 import com.github.rinde.rinsim.core.TimeLapse;
 import com.github.rinde.rinsim.core.model.comm.CommDevice;
 import com.github.rinde.rinsim.core.model.comm.CommDeviceBuilder;
-
 import com.github.rinde.rinsim.core.model.pdp.PDPModel;
-
 import com.github.rinde.rinsim.core.model.road.MoveProgress;
 import com.github.rinde.rinsim.core.model.road.RoadModel;
 import com.github.rinde.rinsim.geom.Point;
@@ -19,7 +17,7 @@ import com.google.common.base.Optional;
 import world.ChargingStation;
 import world.Package;
 public class WorldInterface {
-	static public final double SpendingRate = 0.01/1000;
+	static public final double SpendingRate = 1/1000;
 	Optional<CommDevice> translator;
 	Point moveTo;
 	BBC bbc;
@@ -52,6 +50,8 @@ public class WorldInterface {
 		if(model.battery() > 0){
 			this.gatherInfo(time);
 			bbc.run();
+		}else{
+			time.consumeAll();
 		}
 	}
 	private void gatherInfo(TimeLapse time) {
@@ -75,23 +75,31 @@ public class WorldInterface {
 		model.getTime().consume((long) timeSpend);
 	}
 	public void drop() {
+		try{
 		pdpModel.get().drop(robot, model.getCarriedPackage(), model.getTime());
 		model.dropPackage();
 		model.getTime().consume(0);
-
+		}
+		catch(IllegalArgumentException e){
+			
+		}
 	}
 	public void pickup() {
+		try{
 		Package parcel = this.getPackageHere();
 		pdpModel.get().pickup(robot, parcel, model.getTime());
 		model.pickupPackage(parcel);
-		model.getTime().consume(0);
+		model.getTime().consume(0);}
+		catch(IllegalArgumentException e){
+			
+		}
 	}
 	private Package getPackageHere() {
 		return roadModel.get().getObjectsAt(robot, world.Package.class).iterator().next();
 	}
 	public void waitMoment() {
 		//model.batteryDrop(model.getTime().getTimeLeft()*SpendingRate);
-		model.getTime().consume(model.getTime().getTimeLeft());
+		model.getTime().consumeAll();;
 
 	}
 	public void initRoadPDP(RoadModel arg0, PDPModel arg1) {

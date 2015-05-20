@@ -28,8 +28,11 @@ public class Robot extends Vehicle implements CommUser{
 
 	@Override
 	protected void tickImpl(TimeLapse arg0) {
-		this.inter.run(arg0);
-		
+		while(arg0.hasTimeLeft()){
+			this.inter.run(arg0);
+		}
+		this.model.batteryDrop(1d/1000d);
+		System.out.println(this.model.battery);
 	}
 
 	@Override

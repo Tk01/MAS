@@ -120,7 +120,7 @@ public class PBC {
 			bbc.setGoal(currentplan.getNextgoal());
 			cc.negotiationAbort();
 			definitivebid = null;
-			
+			this.worldModel.messages().removeAll(this.worldModel.messages());
 
 		}
 		else{
@@ -186,14 +186,15 @@ public class PBC {
 
 		}
 
-
+		/*
 		for(int i=0;i<deleteMessages.size();i++){
 			messages.remove(deleteMessages.get(i));
 		}
-
+		*/
 		if(bestPlan != null){
 			doDefBid(bestPlan, sender);
 		}
+		
 
 	}
 
@@ -212,13 +213,13 @@ public class PBC {
 				return;
 			}
 		}
-
+		
 		double oldValue = currentplan.value(currentplan.getPlan());
 		double newValue = finalPlan.value(finalPlan.getPlan());
 		double bid = newValue - oldValue;
 
 		bbc.sendDefBidMessage(sender, bid);
-
+		this.worldModel.deletePreAssign(sender);
 
 
 	}
@@ -256,14 +257,14 @@ public class PBC {
 				else{
 					bidPlan = plan.isPossiblePlan(pack);
 				}
-
+				if(bidPlan !=null){
 				double oldValue = currentplan.value(currentplan.getPlan());
 				double newValue = bidPlan.value(bidPlan.getPlan());
 				double bid = newValue - oldValue;
 				bidPlan.setBidPackage(pack);
 				this.prebids.put(ID, bidPlan);
 				bbc.sendPreBidMessage(message.getSender(), bid, ID);
-
+				}
 			}
 
 		}

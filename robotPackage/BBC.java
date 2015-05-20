@@ -39,8 +39,12 @@ public class BBC {
 		this.goal = goal;
 	}
 	public void run() {
-		if(done) pbc.done(goal);
-		if( model.messages().size() !=0) pbc.readMessages();
+		if(done){
+			pbc.done(goal);
+			done = false;
+		}
+		if( model.messages().size() !=0) 
+			pbc.readMessages();
 
 
 		checkMessages();
@@ -53,16 +57,16 @@ public class BBC {
 			worldInterface.MoveTo(goal.coordinates());
 			return;
 		}
-		if(goal.type().equals("pickup")){
-			worldInterface.pickup();
-			done =true;
-			return;
-		}
 		if(goal.type().equals("drop")){
 			worldInterface.drop();
 			done = true;
 			return;
 		}
+		if(goal.type().equals("pickup")){
+			worldInterface.pickup();
+			done =true;
+			return;
+		}		
 		if(goal.type().equals("charging") && model.chargeTaken()){
 			worldInterface.waitMoment();
 			return;

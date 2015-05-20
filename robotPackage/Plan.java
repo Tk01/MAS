@@ -53,7 +53,7 @@ public class Plan {
 		long time = model.getTime().getTime();
 		double battery = model.battery();
 		for(Goal g:newPlan){
-			double timespend = distance(model.coordinates(),g.coordinates())/model.getSpeed();
+			double timespend = distance(model.coordinates(),g.coordinates())/model.getSpeed()/1000;
 			long timespend2;
 			if(timespend == (long) timespend)timespend2 = (long) timespend;
 			else{
@@ -84,6 +84,7 @@ public class Plan {
 
 	// check if the pack can be taken up in the plan by checking if in the specified timewindows it is possible to pick up the package.
 	public Plan isPossiblePlan(Package p){
+		if(goals.size() > 5) return null;
 		ArrayList<Goal> bestPlan = null;
 		@SuppressWarnings("unchecked")
 		ArrayList <Goal> copyGoals = (ArrayList<Goal>) goals.clone();
@@ -152,7 +153,7 @@ public class Plan {
 		long time = model.getTime().getTime();
 		double battery = model.battery();
 		for(Goal g:newPlan){
-			double timespend = distance(model.coordinates(),g.coordinates())/model.getSpeed();
+			double timespend = distance(model.coordinates(),g.coordinates())/model.getSpeed()/1000;
 			long timespend2;
 			if(timespend == (long) timespend)timespend2 = (long) timespend;
 			else{
@@ -183,7 +184,7 @@ public class Plan {
 				
 			}
 		}
-		double timespend = distance(newPlan.get(newPlan.size()-1).coordinates(),model.coordinates())/model.getSpeed();
+		double timespend = distance(newPlan.get(newPlan.size()-1).coordinates(),model.coordinates())/model.getSpeed()/1000;
 		long timespend2;
 		if(timespend == (long) timespend)timespend2 = (long) timespend;
 		else{

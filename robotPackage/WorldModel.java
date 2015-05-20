@@ -1,8 +1,11 @@
 package robotPackage;
 
 import java.util.ArrayList;
+
 import world.ChargingStation;
+
 import com.github.rinde.rinsim.core.TimeLapse;
+import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.Message;
 import com.github.rinde.rinsim.core.model.pdp.Parcel;
 import com.github.rinde.rinsim.geom.Point;
@@ -22,11 +25,11 @@ public class WorldModel {
 	private Point coordinates;
 	private double speed;
 	ArrayList<Point> ChargingStations;
-	
-	
+
+
 	private boolean reserveChargingStation = false;
 
-	
+
 	public WorldModel(Point p,ChargingStation c, double s ) {
 		coordinates =p;
 		ChargingStation=c;
@@ -105,13 +108,21 @@ public class WorldModel {
 		// TODO Auto-generated method stub
 		return speed;
 	}
-	
+
 	public boolean isReserveChargingStation() {
 		return reserveChargingStation;
 	}
 	public void setReserveChargingStation(boolean reserveChargingStation) {
 		this.reserveChargingStation = reserveChargingStation;
 	}
+	public void deletePreAssign(CommUser sender) {
+		for(Message m:this.messages()){
+			if(m.getSender()==sender && ((MessageContent) m.getContents()).getType().equals("PreAssignment") ){
+				this.messages.remove(m);
+				return;
+			}
+		}
 
 
+	}
 }

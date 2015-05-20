@@ -140,7 +140,12 @@ import com.google.common.collect.ImmutableList;
 							this.translator.get().send(new DefAssignmentMessageContent(bestUser, bid, false , mycontractId), m.getSender());
 						}
 					}
-					stage++;
+					if(!list.isEmpty()){
+						stage++;
+					}
+					else{
+						stage =0;
+						}
 					timeLastAction=time.getStartTime();
 					if(time.getEndTime()<timeLastAction+delay){
 						time.consumeAll();
@@ -148,6 +153,7 @@ import com.google.common.collect.ImmutableList;
 						time.consume(timeLastAction+delay-1-time.getStartTime());
 					}
 				}else{
+					
 					time.consumeAll();
 				}
 			}
