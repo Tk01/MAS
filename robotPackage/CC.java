@@ -10,7 +10,7 @@ public class CC {
 	
 	private PBC pbc;
 	
-	private ArrayList<JPlan> jplans = new ArrayList<JPlan>();
+	private JPlan jplans;
 	
 	
 	private boolean ongoing = false;
@@ -33,7 +33,7 @@ public class CC {
 		String type = messageContent.getType();
 		
 		
-		if(type.equals("startNegotiation") && jplans.isEmpty() && pbc.currentplan.goals.size()>3 && !ongoing){
+		if(type.equals("startNegotiation") && jplans==null && pbc.currentplan.goals.size()>3 && !ongoing){
 			Plan negPlan = ((StartNegotiationMessageContent) messageContent).getPlan();
 			JPlan jointPlan = getBestJointPlan(negPlan);
 			if(jointPlan!=null){
@@ -70,103 +70,100 @@ public class CC {
 		}*/
 		return null;
 	}
-	private JPlan getBestJointPlan(Plan negPlan) {
-		
-		ArrayList <Goal> negGoals = negPlan.getPlan();
-		ArrayList <Goal> ownGoals = pbc.getCurrentPlan().getPlan();
-		
-		double valueNegPlan = negPlan.value(negPlan.getPlan());
-		double valueCurrentPlan = pbc.getCurrentPlan().value(pbc.getCurrentPlan().getPlan());
-		
-		Plan tempNegPlan = new Plan(negGoals, pbc.worldModel);
-		Plan tempOwnPlan = new Plan(ownGoals, pbc.worldModel);
-		
-		boolean changed = false;
-		
-		for(int i = 1; i<negGoals.size();i++){
-			if(negGoals.get(i).type.equals("pickup") && negGoals.get(i+1).type.equals("drop")){
-				for(int j = 1;j<ownGoals.size();j++){
-					if(ownGoals.get(j).type.equals("pickup") && ownGoals.get(j+1).type.equals("drop")){
-						Plan tempPlan = new Plan(tempOwnPlan.goals,pbc.worldModel);
-						tempPlan.remove(ownGoals.get(j));
-						tempPlan.remove(ownGoals.get(j+1));
-						Plan tryTempOwnPlan = tempPlan.isPossiblePlan(negGoals.get(i),negGoals.get(i+1));
-						tempPlan = new Plan(tempNegPlan.goals,tempNegPlan.model);
-						tempPlan.remove(ownGoals.get(i));
-						tempPlan.remove(ownGoals.get(i+1));
-						Plan tryTempNegPlan = tempPlan.isPossiblePlan(negGoals.get(j),negGoals.get(j+1));
-						if(tryTempOwnPlan.value(tryTempOwnPlan.goals)>tempOwnPlan.value(tempOwnPlan.goals) && tryTempNegPlan.value(tryTempNegPlan.goals)>tempNegPlan.value(tempNegPlan.goals)){
-							tempNegPlan = tryTempNegPlan;
-							tempOwnPlan = tryTempOwnPlan;
-							changed = true;
-						}
-					}
-					if(ownGoals.get(j).type.equals("pickup") && ownGoals.get(j+2).type.equals("drop")){
-						Plan tempPlan = new Plan(tempOwnPlan.goals,pbc.worldModel);
-						tempPlan.remove(ownGoals.get(j));
-						tempPlan.remove(ownGoals.get(j+2));
-						Plan tryTempOwnPlan = tempPlan.isPossiblePlan(negGoals.get(i),negGoals.get(i+1));
-						tempPlan = new Plan(tempNegPlan.goals,tempNegPlan.model);
-						tempPlan.remove(ownGoals.get(i));
-						tempPlan.remove(ownGoals.get(i+1));
-						Plan tryTempNegPlan = tempPlan.isPossiblePlan(negGoals.get(j),negGoals.get(j+2));
-						if(tryTempOwnPlan.value(tryTempOwnPlan.goals)>tempOwnPlan.value(tempOwnPlan.goals) && tryTempNegPlan.value(tryTempNegPlan.goals)>tempNegPlan.value(tempNegPlan.goals)){
-							tempNegPlan = tryTempNegPlan;
-							tempOwnPlan = tryTempOwnPlan;
-							changed = true;
-						}
-					}
-				}
-			}
-			if(negGoals.get(i).type.equals("pickup") && negGoals.get(i+2).type.equals("drop")){
-				for(int j = 1;j<ownGoals.size();j++){
-					if(ownGoals.get(j).type.equals("pickup") && ownGoals.get(j+1).type.equals("drop")){
-						Plan tempPlan = new Plan(tempOwnPlan.goals,pbc.worldModel);
-						tempPlan.remove(ownGoals.get(j));
-						tempPlan.remove(ownGoals.get(j+1));
-						Plan tryTempOwnPlan = tempPlan.isPossiblePlan(negGoals.get(i),negGoals.get(i+2));
-						tempPlan = new Plan(tempNegPlan.goals,tempNegPlan.model);
-						tempPlan.remove(ownGoals.get(i));
-						tempPlan.remove(ownGoals.get(i+2));
-						Plan tryTempNegPlan = tempPlan.isPossiblePlan(negGoals.get(j),negGoals.get(j+1));
-						if(tryTempOwnPlan.value(tryTempOwnPlan.goals)>tempOwnPlan.value(tempOwnPlan.goals) && tryTempNegPlan.value(tryTempNegPlan.goals)>tempNegPlan.value(tempNegPlan.goals)){
-							tempNegPlan = tryTempNegPlan;
-							tempOwnPlan = tryTempOwnPlan;
-							changed = true;
-						}
-					}
-					if(ownGoals.get(j).type.equals("pickup") && ownGoals.get(j+2).type.equals("drop")){
-						Plan tempPlan = new Plan(tempOwnPlan.goals,pbc.worldModel);
-						tempPlan.remove(ownGoals.get(j));
-						tempPlan.remove(ownGoals.get(j+2));
-						Plan tryTempOwnPlan = tempPlan.isPossiblePlan(negGoals.get(i),negGoals.get(i+2));
-						tempPlan = new Plan(tempNegPlan.goals,tempNegPlan.model);
-						tempPlan.remove(ownGoals.get(i));
-						tempPlan.remove(ownGoals.get(i+2));
-						Plan tryTempNegPlan = tempPlan.isPossiblePlan(negGoals.get(j),negGoals.get(j+2));
-						if(tryTempOwnPlan.value(tryTempOwnPlan.goals)>tempOwnPlan.value(tempOwnPlan.goals) && tryTempNegPlan.value(tryTempNegPlan.goals)>tempNegPlan.value(tempNegPlan.goals)){
-							tempNegPlan = tryTempNegPlan;
-							tempOwnPlan = tryTempOwnPlan;
-							changed = true;
-						}
-					}
-				}
-			}
-			
-			
-		}
-		
-		
 
-		if (changed){
-			return new JPlan(tempOwnPlan,tempNegPlan);
-		}
-		else{
-			return null;
-		}
+	
+	public void bestJPlan(Plan otherPlan){
+		Plan ownPlanNoCharging = pbc.currentplan.returnPlanWithoutCharging();
+		Plan otherPlanNoCharging = otherPlan.returnPlanWithoutCharging();
+		
+		ArrayList<Goal> allGoals = ownPlanNoCharging.goals;
+		allGoals.addAll(otherPlanNoCharging.goals);
+		
+		ArrayList<Goal> ownGoals = ownPlanNoCharging.goals;
+		ArrayList<Goal> otherGoals = otherPlanNoCharging.goals;
+		
+		
+		
+		
+		
+		JPlan bestJPlan = getBestPlan(allGoals, ownGoals, otherGoals, new ArrayList<Goal>(), new ArrayList<Goal>(), 0, otherPlan.value(otherPlan.goals));
 	}
 	
-
+	private JPlan getBestPlan(ArrayList<Goal> allGoals,
+			ArrayList<Goal> ownGoals, ArrayList<Goal> otherGoals,
+			ArrayList<Goal> bestOwn, ArrayList<Goal> bestOther, int i,
+			double minOtherValue) {
+		
+		if(i+1==allGoals.size()){
+			Plan bestOwnPlan;
+			Plan bestOtherPlan;
+			
+			if(pbc.currentplan.value(ownGoals)<pbc.currentplan.value(bestOwn) && pbc.currentplan.value(bestOther)<=minOtherValue){
+				bestOwnPlan = new Plan(ownGoals, pbc.worldModel);
+				bestOtherPlan = new Plan(otherGoals, pbc.worldModel);
+				
+			}
+			else{
+				bestOwnPlan = new Plan(bestOwn, pbc.worldModel);
+				bestOtherPlan = new Plan(bestOther, pbc.worldModel);
+				
+			}
+			JPlan bestJPlan = new JPlan();
+			bestJPlan.ownPlan=bestOwnPlan;
+			bestJPlan.otherPlan=bestOtherPlan;
+			return bestJPlan;
+		}
+		else{
+			
+			JPlan jPlan = new JPlan();
+			jPlan.ownPlan=new Plan(bestOwn, pbc.worldModel);
+			jPlan.otherPlan =new Plan(bestOther, pbc.worldModel);
+			
+			if(ownGoals.size()<5){
+				ArrayList<Goal>copyOwn = (ArrayList<Goal>) ownGoals.clone();
+			
+			
+				Plan ownPlan = new Plan(copyOwn, pbc.worldModel);
+				ownPlan.isPossiblePlan(allGoals.get(i), allGoals.get(i+1));
+			
+			
+				jPlan = getBestPlan(allGoals, ownPlan.goals, otherGoals, bestOwn, bestOther, i++, minOtherValue);
+			
+			}
+			if(otherGoals.size()<5){
+				ArrayList<Goal>copyOther = (ArrayList<Goal>) otherGoals.clone();
+			
+				Plan otherPlan = new Plan(copyOther, pbc.worldModel); 
+				otherPlan.isPossiblePlan(allGoals.get(i), allGoals.get(i+1));
+			
+				JPlan jPlan2 = getBestPlan(allGoals, ownGoals, copyOther, jPlan.ownPlan.goals, jPlan.otherPlan.goals, i++, minOtherValue);
+			}
+			
+			return jPlan2;
+		}
+		
+			
+			
+			
+			
+			
+		
+		
+		
+		
+	}
+	
+	
+	private Plan getBestPlanForAddedGoals(Plan plan, ArrayList<Goal> goals){
+		Plan bestPlan = null;
+		
+		for(int i=0;i<goals.size();i++){
+			bestPlan = plan.isPossiblePlan(goals.get(i), goals.get(i+1));
+		}
+		
+		
+		return bestPlan;
+	}
 	
 	
 	public void negotiationAbort(){

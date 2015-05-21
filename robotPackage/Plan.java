@@ -211,6 +211,17 @@ public class Plan {
 		if(this.goals.isEmpty())return null;
 		return this.goals.get(0);
 	}
+	
+	public Plan returnPlanWithoutCharging(){
+		ArrayList<Goal> goalsCopy = (ArrayList) goals.clone();
+		for(int i=0;i<goalsCopy.size();i++){
+			if(((Goal)goalsCopy.get(i)).type().equals("charging")){
+				goalsCopy.remove(goalsCopy.get(i));
+			}
+			
+		}
+		return new Plan(goalsCopy,model);
+	}
 
 
 
