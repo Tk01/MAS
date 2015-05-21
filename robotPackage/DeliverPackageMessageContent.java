@@ -9,13 +9,17 @@ public class DeliverPackageMessageContent extends ContractNetMessageContent{
 	
 
 	Package packageToDel;
-	
+	long endTime;
 
-	public DeliverPackageMessageContent(CommUser receiver,Package packageToDeliver, int contractID){
+	public long getEndTime() {
+		return endTime;
+	}
+
+	public DeliverPackageMessageContent(CommUser receiver,Package packageToDeliver, int contractID, long endTime){
 	super(receiver,"DeliverMessage");
 	this.packageToDel = packageToDeliver;	
 	setContractID(contractID);
-	
+	this.endTime = endTime;
 	}
 	
 	public Package getPackageToDel() {

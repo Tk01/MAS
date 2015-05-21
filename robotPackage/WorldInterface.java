@@ -4,6 +4,7 @@ package robotPackage;
 
 
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 import com.github.rinde.rinsim.core.TimeLapse;
 import com.github.rinde.rinsim.core.model.comm.CommDevice;
@@ -59,8 +60,8 @@ public class WorldInterface {
 		model.setCoordinates(this.roadModel.get().getPosition(robot));
 		model.addMessages(translator.get().getUnreadMessages());
 		ArrayList<Point> list = new ArrayList<Point>();
-		for(Robot r:roadModel.get().getObjectsAt(this.robot, Robot.class)){
-			if(!r.equals(this.robot)){
+		for(Robot r:roadModel.get().getObjectsOfType( Robot.class)){
+			if(!r.equals(this.robot) && distance(roadModel.get().getPosition(r),this.model.coordinates()) < 1){
 				list.add(model.coordinates());
 			}
 		}
@@ -68,16 +69,33 @@ public class WorldInterface {
 		model.setRobots(list);
 		model.setTime(time);
 	}
+	private double distance(Point point, Point point2) {
+		double startX = point.x;
+		double startY = point.y;
+
+		double endX = point2.x;
+		double endY = point2.y;
+
+
+		double xd = endX-startX;
+		double yd = endY- startY;
+		double distance = Math.sqrt(xd*xd + yd*yd);
+
+		return distance;
+	}
+
 	public void charge() {
-		double toCharge = 1-model.battery();
-		double chargeRate = 5*model.getBatteryDecay();
-		long timeSpend = (long) Math.min((long) toCharge/chargeRate , model.getTime().getTimeLeft());
-		model.charge(timeSpend*chargeRate);
+		double toCharge = 1000l*10000l-model.battery();
+		long chargeRate = 6;
+		double chargeTime =(long) (toCharge/chargeRate);
+		if(chargeTime ==0) chargeTime =1; 
+		long timeSpend = (long) Math.min(chargeTime , model.getTime().getTimeLeft());
+		model.charge(chargeRate*timeSpend);
 		model.getTime().consume( timeSpend);
 	}
 	public void drop() {
 		try{
-		pdpModel.get().drop(robot, model.getCarriedPackage(), model.getTime());
+		pdpModel.get().deliver(robot, model.getCarriedPackage(), model.getTime());
 		model.dropPackage();
 		model.getTime().consume(0);
 		}
@@ -85,7 +103,7 @@ public class WorldInterface {
 			
 		}
 	}
-	public void pickup() {
+	public void pickup() throws NoSuchElementException{
 		try{
 		Package parcel = this.getPackageHere();
 		pdpModel.get().pickup(robot, parcel, model.getTime());
@@ -94,9 +112,17 @@ public class WorldInterface {
 		catch(IllegalArgumentException e){
 			
 		}
+		catch(NoSuchElementException e){
+			throw e;
+		}
 	}
-	private Package getPackageHere() {
-		return roadModel.get().getObjectsAt(robot, world.Package.class).iterator().next();
+	private Package getPackageHere() throws NoSuchElementException{
+		try{
+			return roadModel.get().getObjectsAt(robot, world.Package.class).iterator().next();
+		}catch(NoSuchElementException e){
+			throw e;
+		}
+		
 	}
 	public void waitMoment() {
 		//model.batteryDrop(model.getTime().getTimeLeft()*SpendingRate);

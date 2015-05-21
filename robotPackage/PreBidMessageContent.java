@@ -11,6 +11,7 @@ public class PreBidMessageContent extends ContractNetMessageContent{
 
 	
 	double bid;
+
 	
 	
 
@@ -27,6 +28,10 @@ public class PreBidMessageContent extends ContractNetMessageContent{
 	public double getBid(){
 		return bid;
 	}
+
+
+
+	
 	
 
 	

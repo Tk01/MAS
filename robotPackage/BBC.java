@@ -1,10 +1,12 @@
 package robotPackage;
 
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 import com.github.rinde.rinsim.core.model.comm.CommDevice;
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.Message;
+import com.github.rinde.rinsim.core.model.road.RoadUnits;
 import com.github.rinde.rinsim.geom.Point;
 
 public class BBC {
@@ -38,42 +40,65 @@ public class BBC {
 	public void placeGoal(Goal goal){
 		this.goal = goal;
 	}
-	public void run() {
+	public void run(){
 		if(done){
 			pbc.done(goal);
 			done = false;
 		}
 		if( model.messages().size() !=0) 
 			pbc.readMessages();
-
-
+		RoadUnits r = model.getRoadUnits();
+		if(goal == null && model.battery()- r.toExTime(r.toInDist(distance(model.coordinates(),model.ChargingStation.getPosition().get()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit()) < 1000l*10000l*0.25){
+			pbc.placeCharge();
+		}
 		checkMessages();
 
 		if( goal == null){
+			if(model.coordinates().equals(new Point(5,5))){
+				this.worldInterface.MoveTo(new Point(5,4.9));
+				return;
+			}
 			worldInterface.waitMoment();
 			return;
 		}
+		if(goal.type().equals("charging") && model.chargeTaken()){
+			if(distance(this.model.coordinates(),new Point(5,5)) == 0 ){
+				this.worldInterface.MoveTo(new Point(5,4.9));
+				return;	
+			}
+			if(distance(this.model.coordinates(),new Point(5,5)) <= 0.2 ){
+				this.worldInterface.waitMoment();
+				return;	
+			}
+		}
+		
 		if(!goal.coordinates().equals(model.coordinates())){
 			worldInterface.MoveTo(goal.coordinates());
 			return;
 		}
+		
 		if(goal.type().equals("drop")){
 			worldInterface.drop();
 			done = true;
 			return;
 		}
 		if(goal.type().equals("pickup")){
-			worldInterface.pickup();
+			try{
+				worldInterface.pickup();
+			}catch(NoSuchElementException e){
+				pbc.failPickUp();
+			}
+			
 			done =true;
 			return;
-		}		
-		if(goal.type().equals("charging") && model.chargeTaken()){
-			worldInterface.waitMoment();
-			return;
 		}
+		
+		
 		if(goal.type().equals("charging")){
 			worldInterface.charge();
-			if(model.battery() == 1) done =true;
+			if(model.battery() == 1000l*10000l){
+				done =true;
+			}
 			return;
 		}
 		/*
@@ -87,6 +112,21 @@ public class BBC {
 	}
 
 
+
+	private Double distance(Point point, Point point2) {
+		double startX = point.x;
+		double startY = point.y;
+
+		double endX = point2.x;
+		double endY = point2.y;
+
+
+		double xd = endX-startX;
+		double yd = endY- startY;
+		double distance = Math.sqrt(xd*xd + yd*yd);
+
+		return distance;
+	}
 
 	//read the messages
 	private void checkMessages(){
