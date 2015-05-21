@@ -116,8 +116,8 @@ public class CC {
 		else{
 			
 			JPlan jPlan = new JPlan();
-			jPlan.ownPlan=new Plan(bestOwn, pbc.worldModel);
-			jPlan.otherPlan =new Plan(bestOther, pbc.worldModel);
+			jPlan.setOwnPlan(new Plan(bestOwn, pbc.worldModel));
+			jPlan.setOtherPlan(new Plan(bestOther, pbc.worldModel));
 			
 			if(ownGoals.size()<5){
 				ArrayList<Goal>copyOwn = (ArrayList<Goal>) ownGoals.clone();
@@ -136,10 +136,10 @@ public class CC {
 				Plan otherPlan = new Plan(copyOther, pbc.worldModel); 
 				otherPlan.isPossiblePlan(allGoals.get(i), allGoals.get(i+1));
 			
-				JPlan jPlan2 = getBestPlan(allGoals, ownGoals, copyOther, jPlan.ownPlan.goals, jPlan.otherPlan.goals, i++, minOtherValue);
+				jPlan = getBestPlan(allGoals, ownGoals, copyOther, jPlan.ownPlan.goals, jPlan.otherPlan.goals, i++, minOtherValue);
 			}
 			
-			return jPlan2;
+			return jPlan;
 		}
 		
 			
