@@ -31,14 +31,13 @@ public class Robot extends Vehicle implements CommUser{
 		while(arg0.hasTimeLeft()){
 			this.inter.run(arg0);
 		}
-		this.model.batteryDrop(1d/1000d);
+		this.model.batteryDrop(arg0.getTimeStep()*model.getBatteryDecay());
 		System.out.println(this.model.battery);
 	}
 
 	@Override
 	public void initRoadPDP(RoadModel arg0, PDPModel arg1) {
 		this.inter.initRoadPDP( arg0,  arg1);
-		
 	}
 	@Override
 	public Optional<Point> getPosition() {

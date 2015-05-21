@@ -11,13 +11,14 @@ import com.github.rinde.rinsim.core.model.comm.CommDeviceBuilder;
 import com.github.rinde.rinsim.core.model.pdp.PDPModel;
 import com.github.rinde.rinsim.core.model.road.MoveProgress;
 import com.github.rinde.rinsim.core.model.road.RoadModel;
+import com.github.rinde.rinsim.core.model.road.RoadUnits;
 import com.github.rinde.rinsim.geom.Point;
 import com.google.common.base.Optional;
 
 import world.ChargingStation;
 import world.Package;
 public class WorldInterface {
-	static public final double SpendingRate = 1/1000;
+
 	Optional<CommDevice> translator;
 	Point moveTo;
 	BBC bbc;
@@ -44,7 +45,7 @@ public class WorldInterface {
 	public void MoveTo(Point x){
 		@SuppressWarnings("unused")
 		MoveProgress consumed = this.roadModel.get().moveTo(robot, x, model.getTime());
-		model.batteryDrop(model.getTime().getTimeConsumed()*SpendingRate);
+
 	}
 	public void run(TimeLapse time){
 		if(model.battery() > 0){
@@ -69,10 +70,10 @@ public class WorldInterface {
 	}
 	public void charge() {
 		double toCharge = 1-model.battery();
-		double chargeRate = 5*WorldInterface.SpendingRate;
-		double timeSpend = Math.max(toCharge/chargeRate , model.getTime().getTimeLeft());
+		double chargeRate = 5*model.getBatteryDecay();
+		long timeSpend = (long) Math.min((long) toCharge/chargeRate , model.getTime().getTimeLeft());
 		model.charge(timeSpend*chargeRate);
-		model.getTime().consume((long) timeSpend);
+		model.getTime().consume( timeSpend);
 	}
 	public void drop() {
 		try{
@@ -105,6 +106,7 @@ public class WorldInterface {
 	public void initRoadPDP(RoadModel arg0, PDPModel arg1) {
 		roadModel = Optional.of(arg0);
 		pdpModel = Optional.of(arg1);
+		model.setRoadUnits(new RoadUnits(arg0.getDistanceUnit(),arg0.getSpeedUnit()));
 
 	}
 	public void setCommDevice(CommDeviceBuilder builder) {

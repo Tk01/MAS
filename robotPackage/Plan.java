@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import world.Package;
 
+import com.github.rinde.rinsim.core.model.road.RoadUnits;
 import com.github.rinde.rinsim.geom.Point;
 import com.github.rinde.rinsim.util.TimeWindow;
 
@@ -48,12 +49,14 @@ public class Plan {
 
 	//Return the utility of the plan. Is used to compare tasks that are added to the current plan. The lower the better
 	public double value(ArrayList<Goal> newPlan){
+		RoadUnits r = model.getRoadUnits();
 		if(newPlan.size()==0)return 0;
 		long startTime = model.getTime().getTime();
 		long time = model.getTime().getTime();
 		double battery = model.battery();
+		Point curcor = model.coordinates();
 		for(Goal g:newPlan){
-			double timespend = distance(model.coordinates(),g.coordinates())/model.getSpeed()/1000;
+			double timespend = r.toExTime(r.toInDist(distance(curcor,g.coordinates()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
 			long timespend2;
 			if(timespend == (long) timespend)timespend2 = (long) timespend;
 			else{
@@ -64,19 +67,20 @@ public class Plan {
 				timespend = g.getStartWindow()-time+timespend;
 				time=g.getStartWindow();
 			}
-			battery-= timespend*WorldInterface.SpendingRate;
+			battery-= timespend*model.getBatteryDecay();
 			if(g.type().equals("charging")){
 				double batterydiff = 1-battery;
 				battery =1;
-				if(batterydiff/5/WorldInterface.SpendingRate==(long) (batterydiff/5/WorldInterface.SpendingRate)){
-					time=time+(long) (batterydiff/5/WorldInterface.SpendingRate);
+				if(batterydiff/5/model.getBatteryDecay()==(long) (batterydiff/5/model.getBatteryDecay())){
+					time=time+(long) (batterydiff/5/model.getBatteryDecay());
 				}else{
-					time=time+(long) (batterydiff/5/WorldInterface.SpendingRate)+1;
+					time=time+(long) (batterydiff/5/model.getBatteryDecay())+1;
 				}
 			}
+			curcor =g.point;
 		}
 		long totalTimeSpend = time-startTime;
-		return totalTimeSpend+(1-battery)*distance(newPlan.get(newPlan.size()-1).coordinates(),model.coordinates());
+		return totalTimeSpend+0*(1-battery)*r.toExTime(r.toInDist(distance(newPlan.get(newPlan.size()-1).coordinates(),model.ChargingStation.getPosition().get()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
 	}
 
 
@@ -99,7 +103,7 @@ public class Plan {
 		}
 		
 		ArrayList<Goal> newPlan = new ArrayList<Goal>();
-		if(goals.size()>0 && goals.get(0).type().equals("drop") ){
+		if(copyGoals.size()>0 && copyGoals.get(0).type().equals("drop") ){
 			
 			newPlan.add(copyGoals.remove(0));
 		}
@@ -114,9 +118,9 @@ public class Plan {
 			ArrayList<Goal> newPlan, Goal charged, ArrayList<Goal> bestplan) {
 		if(copyGoals.size() ==0){
 			if(valid(newPlan)){
-				if(bestplan == null) bestplan = newPlan;
+				if(bestplan == null) bestplan = (ArrayList<Goal>) newPlan.clone();
 				else{
-					if(value(newPlan)>value(bestplan)) bestplan = newPlan;
+					if(value(newPlan)>value(bestplan)) bestplan = (ArrayList<Goal>) newPlan.clone();
 				}
 			}
 			for(int l=0;l<newPlan.size()+1;l++){
@@ -127,9 +131,9 @@ public class Plan {
 				}
 				
 				if(valid(newPlan)){
-					if(bestplan == null) bestplan = newPlan;
+					if(bestplan == null) bestplan = (ArrayList<Goal>) newPlan.clone();
 					else{
-						if(value(newPlan)>value(bestplan)) bestplan = newPlan;
+						if(value(newPlan)>value(bestplan)) bestplan = (ArrayList<Goal>) newPlan.clone();
 					}
 				}
 				newPlan.remove(l);
@@ -149,32 +153,29 @@ public class Plan {
 		}
 	}
 	private boolean valid(ArrayList<Goal> newPlan) {
-		
+		RoadUnits r = model.getRoadUnits();
 		long time = model.getTime().getTime();
 		double battery = model.battery();
+		Point curcor = model.coordinates();
 		for(Goal g:newPlan){
-			double timespend = distance(model.coordinates(),g.coordinates())/model.getSpeed()/1000;
-			long timespend2;
-			if(timespend == (long) timespend)timespend2 = (long) timespend;
-			else{
-				timespend2 = (long) timespend+1;
-			}
-			time = time+ timespend2;
+			long timespend = (long) r.toExTime(r.toInDist(distance(curcor,g.coordinates()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
+			
+			time = time+ timespend;
 			if(time>g.getEndWindow())return false;
 			if(time<g.getStartWindow()){
 				timespend = g.getStartWindow()-time+timespend;
 				time=g.getStartWindow();
 			}
-			battery-= timespend*WorldInterface.SpendingRate;
+			battery-= timespend*model.getBatteryDecay();
 			if(battery <=0) return false;
 			if(g.type().equals("charging")){
 				double batterydiff = 1-battery;
 				long timestart = time;
 				battery =1;
-				if(batterydiff/5/WorldInterface.SpendingRate==(long) (batterydiff/5/WorldInterface.SpendingRate)){
-					time=time+(long) (batterydiff/5/WorldInterface.SpendingRate);
+				if(batterydiff/5/model.getBatteryDecay()==(long) (batterydiff/5/model.getBatteryDecay())){
+					time=time+(long) (batterydiff/5/model.getBatteryDecay());
 				}else{
-					time=time+(long) (batterydiff/5/WorldInterface.SpendingRate)+1;
+					time=time+(long) (batterydiff/5/model.getBatteryDecay())+1;
 				}
 				if(time>g.endWindow)return false;
 				if(!((ChargeGoal)g).isReserved()){
@@ -183,14 +184,15 @@ public class Plan {
 				}
 				
 			}
+			curcor =g.point;
 		}
-		double timespend = distance(newPlan.get(newPlan.size()-1).coordinates(),model.coordinates())/model.getSpeed()/1000;
+		double timespend = r.toExTime(r.toInDist(distance(newPlan.get(newPlan.size()-1).coordinates(),model.ChargingStation.getPosition().get()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
 		long timespend2;
 		if(timespend == (long) timespend)timespend2 = (long) timespend;
 		else{
 			timespend2 = (long) timespend+1;
 		}
-		battery-= timespend2*WorldInterface.SpendingRate;
+		battery-= timespend2*model.getBatteryDecay();
 		if(battery <=0) return false;
 		return true;
 	}

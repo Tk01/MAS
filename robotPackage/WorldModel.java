@@ -2,12 +2,15 @@ package robotPackage;
 
 import java.util.ArrayList;
 
+import javax.measure.converter.UnitConverter;
+
 import world.ChargingStation;
 
 import com.github.rinde.rinsim.core.TimeLapse;
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.Message;
 import com.github.rinde.rinsim.core.model.pdp.Parcel;
+import com.github.rinde.rinsim.core.model.road.RoadUnits;
 import com.github.rinde.rinsim.geom.Point;
 import com.google.common.collect.ImmutableList;
 
@@ -28,6 +31,15 @@ public class WorldModel {
 
 
 	private boolean reserveChargingStation = false;
+	public UnitConverter getDistanceConverter() {
+		return DistanceConverter;
+	}
+	public UnitConverter getSpeedConverter() {
+		return SpeedConverter;
+	}
+	private UnitConverter DistanceConverter;
+	private UnitConverter SpeedConverter;
+	private RoadUnits RoadUnits;
 
 
 	public WorldModel(Point p,ChargingStation c, double s ) {
@@ -124,5 +136,24 @@ public class WorldModel {
 		}
 
 
+	}
+	public void setDistanceConverter(UnitConverter converterTo) {
+		DistanceConverter = converterTo;
+
+	}
+	public void setSpeedConverter(UnitConverter converterTo) {
+		SpeedConverter = converterTo;
+
+	}
+	public double getBatteryDecay() {
+		// TODO Auto-generated method stub
+		return 1d/1000d/1000d;
+	}
+	public RoadUnits getRoadUnits() {
+		// TODO Auto-generated method stub
+		return RoadUnits;
+	}
+	public void setRoadUnits(RoadUnits roadUnits2) {
+		this.RoadUnits	=roadUnits2;
 	}
 }

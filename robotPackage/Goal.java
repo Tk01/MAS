@@ -39,5 +39,9 @@ public class Goal {
 		this.endWindow = endWindow;
 	}
 	
-
+	public String toString(){
+		
+		return type+":"+point.toString();
+		
+	}
 }

@@ -260,7 +260,7 @@ public class PBC {
 				else{
 					bidPlan = plan.isPossiblePlan(pickupGoal,dropGoal);
 				}
-				if(bidPlan !=null){
+				if(bidPlan !=null && bidPlan.getPlan() !=null){
 				double oldValue = currentplan.value(currentplan.getPlan());
 				double newValue = bidPlan.value(bidPlan.getPlan());
 				double bid = newValue - oldValue;
