@@ -21,7 +21,7 @@ public class WorldModel {
 	TimeLapse time =null;
 
 	ArrayList<Point> Robots = new ArrayList<Point>();
-	Double battery = 1d;
+	long battery = 1000l*10000l;
 	ChargingStation ChargingStation;
 	world.Package Carried=null;
 	private ArrayList<Message> messages= new ArrayList<Message>();
@@ -58,8 +58,8 @@ public class WorldModel {
 
 
 
-	public void batteryDrop(double d) {
-		battery=Math.max(battery-d, 0);
+	public void batteryDrop(long d) {
+		battery= Math.max(battery-d, 0);
 
 	}
 	public double battery() {
@@ -81,12 +81,12 @@ public class WorldModel {
 	public boolean chargeTaken() {
 		// TODO Auto-generated method stub
 		for(Point r:Robots){
-			if(r.equals(ChargingStation))return true;
+			if(r.equals(new Point(5,5)))return true;
 		}
 		return false;
 	}
-	public void charge(double d) {
-		battery=Math.max(battery+d, 1);
+	public void charge(long d) {
+		battery= Math.min(battery+d, 1000l*10000l);
 
 	}
 	public Parcel getCarriedPackage() {
@@ -145,10 +145,7 @@ public class WorldModel {
 		SpeedConverter = converterTo;
 
 	}
-	public double getBatteryDecay() {
-		// TODO Auto-generated method stub
-		return 1d/1000d/1000d;
-	}
+	
 	public RoadUnits getRoadUnits() {
 		// TODO Auto-generated method stub
 		return RoadUnits;

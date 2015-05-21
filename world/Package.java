@@ -75,7 +75,7 @@ import com.google.common.collect.ImmutableList;
 		@Override
 		public void tick(TimeLapse time) {
 			if(stage ==0 && time.getTimeLeft()>0){
-				this.translator.get().broadcast(new DeliverPackageMessageContent(null, this, mycontractId));
+				this.translator.get().broadcast(new DeliverPackageMessageContent(null, this, mycontractId,time.getStartTime()+delay));
 				stage++;
 				timeLastAction=time.getStartTime();
 				if(time.getEndTime()<timeLastAction+delay){
@@ -102,9 +102,9 @@ import com.google.common.collect.ImmutableList;
 					}
 					for(Message m:preBidList){
 						if(m.getSender()==bestUser){
-							this.translator.get().send(new PreAssignmentMessageContent(bestUser, bid, true , this, mycontractId), m.getSender());
+							this.translator.get().send(new PreAssignmentMessageContent(bestUser, bid, true , this, mycontractId,time.getStartTime()+delay), m.getSender());
 						}else{
-							this.translator.get().send(new PreAssignmentMessageContent(bestUser, bid, false , this, mycontractId), m.getSender());
+							this.translator.get().send(new PreAssignmentMessageContent(bestUser, bid, false , this, mycontractId,time.getStartTime()+delay), m.getSender());
 						}
 					}
 					stage++;
@@ -163,7 +163,11 @@ import com.google.common.collect.ImmutableList;
 		public Optional<Point> getPosition() {
 			if(stage ==3) {
 				for(Robot user: roadModel.getObjectsOfType(Robot.class))
-				if(pdpModel.containerContains(user, this))return Optional.of(roadModel.getPosition(user));
+					if(pdpModel.containerContains(user, this))return Optional.of(roadModel.getPosition(user));
+				if(roadModel.containsObject(this))return Optional.of(roadModel.getPosition(this));
+				else{
+					return Optional.absent();
+				}
 			}
 			return Optional.of(roadModel.getPosition(this));
 			

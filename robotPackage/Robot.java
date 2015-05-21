@@ -31,7 +31,7 @@ public class Robot extends Vehicle implements CommUser{
 		while(arg0.hasTimeLeft()){
 			this.inter.run(arg0);
 		}
-		this.model.batteryDrop(arg0.getTimeStep()*model.getBatteryDecay());
+		this.model.batteryDrop(arg0.getTimeStep());
 		System.out.println(this.model.battery);
 	}
 

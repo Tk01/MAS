@@ -11,7 +11,7 @@ import com.github.rinde.rinsim.util.TimeWindow;
 public class Plan {
 
 
-	
+
 	ArrayList <Goal> goals;
 
 	Package bidPackage;
@@ -19,7 +19,7 @@ public class Plan {
 
 	public Plan(ArrayList <Goal> goals, WorldModel model){
 		this.goals =goals;
-		
+
 		this.model =model;
 	}
 
@@ -67,20 +67,20 @@ public class Plan {
 				timespend = g.getStartWindow()-time+timespend;
 				time=g.getStartWindow();
 			}
-			battery-= timespend*model.getBatteryDecay();
+			battery-= timespend;
 			if(g.type().equals("charging")){
 				double batterydiff = 1-battery;
 				battery =1;
-				if(batterydiff/5/model.getBatteryDecay()==(long) (batterydiff/5/model.getBatteryDecay())){
-					time=time+(long) (batterydiff/5/model.getBatteryDecay());
+				if(batterydiff/5==(long) (batterydiff/5)){
+					time=time+(long) (batterydiff/5);
 				}else{
-					time=time+(long) (batterydiff/5/model.getBatteryDecay())+1;
+					time=time+(long) (batterydiff/5)+1;
 				}
 			}
 			curcor =g.point;
 		}
 		long totalTimeSpend = time-startTime;
-		return totalTimeSpend+0*(1-battery)*r.toExTime(r.toInDist(distance(newPlan.get(newPlan.size()-1).coordinates(),model.ChargingStation.getPosition().get()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
+		return totalTimeSpend+(1-battery)*r.toExTime(r.toInDist(distance(newPlan.get(newPlan.size()-1).coordinates(),model.ChargingStation.getPosition().get()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
 	}
 
 
@@ -89,7 +89,7 @@ public class Plan {
 	// check if the pack can be taken up in the plan by checking if in the specified timewindows it is possible to pick up the package.
 	public Plan isPossiblePlan(Goal pickupGoal, Goal dropGoal){
 		if(goals.size() > 7) return null;
-		
+
 		@SuppressWarnings("unchecked")
 		ArrayList <Goal> copyGoals = (ArrayList<Goal>) goals.clone();
 		copyGoals.add(pickupGoal);
@@ -101,43 +101,23 @@ public class Plan {
 				break;
 			}
 		}
-		
+
 		ArrayList<Goal> newPlan = new ArrayList<Goal>();
 		if(copyGoals.size()>0 && copyGoals.get(0).type().equals("drop") ){
-			
+
 			newPlan.add(copyGoals.remove(0));
 		}
-		
+
 		return new Plan(GenerateBestPlan(copyGoals,newPlan,charged,null),model);
 	}
-	
-	
+
+
 
 
 	private ArrayList<Goal> GenerateBestPlan(ArrayList<Goal> copyGoals,
 			ArrayList<Goal> newPlan, Goal charged, ArrayList<Goal> bestplan) {
 		if(copyGoals.size() ==0){
-			if(valid(newPlan)){
-				if(bestplan == null) bestplan = (ArrayList<Goal>) newPlan.clone();
-				else{
-					if(value(newPlan)>value(bestplan)) bestplan = (ArrayList<Goal>) newPlan.clone();
-				}
-			}
-			for(int l=0;l<newPlan.size()+1;l++){
-				if(charged==null){
-					newPlan.add(l, new ChargeGoal(model.ChargingStation.getPosition().get(), "charging",new TimeWindow(0, Long.MAX_VALUE) ,false));
-				}else{
-					newPlan.add(l, charged);
-				}
-				
-				if(valid(newPlan)){
-					if(bestplan == null) bestplan = (ArrayList<Goal>) newPlan.clone();
-					else{
-						if(value(newPlan)>value(bestplan)) bestplan = (ArrayList<Goal>) newPlan.clone();
-					}
-				}
-				newPlan.remove(l);
-			}
+			bestplan = addCharging(newPlan, charged, bestplan);
 			return bestplan;
 		}
 		else{
@@ -146,11 +126,36 @@ public class Plan {
 				ArrayList<Goal> cnewPlan = (ArrayList<Goal>) newPlan.clone();
 				cnewPlan.add(ccopyGoals.remove(i));
 				cnewPlan.add(ccopyGoals.remove(i));
-				
+
 				bestplan=GenerateBestPlan(ccopyGoals,cnewPlan,charged,bestplan);
 			}
 			return bestplan;
 		}
+	}
+
+	private ArrayList<Goal> addCharging(ArrayList<Goal> newPlan, Goal charged,
+			ArrayList<Goal> bestplan) {
+		if(valid(newPlan)){
+			if(bestplan == null) bestplan = (ArrayList<Goal>) newPlan.clone();
+			else{
+				if(value(newPlan)>value(bestplan)) bestplan = (ArrayList<Goal>) newPlan.clone();
+			}
+		}
+		for(int number=0;number<=newPlan.size();number++){
+			if(charged==null){
+				newPlan.add(number, new ChargeGoal(model.ChargingStation.getPosition().get(), "charging",new TimeWindow(0, Long.MAX_VALUE) ,false));
+			}else{
+				newPlan.add(number, charged);
+			}
+			if(valid(newPlan)){
+				if(bestplan == null) bestplan = (ArrayList<Goal>) newPlan.clone();
+				else{
+					if(value(newPlan)>value(bestplan)) bestplan = (ArrayList<Goal>) newPlan.clone();
+				}
+			}
+			newPlan.remove(number);
+		}
+		return bestplan;
 	}
 	private boolean valid(ArrayList<Goal> newPlan) {
 		RoadUnits r = model.getRoadUnits();
@@ -159,30 +164,30 @@ public class Plan {
 		Point curcor = model.coordinates();
 		for(Goal g:newPlan){
 			long timespend = (long) r.toExTime(r.toInDist(distance(curcor,g.coordinates()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
-			
+
 			time = time+ timespend;
 			if(time>g.getEndWindow())return false;
-			if(time<g.getStartWindow()){
+			if(!g.type().equals("charging") && time<g.getStartWindow()){
 				timespend = g.getStartWindow()-time+timespend;
 				time=g.getStartWindow();
 			}
-			battery-= timespend*model.getBatteryDecay();
+			battery-= timespend;
 			if(battery <=0) return false;
 			if(g.type().equals("charging")){
 				double batterydiff = 1-battery;
 				long timestart = time;
 				battery =1;
-				if(batterydiff/5/model.getBatteryDecay()==(long) (batterydiff/5/model.getBatteryDecay())){
-					time=time+(long) (batterydiff/5/model.getBatteryDecay());
+				if(batterydiff/5==(long) (batterydiff/5)){
+					time=time+(long) (batterydiff/5);
 				}else{
-					time=time+(long) (batterydiff/5/model.getBatteryDecay())+1;
+					time=time+(long) (batterydiff/5)+1;
 				}
 				if(time>g.endWindow)return false;
 				if(!((ChargeGoal)g).isReserved()){
 					g.setEndWindow(time);
 					g.setStartWindow(timestart);					
 				}
-				
+
 			}
 			curcor =g.point;
 		}
@@ -192,7 +197,7 @@ public class Plan {
 		else{
 			timespend2 = (long) timespend+1;
 		}
-		battery-= timespend2*model.getBatteryDecay();
+		battery-= timespend2;
 		if(battery <=0) return false;
 		return true;
 	}

@@ -8,6 +8,8 @@ import org.jscience.geography.coordinates.Coordinates;
 
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.Message;
+import com.github.rinde.rinsim.core.model.pdp.Depot;
+import com.github.rinde.rinsim.util.TimeWindow;
 
 import world.ChargingStation;
 import world.Package;
@@ -59,11 +61,11 @@ public class PBC {
 
 
 	public void readMessages(){
-
+		
 
 
 		ArrayList<Message> messages = worldModel.messages();
-
+		cleanUp(messages);
 		reserveMessages(messages);
 
 		for(int i = 0; i<messages.size();i++){
@@ -84,6 +86,21 @@ public class PBC {
 
 
 
+	}
+
+	private void cleanUp(ArrayList<Message> messages) {
+		for(int i=0;i<messages.size();i++){
+			if(((MessageContent) messages.get(i).getContents()).getType().equals("DeliverMessage") && ((DeliverPackageMessageContent)messages.get(i).getContents()).getEndTime() <= worldModel.getTime().getStartTime()){
+				messages.remove(i);
+				i--;
+			}else{
+				if(((MessageContent) messages.get(i).getContents()).getType().equals("PreAssignment") && ((PreAssignmentMessageContent)messages.get(i).getContents()).getEndTime() <= worldModel.getTime().getStartTime()){
+					messages.remove(i);
+					i--;
+				}
+			}
+		}
+		
 	}
 
 	private void reserveMessages(ArrayList<Message> messages){
@@ -292,6 +309,23 @@ public class PBC {
 	public void sendNegotiationReplyMessage(CommUser jPlanAgent) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public void placeCharge() {
+		bbc.setGoal( new ChargeGoal(worldModel.ChargingStation.getPosition().get(), "charging",new TimeWindow(0, Long.MAX_VALUE) ,false));
+		
+	}
+
+	public void failPickUp() {
+		currentplan.goals.remove(0);
+	
+		for(Goal goal:currentplan.goals){
+			if(goal.type().equals("drop")){
+				currentplan.goals.remove(goal);
+				bbc.setGoal(getCurrentPlan().getNextgoal());
+				return;
+			}
+		}
 	}
 
 

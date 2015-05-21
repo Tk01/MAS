@@ -20,7 +20,7 @@ public class SimulationGenerator {
 	final ArrayList<Point> PLocation = new ArrayList<Point>();
 	final ArrayList<Long> PTime = new ArrayList<Long>();
 	final long SERVICE_DURATION =0;
-	final long endTime = 1000*1000;
+	final long endTime = 10000*10000;
 	public  SimulationGenerator(String filename) throws IOException{
 		BufferedReader in = new BufferedReader(new FileReader(filename));
 		String[] robots = in.readLine().split(";");
