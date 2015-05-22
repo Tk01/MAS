@@ -48,28 +48,26 @@ public class BBC {
 		if( model.messages().size() !=0) 
 			pbc.readMessages();
 		RoadUnits r = model.getRoadUnits();
-		if(goal == null && model.battery()- r.toExTime(r.toInDist(distance(model.coordinates(),model.ChargingStation.getPosition().get()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit()) < 1000l*10000l*0.25){
+		if(goal == null && model.battery()- r.toExTime(r.toInDist(distance(model.coordinates(),model.ChargingStation.getPosition().get()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit()) < 1000l*10000l*0.90){
 			pbc.placeCharge();
 		}
 		checkMessages();
 
 		if( goal == null){
 			if(model.coordinates().equals(new Point(5,5))){
-				this.worldInterface.MoveTo(new Point(5,4.9));
+				this.worldInterface.MoveTo(new Point(5,4));
 				return;
 			}
 			worldInterface.waitMoment();
 			return;
 		}
-		if(goal.type().equals("charging") && model.chargeTaken()){
-			if(distance(this.model.coordinates(),new Point(5,5)) == 0 ){
+		if(goal.type().equals("charging") && chargeTaken()){
+			if(this.model.coordinates().equals(new Point(5,5)) ){
 				this.worldInterface.MoveTo(new Point(5,4.9));
 				return;	
 			}
-			if(distance(this.model.coordinates(),new Point(5,5)) <= 0.2 ){
-				this.worldInterface.waitMoment();
-				return;	
-			}
+			this.worldInterface.waitMoment();
+			return;
 		}
 		
 		if(!goal.coordinates().equals(model.coordinates())){
@@ -204,5 +202,17 @@ public void sendStartNegotiationMessage(Plan plan) {
 public void sendConfirmationMessage(JPlan bestJPlan) {
 	// TODO Auto-generated method stub
 	
+}
+public boolean chargeTaken() {
+	// TODO Auto-generated method stub
+	for(Point r:model.Robots){
+		if(r.equals(new Point(5,5)))return true;
+		if(Point.distance(r, new Point(5,5)) <= 0.1 && Point.distance(r, new Point(5,5))  <= Point.distance(model.coordinates(), new Point(5,5))){
+		if(Point.distance(r, new Point(5,5))  < Point.distance(model.coordinates(), new Point(5,5)))return true;
+		if(r.x> model.coordinates().x)return true;
+		if(r.x== model.coordinates().x && true)return true;
+		}
+	}
+	return false;
 }
 }

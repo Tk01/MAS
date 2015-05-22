@@ -62,7 +62,7 @@ public class WorldInterface {
 		ArrayList<Point> list = new ArrayList<Point>();
 		for(Robot r:roadModel.get().getObjectsOfType( Robot.class)){
 			if(!r.equals(this.robot) && distance(roadModel.get().getPosition(r),this.model.coordinates()) < 1){
-				list.add(model.coordinates());
+				list.add(roadModel.get().getPosition(r));
 			}
 		}
 

@@ -78,13 +78,7 @@ public class WorldModel {
 		// TODO Auto-generated method stub
 		return coordinates;
 	}
-	public boolean chargeTaken() {
-		// TODO Auto-generated method stub
-		for(Point r:Robots){
-			if(r.equals(new Point(5,5)))return true;
-		}
-		return false;
-	}
+	
 	public void charge(long d) {
 		battery= Math.min(battery+d, 1000l*10000l);
 
