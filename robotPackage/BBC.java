@@ -8,6 +8,7 @@ import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.Message;
 import com.github.rinde.rinsim.core.model.road.RoadUnits;
 import com.github.rinde.rinsim.geom.Point;
+import com.github.rinde.rinsim.util.TimeWindow;
 
 public class BBC {
 	Goal goal;
@@ -52,9 +53,9 @@ public class BBC {
 			pbc.placeCharge();
 		}
 		checkMessages();
-
 		if( goal == null){
 			if(model.coordinates().equals(new Point(5,5))){
+				goal = new Goal(new Point(5,4),"MoveTo" , TimeWindow.ALWAYS);
 				this.worldInterface.MoveTo(new Point(5,4));
 				return;
 			}
@@ -72,6 +73,10 @@ public class BBC {
 		
 		if(!goal.coordinates().equals(model.coordinates())){
 			worldInterface.MoveTo(goal.coordinates());
+			return;
+		}
+		if(goal.type().equals("MoveTo")){
+			done = true;
 			return;
 		}
 		
