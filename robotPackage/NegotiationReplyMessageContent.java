@@ -6,8 +6,9 @@ public class NegotiationReplyMessageContent extends NegotiationMessage{
 	
 private boolean accepted;
 	
-	public NegotiationReplyMessageContent(String type, CommUser receiver){
-		super(type,receiver);
+	public NegotiationReplyMessageContent( CommUser receiver, boolean accepted){
+		super("NegotiationReply",receiver);
+		this.accepted = accepted;
 	}
 
 	public boolean isAccepted() {

@@ -28,6 +28,8 @@ public class WorldModel {
 	private Point coordinates;
 	private double speed;
 	ArrayList<Point> ChargingStations;
+	
+
 
 
 	private boolean reserveChargingStation = false;

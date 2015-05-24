@@ -34,7 +34,7 @@ public class PBC {
 	public PBC(BBC bbc){
 		this.bbc=bbc;
 		worldModel = bbc.getWorldModel();
-		cc = new CC();
+		cc = new CC(this);
 		currentplan = new Plan(new ArrayList<Goal>(), worldModel);
 	}
 
@@ -77,6 +77,11 @@ public class PBC {
 				worldModel.messages().remove(message);
 
 			}
+			if(content.getType().equals("StartNegotiation") || content.getType().equals("NegotiationReply") || content.getType().equals("NegotiationBidMessage") ){
+
+				cc.handleMessage(message);
+
+			}
 		}
 
 
@@ -98,7 +103,14 @@ public class PBC {
 					messages.remove(i);
 					i--;
 				}
+				else{
+					if(((MessageContent) messages.get(i).getContents()).getType().equals("StartNegotiationMessage") && ((StartNegotiationMessageContent)messages.get(i).getContents()).getEndTime() <= worldModel.getTime().getStartTime()){
+						messages.remove(i);
+						i--;
+					}
+				}
 			}
+			
 		}
 		
 	}
@@ -138,6 +150,11 @@ public class PBC {
 			cc.negotiationAbort();
 			definitivebid = null;
 			this.worldModel.messages().removeAll(this.worldModel.messages());
+			
+			//Call CC to start negotiation
+			if(currentplan.goals.size()>3){
+				cc.startNegotiation(currentplan);
+			}
 
 		}
 		else{
@@ -160,7 +177,7 @@ public class PBC {
 
 	private void preAssignment(ArrayList <Message> messages){
 
-		ArrayList deleteMessages = new ArrayList();
+		
 		Plan bestPlan = null;
 		double bestPlanValue=-1;
 		CommUser sender=null;
@@ -179,7 +196,7 @@ public class PBC {
 					long lastTime = timeLastAction+delay;
 					long currentTime = worldModel.getTime().getTime();
 					if(currentTime>lastTime){
-						deleteMessages.add(i);
+						
 					}
 					else{
 						double planValue = plan.value(plan.goals);
@@ -187,14 +204,14 @@ public class PBC {
 							bestPlanValue = planValue;
 							bestPlan = plan;
 							sender = message.getSender();
-							deleteMessages.add(i);
+							
 
 						}
 						else if(bestPlanValue==-1){
 							bestPlanValue = planValue;
 							bestPlan = plan;
 							sender = message.getSender();
-							deleteMessages.add(i);
+							
 						}
 
 					}
@@ -296,8 +313,8 @@ public class PBC {
 
 	}
 
-	public void sendStartNegotiationMessage(Plan plan) {
-		bbc.sendStartNegotiationMessage( plan);
+	public void sendStartNegotiationMessage(Plan plan, long endTime) {
+		bbc.sendStartNegotiationMessage( plan, endTime);
 
 	}
 

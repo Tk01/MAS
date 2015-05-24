@@ -52,7 +52,7 @@ public class BBC {
 		if(goal == null && model.battery()- r.toExTime(r.toInDist(distance(model.coordinates(),model.ChargingStation.getPosition().get()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit()) < 1000l*10000l*0.90){
 			pbc.placeCharge();
 		}
-		checkMessages();
+		
 		if( goal == null){
 			if(model.coordinates().equals(new Point(5,5))){
 				goal = new Goal(new Point(5,4),"MoveTo" , TimeWindow.ALWAYS);
@@ -131,40 +131,11 @@ public class BBC {
 		return distance;
 	}
 
-	//read the messages
-	private void checkMessages(){
-		for(int i = 0; i<messages.size();i++){
-			Message message = messages.get(i);
-			MessageContent content = (MessageContent) message.getContents();
-			if(content.getType().equals("DeliverPackage")){
-
-				sendDeliverBidMessage(message);
-
-
-			}
-			if(content.getType().equals("PreAssignment")){
-
-				evaluatePreAssignment(message);
-
-
-			}
-
-
-		}
-	}
+	
 
 
 
 
-private void evaluatePreAssignment(Message message) {
-		// TODO Auto-generated method stub
-		
-	}
-
-private void sendDeliverBidMessage(Message message) {
-		// TODO Auto-generated method stub
-		
-	}
 
 public WorldModel getWorldModel(){
 	return model;
@@ -195,12 +166,13 @@ public void sendReserveMessage(long startWindow, long endWindow) {
 }
 
 public void sendNegotiationBidMessage(JPlan jointPlan, CommUser sender) {
+	jointPlan.setJPlanAgent(thisRobot);
 	this.worldInterface.sendMessage(new NegotiationBidMessageContent(sender,jointPlan));
 	
 }
 
-public void sendStartNegotiationMessage(Plan plan) {
-	this.worldInterface.sendMessage(new StartNegotiationMessageContent(null,plan));
+public void sendStartNegotiationMessage(Plan plan, long endTime) {
+	this.worldInterface.sendMessage(new StartNegotiationMessageContent(null,plan, endTime));
 	
 }
 

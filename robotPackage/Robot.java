@@ -32,7 +32,7 @@ public class Robot extends Vehicle implements CommUser{
 			this.inter.run(arg0);
 		}
 		this.model.batteryDrop(arg0.getTimeStep());
-		System.out.println(this.model.battery);
+		//System.out.println(this.model.battery);
 	}
 
 	@Override
