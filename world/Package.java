@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 
 
+
 import robotPackage.Robot;
 import robotPackage.DefAssignmentMessageContent;
 import robotPackage.DefBidMessageContent;
@@ -26,6 +27,7 @@ import com.github.rinde.rinsim.core.model.comm.Message;
 import com.github.rinde.rinsim.core.model.comm.MessageContents;
 import com.github.rinde.rinsim.core.model.pdp.PDPModel;
 import com.github.rinde.rinsim.core.model.pdp.Parcel;
+import com.github.rinde.rinsim.core.model.pdp.Vehicle;
 import com.github.rinde.rinsim.core.model.road.RoadModel;
 import com.github.rinde.rinsim.core.model.road.RoadUser;
 import com.github.rinde.rinsim.geom.Point;
@@ -48,9 +50,9 @@ import com.google.common.collect.ImmutableList;
 		private int stage =0;
 		RoadModel roadModel;
 		Package(Point startPosition, Point pDestination,
-				long pLoadingDuration, long pUnloadingDuration) {
-			super(pDestination, pLoadingDuration, TimeWindow.ALWAYS,
-					pUnloadingDuration, TimeWindow.ALWAYS, 1);
+				long pLoadingDuration, long pUnloadingDuration, TimeWindow timeWindow, TimeWindow timeWindow2) {
+			super(pDestination, pLoadingDuration, timeWindow,
+					pUnloadingDuration, timeWindow2, 1);
 			start =startPosition;
 			setStartPosition(startPosition);
 			end = pDestination;
@@ -74,6 +76,16 @@ import com.google.common.collect.ImmutableList;
 
 		@Override
 		public void tick(TimeLapse time) {
+			if(super.getPickupTimeWindow().isAfterEnd(time.getTime()) && this.isCarried() == null){
+				this.pdpModel.unregister(this);
+				this.roadModel.unregister(this);
+				stage = 404;
+			}
+			if(super.getDeliveryTimeWindow().isAfterEnd(time.getTime()) && super.isRegistered()){
+				this.pdpModel.unregister(this);
+				this.roadModel.unregister(this);
+				stage = 404;
+			}
 			if(stage ==0 && time.getTimeLeft()>0){
 				this.translator.get().broadcast(new DeliverPackageMessageContent(null, this, mycontractId,time.getStartTime()+delay));
 				stage++;
@@ -161,9 +173,9 @@ import com.google.common.collect.ImmutableList;
 
 		@Override
 		public Optional<Point> getPosition() {
+			if(stage == 404)return Optional.absent();
 			if(stage ==3) {
-				for(Robot user: roadModel.getObjectsOfType(Robot.class))
-					if(pdpModel.containerContains(user, this))return Optional.of(roadModel.getPosition(user));
+				if(this.isCarried() !=null)return Optional.of(roadModel.getPosition(this.isCarried() ));
 				if(roadModel.containsObject(this))return Optional.of(roadModel.getPosition(this));
 				else{
 					return Optional.absent();
@@ -171,6 +183,12 @@ import com.google.common.collect.ImmutableList;
 			}
 			return Optional.of(roadModel.getPosition(this));
 			
+		}
+
+		private Vehicle isCarried() {
+			for(Robot user: roadModel.getObjectsOfType(Robot.class))
+				if(pdpModel.containerContains(user, this))return user;
+			return null;
 		}
 
 		@Override
@@ -213,7 +231,13 @@ import com.google.common.collect.ImmutableList;
 		public void setTimeLastAction(Long timeLastAction) {
 			this.timeLastAction = timeLastAction;
 		}
-
+		public Boolean canBeDelivered(Vehicle v, Long time){
+			return super.canBeDelivered(v, time);
+		}
+		public Boolean canBePickedUp(Vehicle v, Long t){
+			return super.getPickupTimeWindow().isIn(t);
+			
+		}
 		
 
 	}

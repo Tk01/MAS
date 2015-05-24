@@ -49,7 +49,7 @@ public class BBC {
 		if( model.messages().size() !=0) 
 			pbc.readMessages();
 		RoadUnits r = model.getRoadUnits();
-		if(goal == null && model.battery()- r.toExTime(r.toInDist(distance(model.coordinates(),model.ChargingStation.getPosition().get()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit()) < 1000l*10000l*0.90){
+		if(goal == null && model.battery()- r.toExTime(r.toInDist(distance(model.coordinates(),model.ChargingStation.getPosition().get()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit()) < model.getMaxBattery()*0.90){
 			pbc.placeCharge();
 		}
 		checkMessages();
@@ -99,7 +99,7 @@ public class BBC {
 		
 		if(goal.type().equals("charging")){
 			worldInterface.charge();
-			if(model.battery() == 1000l*10000l){
+			if(model.battery() == model.getMaxBattery()){
 				done =true;
 			}
 			return;

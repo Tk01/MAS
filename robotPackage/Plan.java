@@ -172,7 +172,7 @@ public class Plan {
 				time=g.getStartWindow();
 			}
 			battery-= timespend;
-			if(battery <=0.1*1000l*10000l) return false;
+			if(battery <=0.1*model.getMaxBattery()) return false;
 			if(g.type().equals("charging")){
 				double batterydiff = 1-battery;
 				long timestart = time;
