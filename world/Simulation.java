@@ -10,9 +10,15 @@ import java.util.ArrayList;
 
 
 
+
+
+
+
 import robotPackage.*;
 
 import javax.annotation.Nullable;
+import javax.measure.quantity.Duration;
+import javax.measure.unit.Unit;
 
 import org.apache.commons.math3.random.RandomGenerator;
 
@@ -24,10 +30,12 @@ import com.github.rinde.rinsim.core.model.pdp.DefaultPDPModel;
 import com.github.rinde.rinsim.core.model.pdp.Parcel;
 import com.github.rinde.rinsim.core.model.road.PlaneRoadModel;
 import com.github.rinde.rinsim.core.model.road.RoadModel;
+import com.github.rinde.rinsim.core.model.road.RoadUnits;
 import com.github.rinde.rinsim.geom.Point;
 import com.github.rinde.rinsim.ui.View;
 import com.github.rinde.rinsim.ui.renderers.PlaneRoadModelRenderer;
 import com.github.rinde.rinsim.ui.renderers.RoadUserRenderer;
+import com.github.rinde.rinsim.util.TimeWindow;
 
 public class Simulation {
  
@@ -78,14 +86,21 @@ public class Simulation {
 				if (time.getStartTime() > endTime) {
 		          simulator.stop();
 		        } else while (!PTime.isEmpty() && time.getTime() >= PTime.get(0)) {
-		          simulator.register(new Package(PList.get(0),PLocation.get(0),0,0));
+		          simulator.register(new Package(PList.get(0),PLocation.get(0),0,0,new TimeWindow(PTime.get(0), PTime.get(0)+SERVICE_DURATION),new TimeWindow(PTime.get(0)+time(PList.get(0),PLocation.get(0),time.getTimeUnit()), PTime.get(0)+SERVICE_DURATION+2*time(PList.get(0),PLocation.get(0),time.getTimeUnit()))));
 		          PList.remove(0);
 		          PLocation.remove(0);
 		          PTime.remove(0);
 		        }
 		      }
 
-		      @Override
+		      private Long time(Point point, Point point2, Unit<Duration> t) {
+				RoadUnits r= new RoadUnits(roadModel.getDistanceUnit(),roadModel.getSpeedUnit());
+				// TODO Auto-generated method stub
+		    	
+				return (long) r.toExTime(r.toInDist(Point.distance(point,point2))/r.toInSpeed(VEHICLE_SPEED_KMH),t);
+			}
+
+			@Override
 		      public void afterTick(TimeLapse timeLapse) {}
 		    });
 		 final View.Builder view = View

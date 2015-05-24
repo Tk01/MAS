@@ -21,7 +21,7 @@ public class WorldModel {
 	TimeLapse time =null;
 
 	ArrayList<Point> Robots = new ArrayList<Point>();
-	long battery = 1000l*10000l;
+	long battery = getMaxBattery();
 	ChargingStation ChargingStation;
 	world.Package Carried=null;
 	private ArrayList<Message> messages= new ArrayList<Message>();
@@ -82,7 +82,7 @@ public class WorldModel {
 	}
 	
 	public void charge(long d) {
-		battery= Math.min(battery+d, 1000l*10000l);
+		battery= Math.min(battery+d, getMaxBattery());
 
 	}
 	public Parcel getCarriedPackage() {
@@ -148,5 +148,9 @@ public class WorldModel {
 	}
 	public void setRoadUnits(RoadUnits roadUnits2) {
 		this.RoadUnits	=roadUnits2;
+	}
+	public long getMaxBattery() {
+		// TODO Auto-generated method stub
+		return 1000l*10000l;
 	}
 }
