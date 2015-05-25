@@ -81,7 +81,7 @@ public class Simulation {
 		}
 
 		simulator.addTickListener(new TickListener() {
-		      @Override
+		      
 		      public void tick(TimeLapse time) {
 		        
 				if (time.getStartTime() > endTime) {
@@ -101,7 +101,6 @@ public class Simulation {
 				return (long) r.toExTime(r.toInDist(Point.distance(point,point2))/r.toInSpeed(VEHICLE_SPEED_KMH),t);
 			}
 
-			@Override
 		      public void afterTick(TimeLapse timeLapse) {}
 		    });
 		 final View.Builder view = View

@@ -31,8 +31,21 @@ public class PBC {
 	BBC bbc;
 
 	CC cc;
+	
+	//Value that says if negotiation during CNet is active or not
+	boolean NegotiationDuringCNet = false;
 
 	boolean ccOnHold = false;
+	
+	//Will hold all changes to a plan as negotiation is ongoing
+	boolean negotiating = false;
+	
+	
+	Plan negotiationPlan;
+	
+	Message messageForNegotiation;
+	
+	CommUser negotiationUser;
 
 	public PBC(BBC bbc){
 		this.bbc=bbc;
@@ -122,7 +135,7 @@ public class PBC {
 	}
 
 	private void reserveMessages(ArrayList<Message> messages){
-		for(Message message:messages){
+		/*for(Message message:messages){
 
 			MessageContent content = (MessageContent) message.getContents();
 			if(content.getType().equals("ChargeMessage")){
@@ -163,6 +176,7 @@ public class PBC {
 				this.windows = chargeContent.getFreeSlots();
 			}
 		}
+		*/
 	}
 
 	//The package has been def assigned to the agent so the definitive bid plan becomes the currentPlan
@@ -204,6 +218,15 @@ public class PBC {
 		Plan bestPlan = null;
 		double bestPlanValue=-1;
 		CommUser sender=null;
+		
+		double lowestPlanValue = -1;
+		Plan lowestPlan = null;
+		CommUser lowestSender = null;
+		
+		Message negMessage = null;
+		
+		
+		
 		for(int i= 0;i<messages.size();i++){
 			Message message = messages.get(i);
 			MessageContent content = (MessageContent) message.getContents();
@@ -218,11 +241,13 @@ public class PBC {
 					long delay  = plan.getBidPackage().getDelay();
 					long lastTime = timeLastAction+delay;
 					long currentTime = worldModel.getTime().getTime();
-					if(currentTime>lastTime){
+					
+					
+					if(currentTime<lastTime){
 						
-					}
-					else{
 						double planValue = plan.value(plan.goals);
+						bestPlanValue = preAssignContent.getBid();
+						
 						if(planValue<bestPlanValue && bestPlanValue>-1){
 							bestPlanValue = planValue;
 							bestPlan = plan;
@@ -236,19 +261,29 @@ public class PBC {
 							sender = message.getSender();
 							
 						}
+						else if(planValue>bestPlanValue && planValue <lowestPlanValue ){
+							lowestPlanValue = planValue;
+							lowestPlan = plan;
+							
+							negMessage = message;
+						}
 
 					}
 				}
 			}
 
 		}
-
-		/*
-		for(int i=0;i<deleteMessages.size();i++){
-			messages.remove(deleteMessages.get(i));
+		
+		if(bestPlan == null && lowestPlan != null && !negotiating && definitivebid==null && !cc.isOngoing()){
+			negotiationPlan = lowestPlan;
+			negotiationUser = lowestSender;
+			negotiating =true;
+			cc.startNegotiation(lowestPlan);
+			messageForNegotiation = negMessage;
 		}
-		*/
-		if(bestPlan != null){
+
+	
+		if(bestPlan != null && !negotiating){
 			doDefBid(bestPlan, sender);
 		}
 		
@@ -331,8 +366,8 @@ public class PBC {
 
 	}
 
-	public void sendNegotiationBidMessage(JPlan jointPlan, CommUser sender) {
-		bbc.sendNegotiationBidMessage( jointPlan,  sender);
+	public void sendNegotiationBidMessage(JPlan jointPlan, CommUser sender, long endTime) {
+		bbc.sendNegotiationBidMessage( jointPlan,  sender, endTime);
 
 	}
 
@@ -392,6 +427,27 @@ public class PBC {
 				return;
 			}
 		}
+	}
+
+	public void checkNegotiation() {
+		cc.checkNegotiation();
+		
+		
+	}
+
+	public void returnNegPlan(Plan negotiatedCCPlan) {
+		if(negotiatedCCPlan ==null && negotiating){
+			doDefBid(negotiationPlan, messageForNegotiation.getSender());
+		}
+		else if(negotiatedCCPlan !=null && negotiating){
+			if(negotiatedCCPlan.value(negotiatedCCPlan.goals)<negotiationPlan.value(negotiationPlan.goals)){
+				doDefBid(negotiatedCCPlan, messageForNegotiation.getSender());
+			}
+			else{
+				doDefBid(negotiationPlan, messageForNegotiation.getSender());
+			}
+		}
+		
 	}
 
 	

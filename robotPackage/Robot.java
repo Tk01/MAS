@@ -22,7 +22,7 @@ public class Robot extends Vehicle implements CommUser{
 		inter = new WorldInterface(this, location, chargingStation, speed);
 		model = inter.getModel();
 	}
-	@Override
+	
 	public double getSpeed() {
 		// TODO Auto-generated method stub
 		return this.model.getSpeed();
@@ -41,12 +41,12 @@ public class Robot extends Vehicle implements CommUser{
 	public void initRoadPDP(RoadModel arg0, PDPModel arg1) {
 		this.inter.initRoadPDP( arg0,  arg1);
 	}
-	@Override
+
 	public Optional<Point> getPosition() {
 		return Optional.of(this.model.coordinates());
 
 	}
-	@Override
+
 	public void setCommDevice(CommDeviceBuilder builder) {
 		// TODO Auto-generated method stub
 		this.inter.setCommDevice(builder);
