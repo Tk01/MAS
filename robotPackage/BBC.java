@@ -45,6 +45,7 @@ public class BBC {
 			pbc.done(goal);
 			done = false;
 		}
+		pbc.checkNegotiation();
 		if( model.messages().size() !=0) 
 			pbc.readMessages();
 		RoadUnits r = model.getRoadUnits();
@@ -168,9 +169,9 @@ public void sendReserveMessage(long startWindow, long endWindow) {
 	this.worldInterface.sendMessage(new ChargeMessageContent(this.model.ChargingStation, startWindow, endWindow, "reserve"));	
 }
 
-public void sendNegotiationBidMessage(JPlan jointPlan, CommUser sender) {
+public void sendNegotiationBidMessage(JPlan jointPlan, CommUser sender, long endTime) {
 	jointPlan.setJPlanAgent(thisRobot);
-	this.worldInterface.sendMessage(new NegotiationBidMessageContent(sender,jointPlan));
+	this.worldInterface.sendMessage(new NegotiationBidMessageContent(sender,jointPlan, endTime));
 	
 }
 
