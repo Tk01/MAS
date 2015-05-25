@@ -50,36 +50,30 @@ public class Plan {
 	//Return the utility of the plan. Is used to compare tasks that are added to the current plan. The lower the better
 	public double value(ArrayList<Goal> newPlan){
 		RoadUnits r = model.getRoadUnits();
-		if(newPlan.size()==0)return 0;
-		long startTime = model.getTime().getTime();
 		long time = model.getTime().getTime();
 		double battery = model.battery();
 		Point curcor = model.coordinates();
 		for(Goal g:newPlan){
-			double timespend = r.toExTime(r.toInDist(distance(curcor,g.coordinates()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
-			long timespend2;
-			if(timespend == (long) timespend)timespend2 = (long) timespend;
-			else{
-				timespend2 = (long) timespend+1;
-			}
-			time = time+ timespend2;
-			if(time<g.getStartWindow()){
+			long timespend = (long) r.toExTime(r.toInDist(distance(curcor,g.coordinates()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
+			time = time+ timespend;
+			if(!g.type().equals("charging") && time<g.getStartWindow()){
 				timespend = g.getStartWindow()-time+timespend;
 				time=g.getStartWindow();
 			}
 			battery-= timespend;
 			if(g.type().equals("charging")){
-				double batterydiff = 1-battery;
-				battery =1;
+				double batterydiff = model.getMaxBattery()-battery;
 				if(batterydiff/5==(long) (batterydiff/5)){
-					time=time+(long) (batterydiff/5);
+					batterydiff=(long) (batterydiff/5);
 				}else{
-					time=time+(long) (batterydiff/5)+1;
+					batterydiff=(long) (batterydiff/5)+1;
 				}
-			}
+				time=(long) (time+Math.min(g.endWindow-time, batterydiff));
+				battery = battery + Math.min(g.endWindow-time, batterydiff)*5;
+				}
 			curcor =g.point;
 		}
-		long totalTimeSpend = time-startTime;
+		long totalTimeSpend = time-model.getTime().getTime();
 		return totalTimeSpend+(1-battery)*r.toExTime(r.toInDist(distance(newPlan.get(newPlan.size()-1).coordinates(),model.ChargingStation.getPosition().get()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
 	}
 
@@ -200,7 +194,7 @@ public class Plan {
 			timespend2 = (long) timespend+1;
 		}
 		battery-= timespend2;
-		if(battery <=0) return false;
+		if(battery <=0.1*model.getMaxBattery()) return false;
 		return true;
 	}
 	private boolean checkWindows(Goal g, ArrayList<TimeWindow> windows) {
