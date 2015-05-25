@@ -25,7 +25,7 @@ public class WorldInterface {
 	Point moveTo;
 	BBC bbc;
 	WorldModel model;
-
+	
 	private Optional<RoadModel> roadModel;
 	private Optional<PDPModel> pdpModel;
 	private Robot robot;
@@ -92,7 +92,7 @@ public class WorldInterface {
 		if(chargeTime ==0) chargeTime =1; 
 		long timeSpend = (long) Math.min(Math.min(chargeTime , model.getTime().getTimeLeft()), l-model.getTime().getTime());
 		model.charge(chargeRate*timeSpend);
-		model.getTime().consume( timeSpend);
+		model.getTime().consume(timeSpend);
 	}
 	public void drop() {
 		try{

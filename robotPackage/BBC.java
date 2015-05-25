@@ -62,6 +62,10 @@ public class BBC {
 			return;
 		}
 		if(goal.type().equals("charging") && chargeTaken()){
+			if(goal.getEndWindow() <= model.getTime().getTime()){
+				done = true;
+				return;
+			}
 			if(this.model.coordinates().equals(new Point(5,5)) ){
 				this.worldInterface.MoveTo(new Point(5,4.9));
 				return;	
@@ -102,7 +106,7 @@ public class BBC {
 		
 		if(goal.type().equals("charging") ){
 			worldInterface.charge(((ChargeGoal)goal).getEndWindow());
-			if(model.battery() == model.getMaxBattery() || ((ChargeGoal)goal).getEndWindow() == model.getTime().getTime()){
+			if(model.battery() == model.getMaxBattery() || ((ChargeGoal)goal).getEndWindow() <= model.getTime().getTime()){
 				done =true;
 			}
 			return;
