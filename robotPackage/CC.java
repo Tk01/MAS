@@ -14,7 +14,7 @@ public class CC {
 	
 	private Long timeLastAction;
 	
-	private JPlan jplan = new JPlan();
+	private JPlan jplan;
 	
 	
 	private boolean ongoing = false;
@@ -27,9 +27,6 @@ public class CC {
 		
 	}
 	public void startNegotiation(Plan plan){
-		
-		
-		
 		timeLastAction = pbc.worldModel.time.getStartTime();
 		ongoing = true;
 		jplan.setOwnPlan(plan);
@@ -37,15 +34,6 @@ public class CC {
 		
 		
 		
-	}
-	
-	
-	
-	public boolean isOngoing() {
-		return ongoing;
-	}
-	public void setOngoing(boolean ongoing) {
-		this.ongoing = ongoing;
 	}
 	public void handleMessage(Message message){
 		
@@ -73,8 +61,7 @@ public class CC {
 					ongoing = true;
 					
 					//jplans.add(jointPlan);
-					timeLastAction = pbc.worldModel.time.getStartTime();
-					pbc.sendNegotiationBidMessage(jointPlan, message.getSender(), timeLastAction+delay);
+					pbc.sendNegotiationBidMessage(jointPlan, message.getSender());
 				}
 			}
 			
@@ -96,13 +83,8 @@ public class CC {
 			
 		}
 		if(type.equals("negotiationReply")){
-			if(((NegotiationReplyMessageContent)messageContent).isAccepted() && !pbc.negotiating){
+			if(((NegotiationReplyMessageContent)messageContent).isAccepted()){
 				pbc.currentplan = jplan.getOtherPlan();
-				ongoing = false;
-			}
-			if(((NegotiationReplyMessageContent)messageContent).isAccepted() && pbc.negotiating){
-				pbc.currentplan = jplan.getOtherPlan();
-				ongoing = false;
 			}
 			
 		}
@@ -257,26 +239,6 @@ public class CC {
 		pbc.sendConfirmationMessage(bestJPlan);
 	}
 	*/
-	public void checkNegotiation() {
-		if(timeLastAction!= null){
-			if(pbc.worldModel.time.getEndTime()>timeLastAction+delay && pbc.negotiating){
-				
-				pbc.returnNegPlan(jplan.ownPlan);
-			}
-			else if (pbc.worldModel.time.getEndTime()>timeLastAction+delay && !pbc.negotiating){
-				ongoing=false;
-			}
-			if(ongoing && pbc.worldModel.time.getStartTime()>timeLastAction+delay ){
-				pbc.sendNegotiationReplyMessage(jplan.JPlanAgent);
-				ongoing = false;
-			}
-			if(pbc.negotiating && pbc.worldModel.time.getStartTime()>timeLastAction+delay ){
-				pbc.returnNegPlan(jplan.ownPlan);
-				ongoing = false;
-			}
-		}
-		
-	}
 	
 	
 	
