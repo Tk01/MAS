@@ -16,7 +16,6 @@ public class BBC {
 	boolean done;
 	WorldModel model;
 	CommDevice commDevice;
-
 	Robot thisRobot;
 
 	PBC pbc ;
@@ -75,6 +74,10 @@ public class BBC {
 			worldInterface.MoveTo(goal.coordinates());
 			return;
 		}
+		if(goal.getStartWindow() >= model.time.getTime() ){
+			worldInterface.waitMoment();
+			return;
+		}
 		if(goal.type().equals("MoveTo")){
 			done = true;
 			return;
@@ -97,9 +100,9 @@ public class BBC {
 		}
 		
 		
-		if(goal.type().equals("charging")){
-			worldInterface.charge();
-			if(model.battery() == model.getMaxBattery()){
+		if(goal.type().equals("charging") ){
+			worldInterface.charge(((ChargeGoal)goal).getEndWindow());
+			if(model.battery() == model.getMaxBattery() || ((ChargeGoal)goal).getEndWindow() == model.getTime().getTime()){
 				done =true;
 			}
 			return;
@@ -162,7 +165,7 @@ public void deleteChargeReservation(long startWindow, long endWindow) {
 }
 
 public void sendReserveMessage(long startWindow, long endWindow) {
-	this.worldInterface.sendMessage(new ChargeMessageContent(this.model.ChargingStation, startWindow, startWindow, "reserve"));	
+	this.worldInterface.sendMessage(new ChargeMessageContent(this.model.ChargingStation, startWindow, endWindow, "reserve"));	
 }
 
 public void sendNegotiationBidMessage(JPlan jointPlan, CommUser sender) {
@@ -181,6 +184,7 @@ public void sendConfirmationMessage(JPlan bestJPlan) {
 	
 }
 public boolean chargeTaken() {
+	if(((ChargeGoal)this.goal).isReserved() && ((ChargeGoal)this.goal).getStartWindow() <= model.getTime().getTime() && ((ChargeGoal)this.goal).getEndWindow() >= model.getTime().getTime()) return false;
 	// TODO Auto-generated method stub
 	for(Point r:model.Robots){
 		if(r.equals(new Point(5,5)))return true;
