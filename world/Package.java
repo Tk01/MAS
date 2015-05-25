@@ -68,13 +68,13 @@ import com.google.common.collect.ImmutableList;
 			this.end = end;
 		}
 
-	
+		@Override
 		public void afterTick(TimeLapse arg0) {
 			// TODO Auto-generated method stub
 			
 		}
 
-		
+		@Override
 		public void tick(TimeLapse time) {
 			if(super.getPickupTimeWindow().isAfterEnd(time.getTime()) && this.isCarried() == null){
 				this.pdpModel.unregister(this);
@@ -171,7 +171,7 @@ import com.google.common.collect.ImmutableList;
 			}
 		}
 
-		
+		@Override
 		public Optional<Point> getPosition() {
 			if(stage == 404)return Optional.absent();
 			if(stage ==3) {
@@ -191,7 +191,7 @@ import com.google.common.collect.ImmutableList;
 			return null;
 		}
 
-	
+		@Override
 		public void setCommDevice(CommDeviceBuilder builder) {
 			builder.setMaxRange(20);
 

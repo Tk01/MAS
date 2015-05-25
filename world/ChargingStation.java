@@ -28,7 +28,7 @@ public class ChargingStation extends Depot implements CommUser,TickListener{
 		setStartPosition(p);
 		pos = p;
 	}
-
+	@Override
 	public void tick(TimeLapse timeLapse) {
 		ImmutableList<Message> list = this.device.get().getUnreadMessages();
 		for (Message message : list){
@@ -108,17 +108,17 @@ public class ChargingStation extends Depot implements CommUser,TickListener{
 		
 	}
 
-
+	@Override
 	public void afterTick(TimeLapse timeLapse) {
 		// TODO Auto-generated method stub
 		
 	}
-
+	@Override
 	public Optional<Point> getPosition() {
 		// TODO Auto-generated method stub
 		return Optional.of(pos);
 	}
-
+	@Override
 	public void setCommDevice(CommDeviceBuilder builder) {
 		builder.setMaxRange(10);
 
