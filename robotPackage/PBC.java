@@ -73,7 +73,7 @@ public class PBC {
 		ArrayList<Message> messages = worldModel.messages();
 		cleanUp(messages);
 		reserveMessages(messages);
-
+		
 		for(int i = 0; i<messages.size();i++){
 			Message message = messages.get(i);
 			MessageContent content = (MessageContent) message.getContents();
@@ -93,7 +93,7 @@ public class PBC {
 
 		//preAssignment(messages);
 
-		callForBids(messages);
+		if(definitivebid == null)callForBids(messages);
 
 
 
@@ -164,7 +164,6 @@ public class PBC {
 			}
 		}
 	}
-
 	//The package has been def assigned to the agent so the definitive bid plan becomes the currentPlan
 	private void defAssignment(DefAssignmentMessageContent content){
 		if(content.assigned){
@@ -330,6 +329,7 @@ public class PBC {
 				//double newValue = bidPlan.value(bidPlan.getPlan());
 					if(bestPlan == null){
 						bestPlan = bidPlan;
+						sender = message.getSender();
 						
 					}
 					else if(bestPlan.value(bestPlan.goals)<bidPlan.value(bidPlan.goals)){
