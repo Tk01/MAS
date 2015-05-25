@@ -41,7 +41,7 @@ import com.google.common.collect.ImmutableList;
 	public class Package extends Parcel implements CommUser,TickListener {
 		private PDPModel pdpModel;
 		static int contractId =0;
-		Long delay = 3000l;
+		Long delay = /*3000l*/ 20000l;
 		Long timeLastAction;
 		int mycontractId ;
 		Point start;

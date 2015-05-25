@@ -3,6 +3,7 @@ package robotPackage;
 
 
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
@@ -84,12 +85,12 @@ public class WorldInterface {
 		return distance;
 	}
 
-	public void charge() {
-		double toCharge = 1000l*10000l-model.battery();
-		long chargeRate = 6;
+	public void charge(long l) {
+		double toCharge = model.getMaxBattery()-model.battery();
+		long chargeRate = 5;
 		double chargeTime =(long) (toCharge/chargeRate);
 		if(chargeTime ==0) chargeTime =1; 
-		long timeSpend = (long) Math.min(chargeTime , model.getTime().getTimeLeft());
+		long timeSpend = (long) Math.min(Math.min(chargeTime , model.getTime().getTimeLeft()), l-model.getTime().getTime());
 		model.charge(chargeRate*timeSpend);
 		model.getTime().consume( timeSpend);
 	}

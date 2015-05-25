@@ -174,14 +174,16 @@ public class Plan {
 			battery-= timespend;
 			if(battery <=0.1*model.getMaxBattery()) return false;
 			if(g.type().equals("charging")){
-				double batterydiff = 1-battery;
+				double batterydiff = model.getMaxBattery()-battery;
 				long timestart = time;
-				battery =1;
+				battery =model.getMaxBattery();
 				if(batterydiff/5==(long) (batterydiff/5)){
-					time=time+(long) (batterydiff/5);
+					batterydiff=(long) (batterydiff/5);
 				}else{
-					time=time+(long) (batterydiff/5)+1;
+					batterydiff=(long) (batterydiff/5)+1;
 				}
+				time=(long) (time+Math.min(g.endWindow-time, batterydiff));
+				battery = battery + Math.min(g.endWindow-time, batterydiff)*5;
 				if(time>g.endWindow)return false;
 				if(!((ChargeGoal)g).isReserved()){
 					g.setEndWindow(time);

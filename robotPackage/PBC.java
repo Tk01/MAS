@@ -130,6 +130,7 @@ public class PBC {
 							Plan plan = definitivebid;
 							definitivebid= null;
 							doDefBid(plan, defSender );
+							return;
 						}
 					}
 				}
