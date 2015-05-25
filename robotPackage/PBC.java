@@ -58,7 +58,7 @@ public class PBC {
 
 	boolean chargingInPlan = true;
 	private boolean chargeGoal=false;
-	private ArrayList<TimeWindow> windows;
+	ArrayList<TimeWindow> windows;
 
 	public void done(Goal g){
 		getCurrentPlan().remove(g);
@@ -135,7 +135,7 @@ public class PBC {
 	}
 
 	private void reserveMessages(ArrayList<Message> messages){
-		/*for(Message message:messages){
+		for(Message message:messages){
 
 			MessageContent content = (MessageContent) message.getContents();
 			if(content.getType().equals("ChargeMessage")){
@@ -176,7 +176,7 @@ public class PBC {
 				this.windows = chargeContent.getFreeSlots();
 			}
 		}
-		*/
+		
 	}
 
 	//The package has been def assigned to the agent so the definitive bid plan becomes the currentPlan
@@ -261,7 +261,7 @@ public class PBC {
 							sender = message.getSender();
 							
 						}
-						else if(planValue>bestPlanValue && planValue <lowestPlanValue ){
+						else if(planValue>bestPlanValue && planValue <lowestPlanValue && NegotiationDuringCNet ){
 							lowestPlanValue = planValue;
 							lowestPlan = plan;
 							
@@ -274,7 +274,7 @@ public class PBC {
 
 		}
 		
-		if(bestPlan == null && lowestPlan != null && !negotiating && definitivebid==null && !cc.isOngoing()){
+		if(bestPlan == null && lowestPlan != null && !negotiating && definitivebid==null && !cc.isOngoing() ){
 			negotiationPlan = lowestPlan;
 			negotiationUser = lowestSender;
 			negotiating =true;
@@ -430,7 +430,7 @@ public class PBC {
 	}
 
 	public void checkNegotiation() {
-		cc.checkNegotiation();
+		//cc.checkNegotiation();
 		
 		
 	}

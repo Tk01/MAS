@@ -197,7 +197,7 @@ public class CC {
 			
 			
 				Plan ownPlan = new Plan(copyOwn, pbc.worldModel);
-				ownPlan.isPossiblePlan(allGoals.get(i), allGoals.get(i+1));
+				ownPlan.isPossiblePlan(allGoals.get(i), allGoals.get(i+1), pbc.windows);
 			
 			
 				jPlan = getBestPlan(allGoals, ownPlan.goals, otherGoals, bestOwn, bestOther, i++, minOtherValue);
@@ -207,7 +207,7 @@ public class CC {
 				ArrayList<Goal>copyOther = (ArrayList<Goal>) otherGoals.clone();
 			
 				Plan otherPlan = new Plan(copyOther, pbc.worldModel); 
-				otherPlan.isPossiblePlan(allGoals.get(i), allGoals.get(i+1));
+				otherPlan.isPossiblePlan(allGoals.get(i), allGoals.get(i+1), pbc.windows);
 			
 				jPlan = getBestPlan(allGoals, ownGoals, copyOther, jPlan.ownPlan.goals, jPlan.otherPlan.goals, i++, minOtherValue);
 			}
@@ -231,7 +231,7 @@ public class CC {
 		Plan bestPlan = null;
 		
 		for(int i=0;i<goals.size();i++){
-			bestPlan = plan.isPossiblePlan(goals.get(i), goals.get(i+1));
+			bestPlan = plan.isPossiblePlan(goals.get(i), goals.get(i+1), pbc.windows);
 		}
 		
 		
