@@ -184,7 +184,8 @@ public void sendConfirmationMessage(JPlan bestJPlan) {
 	
 }
 public boolean chargeTaken() {
-	if(((ChargeGoal)this.goal).isReserved() && ((ChargeGoal)this.goal).getStartWindow() <= model.getTime().getTime() && ((ChargeGoal)this.goal).getEndWindow() >= model.getTime().getTime()) return false;
+	if(((ChargeGoal)this.goal).isReserved() && ((ChargeGoal)this.goal).getStartWindow() <= model.getTime().getTime()+ model.calcTime(model.coordinates(),new Point(5,5)) && ((ChargeGoal)this.goal).getEndWindow() >= model.getTime().getTime()+ model.calcTime(model.coordinates(),new Point(5,5))) return false;
+	if(((ChargeGoal)this.goal).isReserved() && !(((ChargeGoal)this.goal).getStartWindow() <= model.getTime().getTime()+ model.calcTime(model.coordinates(),new Point(5,5)) && ((ChargeGoal)this.goal).getEndWindow() >= model.getTime().getTime()+ model.calcTime(model.coordinates(),new Point(5,5)))) return true;
 	// TODO Auto-generated method stub
 	for(Point r:model.Robots){
 		if(r.equals(new Point(5,5)))return true;

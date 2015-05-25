@@ -2,6 +2,8 @@ package robotPackage;
 
 import world.ChargingStation;
 
+
+
 import com.github.rinde.rinsim.core.TimeLapse;
 import com.github.rinde.rinsim.core.model.comm.CommDeviceBuilder;
 import com.github.rinde.rinsim.core.model.comm.CommUser;
@@ -32,7 +34,7 @@ public class Robot extends Vehicle implements CommUser{
 			this.inter.run(arg0);
 		}
 		this.model.batteryDrop(arg0.getTimeStep());
-		//System.out.println(this.model.battery);
+		System.out.println(this.model.battery);
 	}
 
 	@Override
@@ -48,6 +50,15 @@ public class Robot extends Vehicle implements CommUser{
 	public void setCommDevice(CommDeviceBuilder builder) {
 		// TODO Auto-generated method stub
 		this.inter.setCommDevice(builder);
+	}
+	
+	public Goal getGoal() {
+		// TODO Auto-generated method stub
+		return inter.bbc.goal;
+	}
+	public long getBattery() {
+		// TODO Auto-generated method stub
+		return model.battery();
 	}
 	
 

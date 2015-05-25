@@ -64,7 +64,7 @@ public class WorldModel {
 		battery= Math.max(battery-d, 0);
 
 	}
-	public double battery() {
+	public long battery() {
 
 		return battery;
 	}
@@ -152,5 +152,11 @@ public class WorldModel {
 	public long getMaxBattery() {
 		// TODO Auto-generated method stub
 		return 1000l*10000l;
+	}
+	public long calcTime(Point point, Point point2) {
+		;
+		// TODO Auto-generated method stub
+    	
+		return (long) RoadUnits.toExTime(RoadUnits.toInDist(Point.distance(point,point2))/RoadUnits.toInSpeed(speed),time.getTimeUnit());
 	}
 }

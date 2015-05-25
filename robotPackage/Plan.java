@@ -87,7 +87,7 @@ public class Plan {
 
 
 	// check if the pack can be taken up in the plan by checking if in the specified timewindows it is possible to pick up the package.
-	public Plan isPossiblePlan(Goal pickupGoal, Goal dropGoal){
+	public Plan isPossiblePlan(Goal pickupGoal, Goal dropGoal, ArrayList<TimeWindow> windows){
 		if(goals.size() > 7) return null;
 
 		@SuppressWarnings("unchecked")
@@ -108,16 +108,16 @@ public class Plan {
 			newPlan.add(copyGoals.remove(0));
 		}
 
-		return new Plan(GenerateBestPlan(copyGoals,newPlan,charged,null),model);
+		return new Plan(GenerateBestPlan(copyGoals,newPlan,charged,null,windows),model);
 	}
 
 
 
 
 	private ArrayList<Goal> GenerateBestPlan(ArrayList<Goal> copyGoals,
-			ArrayList<Goal> newPlan, Goal charged, ArrayList<Goal> bestplan) {
+			ArrayList<Goal> newPlan, Goal charged, ArrayList<Goal> bestplan, ArrayList<TimeWindow> windows) {
 		if(copyGoals.size() ==0){
-			bestplan = addCharging(newPlan, charged, bestplan);
+			bestplan = addCharging(newPlan, charged, bestplan,windows);
 			return bestplan;
 		}
 		else{
@@ -127,15 +127,15 @@ public class Plan {
 				cnewPlan.add(ccopyGoals.remove(i));
 				cnewPlan.add(ccopyGoals.remove(i));
 
-				bestplan=GenerateBestPlan(ccopyGoals,cnewPlan,charged,bestplan);
+				bestplan=GenerateBestPlan(ccopyGoals,cnewPlan,charged,bestplan, windows);
 			}
 			return bestplan;
 		}
 	}
 
 	private ArrayList<Goal> addCharging(ArrayList<Goal> newPlan, Goal charged,
-			ArrayList<Goal> bestplan) {
-		if(valid(newPlan)){
+			ArrayList<Goal> bestplan, ArrayList<TimeWindow> windows) {
+		if(valid(newPlan,windows)){
 			if(bestplan == null) bestplan = (ArrayList<Goal>) newPlan.clone();
 			else{
 				if(value(newPlan)>value(bestplan)) bestplan = (ArrayList<Goal>) newPlan.clone();
@@ -147,7 +147,7 @@ public class Plan {
 			}else{
 				newPlan.add(number, charged);
 			}
-			if(valid(newPlan)){
+			if(valid(newPlan,windows)){
 				if(bestplan == null) bestplan = (ArrayList<Goal>) newPlan.clone();
 				else{
 					if(value(newPlan)>value(bestplan)) bestplan = (ArrayList<Goal>) newPlan.clone();
@@ -157,7 +157,7 @@ public class Plan {
 		}
 		return bestplan;
 	}
-	private boolean valid(ArrayList<Goal> newPlan) {
+	private boolean valid(ArrayList<Goal> newPlan, ArrayList<TimeWindow> windows) {
 		RoadUnits r = model.getRoadUnits();
 		long time = model.getTime().getTime();
 		double battery = model.battery();
@@ -176,7 +176,6 @@ public class Plan {
 			if(g.type().equals("charging")){
 				double batterydiff = model.getMaxBattery()-battery;
 				long timestart = time;
-				battery =model.getMaxBattery();
 				if(batterydiff/5==(long) (batterydiff/5)){
 					batterydiff=(long) (batterydiff/5);
 				}else{
@@ -186,6 +185,7 @@ public class Plan {
 				battery = battery + Math.min(g.endWindow-time, batterydiff)*5;
 				if(time>g.endWindow)return false;
 				if(!((ChargeGoal)g).isReserved()){
+					if(!checkWindows(g,windows)) return false;
 					g.setEndWindow(time);
 					g.setStartWindow(timestart);					
 				}
@@ -203,6 +203,13 @@ public class Plan {
 		if(battery <=0) return false;
 		return true;
 	}
+	private boolean checkWindows(Goal g, ArrayList<TimeWindow> windows) {
+		for(TimeWindow w:windows){
+			if(w.isIn(g.getStartWindow()) && w.isIn(g.getEndWindow()))return true;
+		}
+		return false;
+	}
+
 	public void remove(Goal g) {
 		this.goals.remove(g);
 

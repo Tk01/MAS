@@ -14,6 +14,7 @@ import java.util.ArrayList;
 
 
 
+
 import robotPackage.*;
 
 import javax.annotation.Nullable;
@@ -115,6 +116,7 @@ public class Simulation {
 			                Package.class, "/graphics/flat/person-red-32.png")
 			        
 			        )
+			        .with(new ProblemRenderer())
 			        .setTitleAppendix("Taxi Demo");
 
 			   

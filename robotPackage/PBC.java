@@ -6,9 +6,12 @@ import java.util.List;
 
 import org.jscience.geography.coordinates.Coordinates;
 
+import com.github.rinde.rinsim.core.model.Model;
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.Message;
 import com.github.rinde.rinsim.core.model.pdp.Depot;
+import com.github.rinde.rinsim.core.model.road.RoadUnits;
+import com.github.rinde.rinsim.geom.Point;
 import com.github.rinde.rinsim.util.TimeWindow;
 
 import world.ChargingStation;
@@ -36,10 +39,13 @@ public class PBC {
 		worldModel = bbc.getWorldModel();
 		cc = new CC(this);
 		currentplan = new Plan(new ArrayList<Goal>(), worldModel);
+		windows = new ArrayList<TimeWindow>();
+		windows.add(TimeWindow.ALWAYS);
 	}
 
 	boolean chargingInPlan = true;
-
+	private boolean chargeGoal=false;
+	private ArrayList<TimeWindow> windows;
 
 	public void done(Goal g){
 		getCurrentPlan().remove(g);
@@ -79,7 +85,7 @@ public class PBC {
 			}
 			if(content.getType().equals("StartNegotiation") || content.getType().equals("NegotiationReply") || content.getType().equals("NegotiationBidMessage") ){
 
-				cc.handleMessage(message);
+				//cc.handleMessage(message);
 
 			}
 		}
@@ -121,6 +127,18 @@ public class PBC {
 			MessageContent content = (MessageContent) message.getContents();
 			if(content.getType().equals("ChargeMessage")){
 				ReturnChargeContents chargeContent  = ((ReturnChargeContents) content);
+				if(this.chargeGoal){
+					if( chargeContent.hasSucceeded()){
+						((ChargeGoal)this.definitivebid.goals.get(0)).setReserved(true);
+						this.currentplan = this.definitivebid;
+						bbc.setGoal(this.currentplan.getNextgoal());
+					}
+					this.windows = chargeContent.getFreeSlots();
+					this.chargeGoal=false;
+					definitivebid= null;
+					messages.remove(message);
+					return;	
+				}
 				if(chargeContent.isReserved() && chargeContent.hasSucceeded()){
 					for(int i =0; i<definitivebid.getPlan().size();i++){
 						Goal goal = definitivebid.getPlan().get(i);
@@ -130,15 +148,19 @@ public class PBC {
 							Plan plan = definitivebid;
 							definitivebid= null;
 							doDefBid(plan, defSender );
+							messages.remove(message);
+							this.windows = chargeContent.getFreeSlots();
 							return;
 						}
 					}
 				}
 				if(chargeContent.isReserved() && !chargeContent.hasSucceeded()){
 					definitivebid= null;
+					messages.remove(message);
+					this.windows = chargeContent.getFreeSlots();
+					return;
 				}
-
-
+				this.windows = chargeContent.getFreeSlots();
 			}
 		}
 	}
@@ -154,7 +176,7 @@ public class PBC {
 			
 			//Call CC to start negotiation
 			if(currentplan.goals.size()>3){
-				cc.startNegotiation(currentplan);
+				//cc.startNegotiation(currentplan);
 			}
 
 		}
@@ -290,10 +312,10 @@ public class PBC {
 
 				if(worldModel.isReserveChargingStation()){
 					
-					bidPlan = plan.isPossiblePlan(pickupGoal,dropGoal);
+					bidPlan = plan.isPossiblePlan(pickupGoal,dropGoal,windows);
 				}
 				else{
-					bidPlan = plan.isPossiblePlan(pickupGoal,dropGoal);
+					bidPlan = plan.isPossiblePlan(pickupGoal,dropGoal,windows);
 				}
 				if(bidPlan !=null && bidPlan.getPlan() !=null){
 				double oldValue = currentplan.value(currentplan.getPlan());
@@ -330,7 +352,33 @@ public class PBC {
 	}
 
 	public void placeCharge() {
-		bbc.setGoal( new ChargeGoal(worldModel.ChargingStation.getPosition().get(), "charging",new TimeWindow(0, Long.MAX_VALUE) ,false));
+		if(!worldModel.isReserveChargingStation()){
+			bbc.setGoal( new ChargeGoal(worldModel.ChargingStation.getPosition().get(), "charging",new TimeWindow(0, Long.MAX_VALUE) ,false));
+			return;
+		}
+		if(definitivebid == null){ 
+			for( TimeWindow w: windows){
+				RoadUnits r = worldModel.getRoadUnits();
+				long start = (long) (worldModel.getTime().getTime()+ r.toExTime(r.toInDist(Point.distance(worldModel.coordinates(),new Point(5,5)))/r.toInSpeed(worldModel.getSpeed()),worldModel.getTime().getTimeUnit()));
+				if(w.isIn(start)){
+					
+					double batterydiff = worldModel.getMaxBattery()-worldModel.battery()-r.toExTime(r.toInDist(Point.distance(worldModel.coordinates(),new Point(5,5)))/r.toInSpeed(worldModel.getSpeed()),worldModel.getTime().getTimeUnit());
+					if(batterydiff/5==(long) (batterydiff/5)){
+						batterydiff=(long) (batterydiff/5);
+					}else{
+						batterydiff=(long) (batterydiff/5)+1;
+					}
+					long end = (long) Math.min((start+batterydiff), w.end);
+					Goal goal = new ChargeGoal(new Point(5,5), "charging",new TimeWindow(start, end), false);
+					ArrayList<Goal> list = new ArrayList<Goal>();
+					list.add(goal);
+					this.chargeGoal =true;
+					definitivebid = new Plan(list, worldModel);
+					bbc.sendReserveMessage(goal.startWindow, goal.endWindow);
+					return;
+				}
+			}
+		}
 		
 	}
 

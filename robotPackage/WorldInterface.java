@@ -87,7 +87,7 @@ public class WorldInterface {
 
 	public void charge(long l) {
 		double toCharge = model.getMaxBattery()-model.battery();
-		long chargeRate = 5;
+		long chargeRate = 6;
 		double chargeTime =(long) (toCharge/chargeRate);
 		if(chargeTime ==0) chargeTime =1; 
 		long timeSpend = (long) Math.min(Math.min(chargeTime , model.getTime().getTimeLeft()), l-model.getTime().getTime());

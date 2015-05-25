@@ -15,6 +15,7 @@ import com.github.rinde.rinsim.core.model.pdp.Depot;
 import com.github.rinde.rinsim.core.model.pdp.PDPModel;
 import com.github.rinde.rinsim.core.model.road.RoadModel;
 import com.github.rinde.rinsim.geom.Point;
+import com.github.rinde.rinsim.util.TimeWindow;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
@@ -98,11 +99,12 @@ public class ChargingStation extends Depot implements CommUser,TickListener{
 		this.schedule.add(new Long[]{start,end});
 	}
 	private void reserveM(long start, long end, boolean b, CommUser sender) {
-		this.device.get().send(new ReturnChargeContents(sender,start,end,b,true), sender);
+		this.device.get().send(new ReturnChargeContents(sender,start,end,b,true,getFreeSlots()), sender);
 		
 	}
+
 	private void checkM(long start, long end, boolean b, CommUser sender) {
-		this.device.get().send(new ReturnChargeContents(sender,start,end,b,false), sender);
+		this.device.get().send(new ReturnChargeContents(sender,start,end,b,false,getFreeSlots()), sender);
 		
 	}
 
@@ -130,6 +132,22 @@ public class ChargingStation extends Depot implements CommUser,TickListener{
 		// TODO Auto-generated method stub
 		
 	}
-
+	private ArrayList<TimeWindow> getFreeSlots() {
+		ArrayList<TimeWindow> freeSlots = new ArrayList<TimeWindow>();
+		freeSlots.add(new TimeWindow(0,Long.MAX_VALUE));
+		for(Long[] slot:schedule){
+			for(TimeWindow freeslot:freeSlots){
+				if(freeslot.isIn(slot[0]) ){
+					freeSlots.remove(freeslot);
+					TimeWindow w1 = new TimeWindow(freeslot.begin,slot[0]);
+					TimeWindow w2 = new TimeWindow(slot[1],freeslot.end);
+					if(w1.length() !=0)freeSlots.add(w1);
+					if(w2.length() !=0)freeSlots.add(w2);
+					break;
+				}
+			}
+		}
+		return freeSlots;
+	}
 	
 }
