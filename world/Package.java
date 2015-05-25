@@ -99,39 +99,6 @@ import com.google.common.collect.ImmutableList;
 			ImmutableList<Message> list;
 			if(stage ==1 && time.getTimeLeft()>0){
 				if(time.getEndTime()>=timeLastAction+delay){
-					list = (ImmutableList<Message>)this.translator.get().getUnreadMessages();
-					ArrayList<Message> preBidList = new ArrayList<Message>();
-					double bid = Double.MAX_VALUE;
-					CommUser bestUser = null;
-					for(Message m:list){
-						if(((MessageContent) m.getContents()).getType().equals("PreBidMessage")){
-							preBidList.add( m);
-							if(((PreBidMessageContent) m.getContents()).getBid()<bid){
-								bid = ((PreBidMessageContent) m.getContents()).getBid();
-								bestUser = m.getSender();
-							}
-						}
-					}
-					for(Message m:preBidList){
-						if(m.getSender()==bestUser){
-							this.translator.get().send(new PreAssignmentMessageContent(bestUser, bid, true , this, mycontractId,time.getStartTime()+delay), m.getSender());
-						}else{
-							this.translator.get().send(new PreAssignmentMessageContent(bestUser, bid, false , this, mycontractId,time.getStartTime()+delay), m.getSender());
-						}
-					}
-					stage++;
-					timeLastAction=time.getStartTime();
-					if(time.getEndTime()<timeLastAction+delay){
-						time.consumeAll();
-					}else{
-						time.consume(timeLastAction+delay-1-time.getStartTime());
-					}
-				}else{
-					time.consumeAll();
-				}
-			}
-			if(stage ==2 && time.getTimeLeft()>0){
-				if(time.getEndTime()>=timeLastAction+delay){
 					list = this.translator.get().getUnreadMessages();
 					ArrayList<Message> DefBidList = new ArrayList<Message>();
 					double bid = Double.MAX_VALUE;
@@ -174,7 +141,7 @@ import com.google.common.collect.ImmutableList;
 		@Override
 		public Optional<Point> getPosition() {
 			if(stage == 404)return Optional.absent();
-			if(stage ==3) {
+			if(stage ==2) {
 				if(this.isCarried() !=null)return Optional.of(roadModel.getPosition(this.isCarried() ));
 				if(roadModel.containsObject(this))return Optional.of(roadModel.getPosition(this));
 				else{
