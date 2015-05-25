@@ -104,7 +104,7 @@ public class PBC {
 		}
 
 
-		preAssignment(messages);
+		//preAssignment(messages);
 
 		callForBids(messages);
 
@@ -211,7 +211,7 @@ public class PBC {
 
 	}
 
-
+	/*
 	private void preAssignment(ArrayList <Message> messages){
 
 		
@@ -246,7 +246,7 @@ public class PBC {
 					if(currentTime<lastTime){
 						
 						double planValue = plan.value(plan.goals);
-						bestPlanValue = preAssignContent.getBid();
+						//bestPlanValue = preAssignContent.getBid();
 						
 						if(planValue<bestPlanValue && bestPlanValue>-1){
 							bestPlanValue = planValue;
@@ -289,6 +289,7 @@ public class PBC {
 		
 
 	}
+	*/
 
 
 	private void doDefBid(Plan plan, CommUser sender){
@@ -315,6 +316,8 @@ public class PBC {
 
 
 	}
+	
+	
 
 	private Plan reserveSlotCharging(Plan plan){
 		Plan finalPlan= plan;
@@ -358,7 +361,7 @@ public class PBC {
 				double bid = newValue - oldValue;
 				bidPlan.setBidPackage(pack);
 				this.prebids.put(ID, bidPlan);
-				bbc.sendPreBidMessage(message.getSender(), bid, ID);
+				bbc.sendDefBidMessage(message.getSender(), bid);
 				}
 			}
 
@@ -435,6 +438,7 @@ public class PBC {
 		
 	}
 
+	/*
 	public void returnNegPlan(Plan negotiatedCCPlan) {
 		if(negotiatedCCPlan ==null && negotiating){
 			doDefBid(negotiationPlan, messageForNegotiation.getSender());
@@ -449,6 +453,7 @@ public class PBC {
 		}
 		
 	}
+	*/
 
 	
 
