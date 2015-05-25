@@ -32,7 +32,7 @@ public class WorldModel {
 
 
 
-	private boolean reserveChargingStation = true;
+	private boolean reserveChargingStation = false;
 	public UnitConverter getDistanceConverter() {
 		return DistanceConverter;
 	}

@@ -296,7 +296,9 @@ public class PBC {
 
 
 	private void callForBids(ArrayList<Message> messages){
-
+		
+		Plan bestPlan = null;
+		CommUser sender = null;
 		for(int i= 0;i<messages.size();i++){
 			Message message = messages.get(i);
 			MessageContent content = (MessageContent) message.getContents();
@@ -324,16 +326,28 @@ public class PBC {
 					bidPlan = plan.isPossiblePlan(pickupGoal,dropGoal,windows);
 				}
 				if(bidPlan !=null && bidPlan.getPlan() !=null){
-				double oldValue = currentplan.value(currentplan.getPlan());
-				double newValue = bidPlan.value(bidPlan.getPlan());
-				double bid = newValue - oldValue;
+				//double oldValue = currentplan.value(currentplan.getPlan());
+				//double newValue = bidPlan.value(bidPlan.getPlan());
+					if(bestPlan == null){
+						bestPlan = bidPlan;
+						
+					}
+					else if(bestPlan.value(bestPlan.goals)<bidPlan.value(bidPlan.goals)){
+						bestPlan = bidPlan;
+						sender = message.getSender();
+					}
+				
 				bidPlan.setBidPackage(pack);
-				this.prebids.put(ID, bidPlan);
-				bbc.sendDefBidMessage(message.getSender(), bid);
+				//this.prebids.put(ID, bidPlan);
+				
 				}
 			}
 
 		}
+		if(bestPlan!=null){
+			doDefBid(bestPlan, sender);
+		}
+		
 
 	}
 
