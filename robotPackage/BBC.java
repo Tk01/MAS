@@ -45,6 +45,7 @@ public class BBC {
 			pbc.done(goal);
 			done = false;
 		}
+		pbc.checkNegotiation();
 		if( model.messages().size() !=0) 
 			pbc.readMessages();
 		RoadUnits r = model.getRoadUnits();
@@ -183,10 +184,7 @@ public void sendStartNegotiationMessage(Plan plan, long endTime) {
 	
 }
 
-public void sendConfirmationMessage(JPlan bestJPlan) {
-	// TODO Auto-generated method stub
-	
-}
+
 public boolean chargeTaken() {
 	if(((ChargeGoal)this.goal).isReserved() && ((ChargeGoal)this.goal).getStartWindow() <= model.getTime().getTime()+ model.calcTime(model.coordinates(),new Point(5,5)) && ((ChargeGoal)this.goal).getEndWindow() >= model.getTime().getTime()+ model.calcTime(model.coordinates(),new Point(5,5))) return false;
 	if(((ChargeGoal)this.goal).isReserved() && !(((ChargeGoal)this.goal).getStartWindow() <= model.getTime().getTime()+ model.calcTime(model.coordinates(),new Point(5,5)) && ((ChargeGoal)this.goal).getEndWindow() >= model.getTime().getTime()+ model.calcTime(model.coordinates(),new Point(5,5)))) return true;
@@ -200,5 +198,10 @@ public boolean chargeTaken() {
 		}
 	}
 	return false;
+}
+
+public void sendNegotiationReplyMessage(CommUser jPlanAgent) {
+	this.worldInterface.sendMessage(new NegotiationReplyMessageContent(jPlanAgent, true));
+	
 }
 }

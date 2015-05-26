@@ -46,6 +46,35 @@ public class Plan {
 
 
 	}
+	
+	public Plan getNegotiationPlan(long negotiationTime){
+		
+		RoadUnits roadUnits = model.getRoadUnits();
+		Plan negotiationPlan = new Plan(goals, model);
+		
+		long time = 0;
+		
+		Point currentLocation = model.coordinates();
+		
+		for(int i=0;i<goals.size();i++){
+			long neededTime = (long) roadUnits.toExTime(roadUnits.toInDist(distance(currentLocation,goals.get(i).coordinates()))/roadUnits.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
+			time = time + neededTime;
+			if(time<negotiationTime){
+				negotiationPlan.remove(goals.get(i));
+			}
+			else{ 
+				if(goals.get(i).type().equals("pickup")){
+					negotiationPlan.remove(goals.get(i+1));
+					break;
+				}
+				else{
+					break;
+				}
+			}
+		}
+		
+		return negotiationPlan;
+	}
 
 	//Return the utility of the plan. Is used to compare tasks that are added to the current plan. The lower the better
 	public double value(ArrayList<Goal> newPlan){
@@ -119,7 +148,10 @@ public class Plan {
 			for(int i =0;i< copyGoals.size();i+=2){
 				ArrayList<Goal> ccopyGoals = (ArrayList<Goal>) copyGoals.clone();
 				ArrayList<Goal> cnewPlan = (ArrayList<Goal>) newPlan.clone();
-				cnewPlan.add(ccopyGoals.remove(i));
+				
+				
+					cnewPlan.add(ccopyGoals.remove(i));
+				
 				cnewPlan.add(ccopyGoals.remove(i));
 
 				bestplan=GenerateBestPlan(ccopyGoals,cnewPlan,charged,bestplan, windows);

@@ -45,7 +45,7 @@ public class PBC {
 
 	boolean chargingInPlan = true;
 	private boolean chargeGoal=false;
-	private ArrayList<TimeWindow> windows;
+	ArrayList<TimeWindow> windows;
 
 	public void done(Goal g){
 		getCurrentPlan().remove(g);
@@ -73,6 +73,8 @@ public class PBC {
 		ArrayList<Message> messages = worldModel.messages();
 		cleanUp(messages);
 		reserveMessages(messages);
+		
+		
 		
 		for(int i = 0; i<messages.size();i++){
 			Message message = messages.get(i);
@@ -168,8 +170,10 @@ public class PBC {
 	private void defAssignment(DefAssignmentMessageContent content){
 		if(content.assigned){
 			currentplan=definitivebid;
-			bbc.setGoal(currentplan.getNextgoal());
-			cc.negotiationAbort();
+			if(bbc.goal == null){
+				bbc.setGoal(currentplan.getNextgoal());
+			}
+			//cc.negotiationAbort();
 			definitivebid = null;
 			this.worldModel.messages().removeAll(this.worldModel.messages());
 			
@@ -262,6 +266,7 @@ public class PBC {
 	private void doDefBid(Plan plan, CommUser sender){
 		if(definitivebid!= null)return;
 		definitivebid = plan;
+		
 		defSender = sender;
 		ArrayList<Goal> goals = plan.getPlan();
 		Plan finalPlan = plan;
@@ -295,57 +300,59 @@ public class PBC {
 
 
 	private void callForBids(ArrayList<Message> messages){
-		
-		Plan bestPlan = null;
-		CommUser sender = null;
-		for(int i= 0;i<messages.size();i++){
-			Message message = messages.get(i);
-			MessageContent content = (MessageContent) message.getContents();
-			if(content.getType().equals("DeliverMessage")){
-
-				DeliverPackageMessageContent callForBidContent = (DeliverPackageMessageContent) content;
-				int ID = callForBidContent.getContractID();
-				Package pack = callForBidContent.getPackageToDel();
-				Plan plan;
-				if(definitivebid!=null){
-					plan  = new Plan(definitivebid.getPlan(), worldModel);
-				}
-				else{
-					plan  = new Plan(currentplan.getPlan(), worldModel);
-				}
-				Plan bidPlan = null;
-				Goal pickupGoal = new Goal(pack.getStart(), "pickup", pack.getPickupTimeWindow());
-				Goal dropGoal = new Goal(pack.getEnd(), "drop", pack.getDeliveryTimeWindow());
-
-				if(worldModel.isReserveChargingStation()){
-					
-					bidPlan = plan.isPossiblePlan(pickupGoal,dropGoal,windows);
-				}
-				else{
-					bidPlan = plan.isPossiblePlan(pickupGoal,dropGoal,windows);
-				}
-				if(bidPlan !=null && bidPlan.getPlan() !=null){
-				//double oldValue = currentplan.value(currentplan.getPlan());
-				//double newValue = bidPlan.value(bidPlan.getPlan());
-					if(bestPlan == null){
-						bestPlan = bidPlan;
-						sender = message.getSender();
+		if(!cc.bidding && !cc.startedNegotiating){
+			Plan bestPlan = null;
+			CommUser sender = null;
+			for(int i= 0;i<messages.size();i++){
+				Message message = messages.get(i);
+				MessageContent content = (MessageContent) message.getContents();
+				if(content.getType().equals("DeliverMessage")){
+	
+					DeliverPackageMessageContent callForBidContent = (DeliverPackageMessageContent) content;
+					int ID = callForBidContent.getContractID();
+					Package pack = callForBidContent.getPackageToDel();
+					Plan plan;
+					if(definitivebid!=null){
+						plan  = new Plan(definitivebid.getPlan(), worldModel);
+					}
+					else{
+						plan  = new Plan(currentplan.getPlan(), worldModel);
+					}
+					Plan bidPlan = null;
+					Goal pickupGoal = new Goal(pack.getStart(), "pickup", pack.getPickupTimeWindow());
+					Goal dropGoal = new Goal(pack.getEnd(), "drop", pack.getDeliveryTimeWindow());
+	
+					if(worldModel.isReserveChargingStation()){
 						
+						bidPlan = plan.isPossiblePlan(pickupGoal,dropGoal,windows);
 					}
-					else if(bestPlan.value(bestPlan.goals)<bidPlan.value(bidPlan.goals)){
-						bestPlan = bidPlan;
-						sender = message.getSender();
+					else{
+						bidPlan = plan.isPossiblePlan(pickupGoal,dropGoal,windows);
 					}
-				
-				bidPlan.setBidPackage(pack);
-				//this.prebids.put(ID, bidPlan);
-				
+					if(bidPlan !=null && bidPlan.getPlan() !=null){
+					//double oldValue = currentplan.value(currentplan.getPlan());
+					//double newValue = bidPlan.value(bidPlan.getPlan());
+						if(bestPlan == null){
+							bestPlan = bidPlan;
+							sender = message.getSender();
+							
+						}
+						else if(bestPlan.value(bestPlan.goals)<bidPlan.value(bidPlan.goals)){
+							bestPlan = bidPlan;
+							sender = message.getSender();
+						}
+					
+					bidPlan.setBidPackage(pack);
+					//this.prebids.put(ID, bidPlan);
+					
+					}
 				}
+	
 			}
-
-		}
-		if(bestPlan!=null){
-			doDefBid(bestPlan, sender);
+			if(bestPlan!=null){
+				System.out.println(bestPlan.goals);
+				doDefBid(bestPlan, sender);
+			}
 		}
 		
 
@@ -361,13 +368,10 @@ public class PBC {
 
 	}
 
-	public void sendConfirmationMessage(JPlan bestJPlan) {
-		bbc.sendConfirmationMessage(bestJPlan);
-
-	}
+	
 
 	public void sendNegotiationReplyMessage(CommUser jPlanAgent) {
-		// TODO Auto-generated method stub
+		bbc.sendNegotiationReplyMessage(jPlanAgent);
 		
 	}
 

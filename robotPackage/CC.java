@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.Message;
+import com.github.rinde.rinsim.core.model.road.RoadUnits;
+import com.github.rinde.rinsim.geom.Point;
 
 
 public class CC {
@@ -17,7 +19,8 @@ public class CC {
 	private JPlan jplan;
 	
 	
-	private boolean ongoing = false;
+	 boolean bidding = false;
+	 boolean startedNegotiating = false;
 	
 	
 	public CC(PBC pbc){
@@ -28,18 +31,33 @@ public class CC {
 	}
 	public void startNegotiation(Plan plan){
 		timeLastAction = pbc.worldModel.time.getStartTime();
-		ongoing = true;
-		jplan.setOwnPlan(plan);
-		pbc.sendStartNegotiationMessage(plan, timeLastAction+delay);
+		startedNegotiating = true;
+		Plan negotiationPlan = getNegotiationPlan(plan);
+		jplan = new JPlan();
+		jplan.setOwnPlan(negotiationPlan);
+		pbc.sendStartNegotiationMessage(negotiationPlan, timeLastAction+delay);
 		
 		
 		
 	}
+	
+	private Plan getNegotiationPlan(Plan plan){
+		
+		long negotiationTime = delay+1000;
+		
+		Plan negotiationPlan = plan.getNegotiationPlan(negotiationTime);
+		
+		return negotiationPlan;
+		
+	}
+	
+	
+	
+	
+	
 	public void handleMessage(Message message){
 		
-		if(ongoing && pbc.worldModel.time.getStartTime()>timeLastAction+delay ){
-			ongoing = false;
-		}
+		
 		
 		MessageContent messageContent = (MessageContent) message.getContents();
 		String type = messageContent.getType();
@@ -49,99 +67,113 @@ public class CC {
 			System.out.println(pbc.currentplan.goals.size());
 		}
 		
-		if(type.equals("StartNegotiation") && pbc.currentplan.goals.size()>3 && !ongoing){
+		if(type.equals("StartNegotiation") ){
+			ProcessStartNegotiation(message);			
+		}
+		if(type.equals("negotiationBid")){
+			processNegotiationBid(message);
+			//jplans.add(((NegotiationBidMessageContent)messageContent).getJointPlan());			
+		}
+		if(type.equals("negotiationReply")){
+			processNegotiationReply(message);
 			
-			long lastTime = ((StartNegotiationMessageContent)messageContent).getEndTime();
+			
+		}
+		
+		
+	}
+	
+	
+	
+	private void ProcessStartNegotiation(Message message){
+		StartNegotiationMessageContent messageContent = (StartNegotiationMessageContent) message.getContents();
+		
+		if(pbc.currentplan.goals.size()>3 && !(bidding || startedNegotiating)){
+			long lastTime = messageContent.getEndTime();
 			long currentTime = pbc.worldModel.getTime().getTime();
 			if(currentTime<lastTime){
 			
-				Plan negPlan = ((StartNegotiationMessageContent) messageContent).getPlan();
-				JPlan jointPlan = bestJPlan(negPlan);
+				Plan otherNegotiationPlan = ((StartNegotiationMessageContent) messageContent).getPlan();
+				Plan ownNegotiationPlan = pbc.currentplan.getNegotiationPlan(lastTime-currentTime);
+				JPlan jointPlan = bestJPlan(otherNegotiationPlan, ownNegotiationPlan);
 				if(jointPlan!=null){
-					ongoing = true;
+					bidding = true;
+					timeLastAction = lastTime - delay; 
 					
 					//jplans.add(jointPlan);
 					pbc.sendNegotiationBidMessage(jointPlan, message.getSender());
 				}
 			}
-			
-			
 		}
-		if(type.equals("negotiationBid")){
-			//jplans.add(((NegotiationBidMessageContent)messageContent).getJointPlan());
-			
-			JPlan receivedJPlan = ((NegotiationBidMessageContent)messageContent).getJointPlan();
-			if(receivedJPlan.getOwnPlan().value(receivedJPlan.getOwnPlan().goals)<this.jplan.getOwnPlan().value(this.jplan.getOwnPlan().goals)){
-				jplan = receivedJPlan;
-			}
-			
-			
-			
-			
-			
-			
-			
-		}
-		if(type.equals("negotiationReply")){
-			if(((NegotiationReplyMessageContent)messageContent).isAccepted()){
-				pbc.currentplan = jplan.getOtherPlan();
-			}
-			
-		}
-		
 		
 	}
+	
+	private void processNegotiationBid(Message message){
+		NegotiationBidMessageContent messageContent = (NegotiationBidMessageContent) message.getContents();
+		
+		JPlan receivedJPlan = messageContent.getJointPlan();
+		if(receivedJPlan.getOwnPlan().value(receivedJPlan.getOwnPlan().goals)<this.jplan.getOwnPlan().value(this.jplan.getOwnPlan().goals)){
+			jplan = receivedJPlan;
+		}
+		
+	}
+	
+	private void processNegotiationReply(Message message){
+		NegotiationReplyMessageContent messageContent = (NegotiationReplyMessageContent) message.getContents();
+		if(messageContent.isAccepted()){
+			pbc.currentplan = jplan.getOtherPlan();
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	public void sendBestNegMessage(){
-		if(ongoing && pbc.worldModel.time.getStartTime()>timeLastAction+delay ){
+		if(pbc.worldModel.time.getStartTime()>timeLastAction+delay && jplan.JPlanAgent!= null ){
 			pbc.sendNegotiationReplyMessage(jplan.JPlanAgent);
-			ongoing = false;
+			
 		}
+		startedNegotiating = false;
+		
 	}
 	
-	private JPlan setBestJplan() {
-		/*
-		for(JPlan jplan: jplans){
-			if(jplan.get)
-		}*/
-		return null;
-	}
-	
-	// This method will filter the goals so no ongoing deliveries are used to find the best plan.
-	private ArrayList<Goal> filterGoals(ArrayList<Goal> goals){
-		
-		for(int i =0; i<goals.size();i++){
-			if(goals.get(0).type.equals("pickup") && i>0){
-				return goals;
-			}
-			goals.remove(0);
-		}
-		
-		return goals;
-	}
 
 	
-	public JPlan bestJPlan(Plan otherPlan){
-		Plan ownPlanNoCharging = pbc.currentplan.returnPlanWithoutCharging();
+
+	
+	public JPlan bestJPlan(Plan ownPlan, Plan otherPlan){
+		Plan ownPlanNoCharging = ownPlan.returnPlanWithoutCharging();
 		Plan otherPlanNoCharging = otherPlan.returnPlanWithoutCharging();
 		
+		ArrayList<Goal> ownGoals = new ArrayList<Goal>();
+		ownGoals.add(ownPlanNoCharging.goals.get(0));
+		
 		ArrayList<Goal> allGoals = ownPlanNoCharging.goals;
+		allGoals.remove(0);
+		
+		ArrayList<Goal> otherGoals = new ArrayList<Goal>();
+		otherGoals.add(otherPlanNoCharging.goals.get(0));
+		
+		otherPlanNoCharging.goals.remove(0);
 		allGoals.addAll(otherPlanNoCharging.goals);
 		
-		ArrayList<Goal> ownGoals = ownPlanNoCharging.goals;
-		ArrayList<Goal> otherGoals = otherPlanNoCharging.goals;
-		
-		ownGoals = filterGoals((ArrayList<Goal>) ownGoals.clone());
-		
-		otherGoals = filterGoals((ArrayList<Goal>) otherGoals.clone());
 		
 		
 		
 		
 		
-		JPlan bestJPlan = getBestPlan(allGoals, ownGoals, otherGoals, new ArrayList<Goal>(), new ArrayList<Goal>(), 0, otherPlan.value(otherPlan.goals));
 		
-		return null;
+		
+		
+		
+		JPlan bestJPlan = getBestPlan(allGoals, ownGoals, otherGoals, ownPlanNoCharging.goals, otherPlanNoCharging.goals, 0, otherPlan.value(otherPlan.goals));
+		
+		return bestJPlan;
 	}
 	
 	private JPlan getBestPlan(ArrayList<Goal> allGoals,
@@ -171,28 +203,30 @@ public class CC {
 		else{
 			
 			JPlan jPlan = new JPlan();
-			jPlan.setOwnPlan(new Plan(bestOwn, pbc.worldModel));
-			jPlan.setOtherPlan(new Plan(bestOther, pbc.worldModel));
+			
 			
 			if(bestOwn.size()<5){
-				ArrayList<Goal>copyOwn = (ArrayList<Goal>) ownGoals.clone();
+				
 			
 			
-				Plan ownPlan = new Plan(copyOwn, pbc.worldModel);
-				ownPlan.isPossiblePlan(allGoals.get(i), allGoals.get(i+1));
+				Plan ownPlan = new Plan(ownGoals, pbc.worldModel);
+				ownPlan.isPossiblePlan(allGoals.get(i), allGoals.get(i+1), pbc.windows);
 			
 			
 				jPlan = getBestPlan(allGoals, ownPlan.goals, otherGoals, bestOwn, bestOther, i++, minOtherValue);
 			
 			}
 			if(bestOther.size()<5){
-				ArrayList<Goal>copyOther = (ArrayList<Goal>) otherGoals.clone();
+				
 			
-				Plan otherPlan = new Plan(copyOther, pbc.worldModel); 
-				otherPlan.isPossiblePlan(allGoals.get(i), allGoals.get(i+1));
+				Plan otherPlan = new Plan(otherGoals, pbc.worldModel); 
+				otherPlan.isPossiblePlan(allGoals.get(i), allGoals.get(i+1),  pbc.windows);
 			
-				jPlan = getBestPlan(allGoals, ownGoals, copyOther, jPlan.ownPlan.goals, jPlan.otherPlan.goals, i++, minOtherValue);
+				jPlan = getBestPlan(allGoals, ownGoals, otherPlan.goals, jPlan.ownPlan.goals, jPlan.otherPlan.goals, i++, minOtherValue);
 			}
+			
+			jPlan.setOwnPlan(new Plan(bestOwn, pbc.worldModel));
+			jPlan.setOtherPlan(new Plan(bestOther, pbc.worldModel));
 			
 			return jPlan;
 		}
@@ -209,16 +243,6 @@ public class CC {
 	}
 	
 	
-	private Plan getBestPlanForAddedGoals(Plan plan, ArrayList<Goal> goals){
-		Plan bestPlan = null;
-		
-		for(int i=0;i<goals.size();i++){
-			bestPlan = plan.isPossiblePlan(goals.get(i), goals.get(i+1));
-		}
-		
-		
-		return bestPlan;
-	}
 	
 	
 	public void negotiationAbort(){
@@ -239,6 +263,19 @@ public class CC {
 		pbc.sendConfirmationMessage(bestJPlan);
 	}
 	*/
+	public void checkNegotiation() {
+		
+		if(timeLastAction!= null && timeLastAction+delay<pbc.worldModel.getTime().getStartTime()){
+			if(bidding){
+				bidding = false;
+				
+			}
+			if(startedNegotiating){
+				sendBestNegMessage();
+			}
+		}
+		
+	}
 	
 	
 	
