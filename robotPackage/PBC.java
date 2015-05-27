@@ -123,7 +123,11 @@ public class PBC {
 			MessageContent content = (MessageContent) message.getContents();
 			if(content.getType().equals("ChargeMessage")){
 				ReturnChargeContents chargeContent  = ((ReturnChargeContents) content);
-				if(cc.bidding) cc.chargeMessage(chargeContent);
+				if(cc.bidding){
+					cc.chargeMessage(chargeContent);
+					worldModel.messages().remove(message);
+					return;
+				}
 				if(this.chargeGoal){
 					if( chargeContent.hasSucceeded()){
 						((ChargeGoal)this.definitivebid.getPlan().get(0)).setReserved(true);
