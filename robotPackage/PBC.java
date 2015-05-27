@@ -123,6 +123,7 @@ public class PBC {
 			MessageContent content = (MessageContent) message.getContents();
 			if(content.getType().equals("ChargeMessage")){
 				ReturnChargeContents chargeContent  = ((ReturnChargeContents) content);
+				if(cc.bidding) cc.chargeMessage(chargeContent);
 				if(this.chargeGoal){
 					if( chargeContent.hasSucceeded()){
 						((ChargeGoal)this.definitivebid.getPlan().get(0)).setReserved(true);
@@ -184,7 +185,8 @@ public class PBC {
 			for(int i=0; i<goals.size();i++){
 
 				if(goals.get(i).type.equals("charging")){
-					bbc.deleteChargeReservation(goals.get(i).startWindow, goals.get(i).endWindow);
+					
+					if(!this.currentplan.getPlan().contains(goals.get(i)))bbc.deleteChargeReservation(goals.get(i).startWindow, goals.get(i).endWindow);
 				}
 
 
@@ -335,7 +337,7 @@ public class PBC {
 							time =callForBidContent.getEndTime()+1000;
 						}
 					
-					bidPlan.setBidPackage(pack);
+					
 					//this.prebids.put(ID, bidPlan);
 					
 					}

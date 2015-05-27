@@ -2,8 +2,6 @@ package robotPackage;
 
 import java.util.ArrayList;
 
-import world.Package;
-
 import com.github.rinde.rinsim.core.model.road.RoadUnits;
 import com.github.rinde.rinsim.geom.Point;
 import com.github.rinde.rinsim.util.TimeWindow;
@@ -14,7 +12,7 @@ public class Plan {
 
 	private ArrayList <Goal> goals;
 
-	Package bidPackage;
+
 	WorldModel model;
 
 	public Plan(ArrayList <Goal> goals, WorldModel model){
@@ -76,7 +74,9 @@ public class Plan {
 		return negotiationPlan;
 	}
 
-	//Return the utility of the plan. Is used to compare tasks that are added to the current plan. The lower the better
+	/**
+	 * Return the time you're not moving packages of the plan. Is used to compare tasks that are added to the current plan. The lower the better
+	 */
 	public double value(ArrayList<Goal> newPlan, long planTime, Point temppos, long tempbat){
 		if(newPlan.size() ==0) return 0;
 		RoadUnits r = model.getRoadUnits();
@@ -104,13 +104,15 @@ public class Plan {
 			curcor =g.point;
 		}
 		long totalTimeSpend = time-model.getTime().getTime();
-		return totalTimeSpend-value(newPlan,temppos)+((model.getMaxBattery()-battery)/model.getMaxBattery())*r.toExTime(r.toInDist(distance(newPlan.get(newPlan.size()-1).coordinates(),model.ChargingStation.getPosition().get()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
+		return totalTimeSpend-TimeDelivering(newPlan,temppos)+((model.getMaxBattery()-battery)/model.getMaxBattery())*r.toExTime(r.toInDist(distance(newPlan.get(newPlan.size()-1).coordinates(),model.ChargingStation.getPosition().get()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
 	}
 
 
 
-
-	private long value(ArrayList<Goal> newPlan, Point temppos) {
+	/**
+	 * Calculates the time you are moving packages
+	 */
+	private long TimeDelivering(ArrayList<Goal> newPlan, Point temppos) {
 		@SuppressWarnings("unchecked")
 		ArrayList<Goal> newPlan2 = (ArrayList<Goal>) newPlan.clone();
 		for(Goal g:newPlan2){
@@ -132,7 +134,9 @@ public class Plan {
 		return val;
 	}
 
-	// check if the pack can be taken up in the plan by checking if in the specified timewindows it is possible to pick up the package.
+	/**
+	 *  check if the pack can be taken up in the plan by checking if in the specified timewindows it is possible to pick up the package.
+	 */
 	public Plan isPossiblePlan(Goal pickupGoal, Goal dropGoal, ArrayList<TimeWindow> windows,long startTime){
 
 		ArrayList<Goal> tempgoals = calculateGoals(startTime);
@@ -163,7 +167,9 @@ public class Plan {
 
 
 
-
+	/**
+	 * Calculates how much battery you have at time l according to the plan
+	 */
 	public long calculateBattery(long l) {
 		RoadUnits r = model.getRoadUnits();
 		long time = model.getTime().getTime();
@@ -200,7 +206,9 @@ public class Plan {
 		return battery;
 
 	}
-
+	/**
+	 * Calculates which position you have at time l according to the plan
+	 */
 	public Point calculatePosition(long l) {
 		RoadUnits r = model.getRoadUnits();
 		long time = model.getTime().getTime();
@@ -236,7 +244,9 @@ public class Plan {
 		}
 		return curcor;
 	}
-
+	/**
+	 * Calculates which goals you have at time l according to the plan
+	 */
 	public ArrayList<Goal> calculateGoals(long l) {
 		@SuppressWarnings("unchecked")
 		ArrayList<Goal> result = (ArrayList<Goal>) goals.clone();
@@ -272,7 +282,9 @@ public class Plan {
 		return result;
 
 	}
-
+	/**
+	 * check of a permutation of goals is better than a given plan
+	 */
 	@SuppressWarnings("unchecked")
 	private ArrayList<Goal> GenerateBestPlan(ArrayList<Goal> copyGoals,
 			ArrayList<Goal> newPlan, Goal charged, ArrayList<Goal> bestplan, ArrayList<TimeWindow> windows, Point temppos, long tempbat, long startTime) {
@@ -295,7 +307,9 @@ public class Plan {
 			return bestplan;
 		}
 	}
-
+	/**
+	 * checks which place you best place charging.
+	 */
 	@SuppressWarnings("unchecked")
 	private ArrayList<Goal> addCharging(ArrayList<Goal> newPlan, Goal charged,
 			ArrayList<Goal> bestplan, ArrayList<TimeWindow> windows, Point temppos, long tempbat, long startTime) {
@@ -321,6 +335,9 @@ public class Plan {
 		}
 		return bestplan;
 	}
+	/**
+	 * checks if a plan can be executed
+	 */
 	private boolean valid(ArrayList<Goal> newPlan, ArrayList<TimeWindow> windows, long startTime, Point temppos, double tempbat) {
 		RoadUnits r = model.getRoadUnits();
 		long time = startTime;
@@ -367,25 +384,25 @@ public class Plan {
 		if(battery <=0.1*model.getMaxBattery()) return false;
 		return true;
 	}
-
+	/**
+	 * checks if there is a timewindow in windows which contains the start and end time of a goal
+	 */
 	private boolean checkWindows(Goal g, ArrayList<TimeWindow> windows) {
 		for(TimeWindow w:windows){
 			if(w.isIn(g.getStartWindow()) && w.isIn(g.getEndWindow()))return true;
 		}
 		return false;
 	}
-
+	/**
+	 * remove a goal from the plan
+	 */
 	public void remove(Goal g) {
 		this.goals.remove(g);
 
 	}
-
-	public Package getBidPackage() {
-		return bidPackage;
-	}
-	public void setBidPackage(Package bidPackage) {
-		this.bidPackage = bidPackage;
-	}
+	/**
+	 * get the next reachable goal
+	 */
 	public Goal getNextgoal() {
 		while(!this.goals.isEmpty() && this.goals.get(0).type().equals("pickup") && this.goals.get(0).getEndWindow() < model.calcTime(model.coordinates(), goals.get(0).coordinates())+ model.getTime().getTime()){
 			this.goals.remove(0);
