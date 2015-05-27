@@ -15,21 +15,16 @@ import robotPackage.DefAssignmentMessageContent;
 import robotPackage.DefBidMessageContent;
 import robotPackage.MessageContent;
 import robotPackage.DeliverPackageMessageContent;
-import robotPackage.PreAssignmentMessageContent;
-import robotPackage.PreBidMessageContent;
-
-	import com.github.rinde.rinsim.core.TickListener;
+import com.github.rinde.rinsim.core.TickListener;
 import com.github.rinde.rinsim.core.TimeLapse;
 import com.github.rinde.rinsim.core.model.comm.CommDevice;
 import com.github.rinde.rinsim.core.model.comm.CommDeviceBuilder;
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.Message;
-import com.github.rinde.rinsim.core.model.comm.MessageContents;
 import com.github.rinde.rinsim.core.model.pdp.PDPModel;
 import com.github.rinde.rinsim.core.model.pdp.Parcel;
 import com.github.rinde.rinsim.core.model.pdp.Vehicle;
 import com.github.rinde.rinsim.core.model.road.RoadModel;
-import com.github.rinde.rinsim.core.model.road.RoadUser;
 import com.github.rinde.rinsim.geom.Point;
 import com.github.rinde.rinsim.util.TimeWindow;
 import com.google.common.base.Optional;
@@ -75,22 +70,24 @@ import com.google.common.collect.ImmutableList;
 
 		@Override
 		public void afterTick(TimeLapse arg0) {
-			// TODO Auto-generated method stub
 			
 		}
-
+		/**
+		 * implements a single tick.
+		 */
 		@Override
 		public void tick(TimeLapse time) {
+			// hard pickupwindow
 			if(super.getPickupTimeWindow().isAfterEnd(time.getTime()) && !this.isDeliverd && this.isCarried() == null){
 				this.pdpModel.unregister(this);
 				this.roadModel.unregister(this);
 				stage = 404;
 			}
+			// soft dropwindow
 			if(super.getDeliveryTimeWindow().isAfterEnd(time.getTime()) && !this.isDeliverd){
-				this.pdpModel.unregister(this);
-				this.roadModel.unregister(this);
 				stage = 404;
 			}
+			// initialise contractnet
 			if(stage ==0 && time.getTimeLeft()>0){
 				this.translator.get().broadcast(new DeliverPackageMessageContent(null, this, mycontractId,time.getStartTime()+delay));
 				stage++;
@@ -102,6 +99,7 @@ import com.google.common.collect.ImmutableList;
 				}
 			}
 			ImmutableList<Message> list;
+			// accept bids and select the best
 			if(stage ==1 && time.getTimeLeft()>0){
 				if(time.getEndTime()>=timeLastAction+delay){
 					list = this.translator.get().getUnreadMessages();
@@ -145,7 +143,10 @@ import com.google.common.collect.ImmutableList;
 
 		@Override
 		public Optional<Point> getPosition() {
-			if(stage == 404)return Optional.absent();
+			if(stage == 404){
+				if(this.isCarried() !=null)return Optional.of(roadModel.getPosition(this.isCarried() ));
+				return Optional.absent();
+			}
 			if(stage ==2) {
 				if(this.isCarried() !=null)return Optional.of(roadModel.getPosition(this.isCarried() ));
 				if(roadModel.containsObject(this))return Optional.of(roadModel.getPosition(this));
@@ -212,7 +213,6 @@ import com.google.common.collect.ImmutableList;
 		}
 
 		public int getStage() {
-			// TODO Auto-generated method stub
 			return stage;
 		}
 		

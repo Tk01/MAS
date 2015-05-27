@@ -12,11 +12,9 @@ import robotPackage.Robot;
 
 import com.github.rinde.rinsim.core.model.ModelProvider;
 import com.github.rinde.rinsim.core.model.pdp.DefaultPDPModel;
-import com.github.rinde.rinsim.core.model.pdp.PDPModel.VehicleState;
 import com.github.rinde.rinsim.core.model.road.RoadModel;
 import com.github.rinde.rinsim.geom.Point;
 import com.github.rinde.rinsim.ui.renderers.ModelRenderer;
-import com.github.rinde.rinsim.ui.renderers.Renderer;
 import com.github.rinde.rinsim.ui.renderers.ViewPort;
 import com.github.rinde.rinsim.ui.renderers.ViewRect;
 import com.google.common.base.Optional;

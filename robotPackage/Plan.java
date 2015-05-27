@@ -46,16 +46,16 @@ public class Plan {
 
 
 	}
-	
+
 	public Plan getNegotiationPlan(long negotiationTime){
-		
+
 		RoadUnits roadUnits = model.getRoadUnits();
 		Plan negotiationPlan = new Plan(goals, model);
-		
+
 		long time = 0;
-		
+
 		Point currentLocation = model.coordinates();
-		
+
 		for(int i=0;i<goals.size();i++){
 			long neededTime = (long) roadUnits.toExTime(roadUnits.toInDist(distance(currentLocation,goals.get(i).coordinates()))/roadUnits.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
 			time = time + neededTime;
@@ -72,7 +72,7 @@ public class Plan {
 				}
 			}
 		}
-		
+
 		return negotiationPlan;
 	}
 
@@ -100,7 +100,7 @@ public class Plan {
 				}
 				time=(long) (time+Math.min(g.endWindow-time, batterydiff));
 				battery = battery + Math.min(g.endWindow-time, batterydiff)*model.getChargeRate();
-				}
+			}
 			curcor =g.point;
 		}
 		long totalTimeSpend = time-model.getTime().getTime();
@@ -134,12 +134,12 @@ public class Plan {
 
 	// check if the pack can be taken up in the plan by checking if in the specified timewindows it is possible to pick up the package.
 	public Plan isPossiblePlan(Goal pickupGoal, Goal dropGoal, ArrayList<TimeWindow> windows,long startTime){
-		
+
 		ArrayList<Goal> tempgoals = calculateGoals(startTime);
 		Point temppos = calculatePosition(startTime);
 		long tempbat = calculateBattery(startTime);
 		if(goals.size() > 7) return null;
-		
+
 		@SuppressWarnings("unchecked")
 		ArrayList <Goal> copyGoals = (ArrayList<Goal>) tempgoals.clone();
 		copyGoals.add(pickupGoal);
@@ -172,7 +172,7 @@ public class Plan {
 		for(Goal g:goals){
 			long timespend = (long) r.toExTime(r.toInDist(distance(curcor,g.coordinates()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
 			time = time+ timespend;
-			
+
 			if(!g.type().equals("charging") && time<g.getStartWindow()){
 				timespend = g.getStartWindow()-time+timespend;
 				time=g.getStartWindow();
@@ -193,12 +193,12 @@ public class Plan {
 				if(time>= l){
 					return (long) (battery+ model.getChargeRate()*(l-(time-Math.min(g.endWindow-time, batterydiff))) -Math.min(g.endWindow-time, batterydiff)*model.getChargeRate());
 				}
-				}
+			}
 			curcor =g.point;
-			
+
 		}
 		return battery;
-		
+
 	}
 
 	public Point calculatePosition(long l) {
@@ -226,10 +226,10 @@ public class Plan {
 				}
 				time=(long) (time+Math.min(g.endWindow-time, batterydiff));
 				battery = battery + Math.min(g.endWindow-time, batterydiff)*model.getChargeRate();
-				}
+			}
 			curcor =g.point;
 			if(time<l){
-				
+
 			}else{
 				return curcor;
 			}
@@ -261,7 +261,7 @@ public class Plan {
 				}
 				time=(long) (time+Math.min(g.endWindow-time, batterydiff));
 				battery = battery + Math.min(g.endWindow-time, batterydiff)*model.getChargeRate();
-				}
+			}
 			curcor =g.point;
 			if(time<l){
 				result.remove(g);
@@ -270,7 +270,7 @@ public class Plan {
 			}
 		}
 		return result;
-		
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -284,10 +284,10 @@ public class Plan {
 			for(int i =0;i< copyGoals.size();i+=2){
 				ArrayList<Goal> ccopyGoals = (ArrayList<Goal>) copyGoals.clone();
 				ArrayList<Goal> cnewPlan = (ArrayList<Goal>) newPlan.clone();
-				
-				
-					cnewPlan.add(ccopyGoals.remove(i));
-				
+
+
+				cnewPlan.add(ccopyGoals.remove(i));
+
 				cnewPlan.add(ccopyGoals.remove(i));
 
 				bestplan=GenerateBestPlan(ccopyGoals,cnewPlan,charged,bestplan, windows,  temppos, tempbat,startTime);
@@ -387,10 +387,19 @@ public class Plan {
 		this.bidPackage = bidPackage;
 	}
 	public Goal getNextgoal() {
+		while(!this.goals.isEmpty() && this.goals.get(0).type().equals("pickup") && this.goals.get(0).getEndWindow() < model.calcTime(model.coordinates(), goals.get(0).coordinates())+ model.getTime().getTime()){
+			this.goals.remove(0);
+			for(Goal g:goals){
+				if(g.type().equals("drop")){
+					goals.remove(g);
+					break;
+				}
+			}
+		}
 		if(this.goals.isEmpty())return null;
 		return this.goals.get(0);
 	}
-	
+
 	public Plan returnPlanWithoutCharging(){
 		@SuppressWarnings("unchecked")
 		ArrayList<Goal> goalsCopy = (ArrayList<Goal>) goals.clone();
@@ -398,7 +407,7 @@ public class Plan {
 			if(((Goal)goalsCopy.get(i)).type().equals("charging")){
 				goalsCopy.remove(goalsCopy.get(i));
 			}
-			
+
 		}
 		return new Plan(goalsCopy,model);
 	}
@@ -416,7 +425,7 @@ public class Plan {
 		return null;
 	}
 
-	
+
 
 
 
