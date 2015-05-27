@@ -68,8 +68,14 @@ public class PBC {
 		cleanUp(messages);
 		reserveMessages(messages);
 		
-		
-		
+		for(int i = 0; i<messages.size();i++){
+			Message message = messages.get(i);
+			MessageContent content = (MessageContent) message.getContents();
+			if(content.getType().equals("NegotiationReply")){
+				cc.handleMessage(message);
+				i--;
+			}
+		}
 		for(int i = 0; i<messages.size();i++){
 			Message message = messages.get(i);
 			MessageContent content = (MessageContent) message.getContents();
@@ -81,7 +87,7 @@ public class PBC {
 			}
 			if(content.getType().equals("StartNegotiation") || content.getType().equals("NegotiationReply") || content.getType().equals("NegotiationBidMessage") ){
 
-				//cc.handleMessage(message);
+				cc.handleMessage(message);
 
 			}
 		}
@@ -180,7 +186,7 @@ public class PBC {
 			
 			//Call CC to start negotiation
 			if(currentplan.getPlan().size()>3){
-				//cc.startNegotiation(currentplan);
+				cc.startNegotiation(currentplan);
 			}
 
 		}
@@ -442,7 +448,7 @@ public class PBC {
 	}
 
 	public void checkNegotiation() {
-		//cc.checkNegotiation();
+		cc.checkNegotiation();
 		
 		
 	}

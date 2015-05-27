@@ -16,6 +16,9 @@ public class Plan {
 	WorldModel model;
 
 	public Plan(ArrayList <Goal> goals, WorldModel model){
+		if (goals ==null){
+			this.goals = null;
+		}
 		this.goals =goals;
 
 		this.model =model;
@@ -26,6 +29,9 @@ public class Plan {
 	}
 	
 	public void setPlan(ArrayList<Goal> goals){
+		if (goals ==null){
+			this.goals = null;
+		}
 		this.goals=goals;
 	}
 
@@ -335,7 +341,7 @@ public class Plan {
 	 * checks if a plan can be executed
 	 */
 	public boolean valid(ArrayList<Goal> newPlan, ArrayList<TimeWindow> windows, long startTime, Point temppos, double tempbat) {
-
+		if(newPlan.size() == 0) return true;
 
 
 		RoadUnits r = model.getRoadUnits();
@@ -403,7 +409,7 @@ public class Plan {
 	 * get the next reachable goal
 	 */
 	public Goal getNextgoal() {
-		while(!this.goals.isEmpty() && this.goals.get(0).type().equals("pickup") && this.goals.get(0).getEndWindow() < model.calcTime(model.coordinates(), goals.get(0).coordinates())+ model.getTime().getTime()){
+		while(this.goals != null && !this.goals.isEmpty() && this.goals.get(0).type().equals("pickup") && this.goals.get(0).getEndWindow() < model.calcTime(model.coordinates(), goals.get(0).coordinates())+ model.getTime().getTime()){
 			this.goals.remove(0);
 			for(Goal g:goals){
 				if(g.type().equals("drop")){
@@ -412,7 +418,7 @@ public class Plan {
 				}
 			}
 		}
-		if(this.goals.isEmpty())return null;
+		if(this.goals == null || this.goals.isEmpty())return null;
 		return this.goals.get(0);
 	}
 

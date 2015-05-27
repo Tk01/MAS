@@ -34,6 +34,7 @@ public class CC {
 	public void startNegotiation(Plan plan){
 		timeLastAction = pbc.worldModel.time.getTime();
 		startedNegotiating = true;
+		/*correct?*/ bidding =false;
 		Plan negotiationPlan = getNegotiationPlan(plan);
 		jplan = new JPlan();
 		jplan.setOwnPlan(negotiationPlan.getPlan());
@@ -69,9 +70,9 @@ public class CC {
 		MessageContent messageContent = (MessageContent) message.getContents();
 		String type = messageContent.getType();
 		
-		System.out.println(pbc.currentplan.getPlan().size());
+		//System.out.println(pbc.currentplan.getPlan().size());
 		if(pbc.currentplan.getPlan().size()>3){
-			System.out.println(pbc.currentplan.getPlan().size());
+		//	System.out.println(pbc.currentplan.getPlan().size());
 		}
 		
 		if(type.equals("StartNegotiation") ){
@@ -119,6 +120,7 @@ public class CC {
 			pbc.sendNegotiationBidMessage(jplan, jplan.JPlanAgent);
 		}
 		else{
+			startedNegotiating = false;
 			bidding= false;
 			jplan.setOtherPlan(null);
 			jplan.setOwnPlan(null);
@@ -177,7 +179,11 @@ public class CC {
 		if(messageContent.isAccepted()){
 			pbc.currentplan.setPlan(jplan.getOtherPlan());
 			pbc.bbc.setGoal(pbc.currentplan.getNextgoal());
+		}else{
+			startedNegotiating = false;
+			bidding = false;
 		}
+		this.pbc.worldModel.messages().remove(message);
 	}
 	
 	
@@ -191,13 +197,14 @@ public class CC {
 	public void sendBestNegMessage(){
 		if(pbc.worldModel.time.getStartTime()>timeLastAction+delay && jplan.JPlanAgent!= null ){
 			pbc.sendNegotiationReplyMessage(jplan.JPlanAgent);
+			pbc.setCurrentplan(jplan.getOtherPlan());
+			pbc.bbc.setGoal(pbc.currentplan.getNextgoal());
+			
 			
 		}
-		
-		pbc.setCurrentplan(jplan.getOtherPlan());
-		pbc.bbc.setGoal(pbc.currentplan.getNextgoal());
-		
 		startedNegotiating = false;
+		
+		
 		
 	}
 	
@@ -252,9 +259,20 @@ public class CC {
 		if(allGoals.size() ==0){
 			Plan ownPlan = new Plan(ownGoals, pbc.worldModel);
 			Plan otherPlan = new Plan(otherGoals, pbc.worldModel);
-			
-			ArrayList<Goal> tempBestOwnGoals = ownPlan.GenerateBestPlan(ownGoals, new ArrayList<Goal>(), ownCharge, bestOwn, pbc.windows, ownPos, ownBat, endTime+1000);
-			ArrayList<Goal> tempOtherOwnGoals = ownPlan.GenerateBestPlan(otherGoals, new ArrayList<Goal>(), otherCharge, bestOther, pbc.windows, otherPos, otherBat, endTime);
+			ArrayList<Goal> ownList =  new ArrayList<Goal>();
+			ArrayList<Goal> otherList =  new ArrayList<Goal>();
+			ArrayList<Goal> ownGoals2 = (ArrayList<Goal>) ownGoals.clone();
+			if(ownGoals2 .size()>0 && ownGoals2.get(0).type().equals("drop") ){
+
+				ownList.add(ownGoals2.remove(0));
+			}
+			ArrayList<Goal> otherGoals2 = (ArrayList<Goal>) otherGoals.clone();
+			if(otherGoals2 .size()>0 && otherGoals2.get(0).type().equals("drop") ){
+
+				otherList.add(otherGoals2.remove(0));
+			}
+			ArrayList<Goal> tempBestOwnGoals = ownPlan.GenerateBestPlan(ownGoals2,ownList , ownCharge, bestOwn, pbc.windows, ownPos, ownBat, endTime+1000);
+			ArrayList<Goal> tempOtherOwnGoals = ownPlan.GenerateBestPlan(otherGoals2, otherList, otherCharge, bestOther, pbc.windows, otherPos, otherBat, endTime);
 			
 			Plan tempBestOwnPlan = new Plan(tempBestOwnGoals, pbc.worldModel);
 			Plan tempBestOtherPlan = new Plan(tempOtherOwnGoals, pbc.worldModel);
@@ -268,8 +286,8 @@ public class CC {
 			//check otherGoals && ownGoals
 			//}
 			
-			tempBestOwnGoals = ownPlan.GenerateBestPlan(ownGoals, new ArrayList<Goal>(), otherCharge, bestOwn, pbc.windows, ownPos, ownBat, endTime+1000);
-			tempOtherOwnGoals = ownPlan.GenerateBestPlan(otherGoals, new ArrayList<Goal>(), ownCharge, bestOther, pbc.windows, otherPos, otherBat, endTime);
+			tempBestOwnGoals = ownPlan.GenerateBestPlan(ownGoals2, ownList, otherCharge, bestOwn, pbc.windows, ownPos, ownBat, endTime+1000);
+			tempOtherOwnGoals = ownPlan.GenerateBestPlan(otherGoals2, otherList, ownCharge, bestOther, pbc.windows, otherPos, otherBat, endTime);
 			
 			tempBestOwnPlan = new Plan(tempBestOwnGoals, pbc.worldModel);
 			tempBestOtherPlan = new Plan(tempOtherOwnGoals, pbc.worldModel);
@@ -289,13 +307,15 @@ public class CC {
 			return jplan;
 		}else{
 			Goal goal = allGoals.remove(0);
+			Goal goal2 = allGoals.remove(0);
 			ArrayList<Goal>copyOwnGoals = (ArrayList<Goal>) ownGoals.clone();
-			
-			
+			copyOwnGoals.add(goal);
+			copyOwnGoals.add(goal2);
 			JPlan bestJplan = getBestPlan(allGoals,otherGoals,otherPos, otherBat, copyOwnGoals, ownPos, ownBat, bestOwn,bestOther, minOtherValue,ownCharge,otherCharge, endTime);
 			
 			ArrayList<Goal>copyOtherGoals = (ArrayList<Goal>) otherGoals.clone();
-			
+			copyOtherGoals.add(goal);
+			copyOtherGoals.add(goal2);
 			return getBestPlan(allGoals,copyOtherGoals,otherPos, otherBat, ownGoals, ownPos, ownBat, bestJplan.getOwnPlan(),bestJplan.getOtherPlan(), minOtherValue,ownCharge,otherCharge, endTime);
 		}
 	

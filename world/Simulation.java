@@ -61,7 +61,7 @@ public class Simulation {
 		final long SERVICE_DURATION =gen.getSERVICE_DURATION();
 		final long endTime = gen.getEndTime();
 		final long delay = gen.getDelay();
-		final boolean reserveChargingStation = true;
+		final boolean reserveChargingStation = false;
 		final RoadModel roadModel =  PlaneRoadModel.builder()
 				.setMinPoint(MIN_POINT)
 				.setMaxPoint(MAX_POINT)
