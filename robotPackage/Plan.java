@@ -77,7 +77,7 @@ public class Plan {
 	}
 
 	//Return the utility of the plan. Is used to compare tasks that are added to the current plan. The lower the better
-	public double value(ArrayList<Goal> newPlan, long planTime, Point temppos, double tempbat){
+	public double value(ArrayList<Goal> newPlan, long planTime, Point temppos, long tempbat){
 		if(newPlan.size() ==0) return 0;
 		RoadUnits r = model.getRoadUnits();
 		long time = planTime;
@@ -137,7 +137,7 @@ public class Plan {
 		
 		ArrayList<Goal> tempgoals = calculateGoals(startTime);
 		Point temppos = calculatePosition(startTime);
-		double tempbat = calculateBattery(startTime);
+		long tempbat = calculateBattery(startTime);
 		if(goals.size() > 7) return null;
 		
 		@SuppressWarnings("unchecked")
@@ -164,10 +164,10 @@ public class Plan {
 
 
 
-	private double calculateBattery(long l) {
+	private long calculateBattery(long l) {
 		RoadUnits r = model.getRoadUnits();
 		long time = model.getTime().getTime();
-		double battery = model.battery();
+		long battery = model.battery();
 		Point curcor = model.coordinates();
 		for(Goal g:goals){
 			long timespend = (long) r.toExTime(r.toInDist(distance(curcor,g.coordinates()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
@@ -178,7 +178,7 @@ public class Plan {
 				time=g.getStartWindow();
 			}
 			if(time>= l){
-				return battery- l+(time- timespend);
+				return  (battery- l+(time- timespend));
 			}
 			battery-= timespend;
 			if(g.type().equals("charging")){
@@ -189,9 +189,9 @@ public class Plan {
 					batterydiff=(long) (batterydiff/model.getChargeRate())+1;
 				}
 				time=(long) (time+Math.min(g.endWindow-time, batterydiff));
-				battery = battery + Math.min(g.endWindow-time, batterydiff)*model.getChargeRate();
+				battery = (long) (battery + Math.min(g.endWindow-time, batterydiff)*model.getChargeRate());
 				if(time>= l){
-					return battery+ model.getChargeRate()*(l-(time-Math.min(g.endWindow-time, batterydiff))) -Math.min(g.endWindow-time, batterydiff)*model.getChargeRate();
+					return (long) (battery+ model.getChargeRate()*(l-(time-Math.min(g.endWindow-time, batterydiff))) -Math.min(g.endWindow-time, batterydiff)*model.getChargeRate());
 				}
 				}
 			curcor =g.point;
@@ -275,7 +275,7 @@ public class Plan {
 
 	@SuppressWarnings("unchecked")
 	private ArrayList<Goal> GenerateBestPlan(ArrayList<Goal> copyGoals,
-			ArrayList<Goal> newPlan, Goal charged, ArrayList<Goal> bestplan, ArrayList<TimeWindow> windows, Point temppos, double tempbat, long startTime) {
+			ArrayList<Goal> newPlan, Goal charged, ArrayList<Goal> bestplan, ArrayList<TimeWindow> windows, Point temppos, long tempbat, long startTime) {
 		if(copyGoals.size() ==0){
 			bestplan = addCharging(newPlan, charged, bestplan,windows,  temppos, tempbat,startTime);
 			return bestplan;
@@ -298,7 +298,7 @@ public class Plan {
 
 	@SuppressWarnings("unchecked")
 	private ArrayList<Goal> addCharging(ArrayList<Goal> newPlan, Goal charged,
-			ArrayList<Goal> bestplan, ArrayList<TimeWindow> windows, Point temppos, double tempbat, long startTime) {
+			ArrayList<Goal> bestplan, ArrayList<TimeWindow> windows, Point temppos, long tempbat, long startTime) {
 		if(valid(newPlan,windows, startTime, temppos,  tempbat)){
 			if(bestplan == null) bestplan = (ArrayList<Goal>) newPlan.clone();
 			else{
@@ -405,7 +405,7 @@ public class Plan {
 
 	public double value(ArrayList<Goal> plan, long startTime) {
 		Point temppos = calculatePosition(startTime);
-		double tempbat = calculateBattery(startTime);
+		long tempbat = calculateBattery(startTime);
 		return value(plan,startTime,temppos,tempbat);
 	}
 
