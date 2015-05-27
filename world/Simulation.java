@@ -2,8 +2,11 @@ package world;
 
 
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+
 
 
 
@@ -83,11 +86,21 @@ public class Simulation {
 		simulator.addTickListener(new TickListener() {
 		      @Override
 		      public void tick(TimeLapse time) {
-		        
 				if (time.getStartTime() > endTime) {
 		          simulator.stop();
+		          try {
+					InformationHandler.getInformationHandler().finish("sim1_result.txt");
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 		        } else while (!PTime.isEmpty() && time.getTime() >= PTime.get(0)) {
-		          simulator.register(new Package(PList.get(0),PLocation.get(0),0,0,new TimeWindow(PTime.get(0), PTime.get(0)+SERVICE_DURATION),new TimeWindow(PTime.get(0)+time(PList.get(0),PLocation.get(0),time.getTimeUnit()), PTime.get(0)+SERVICE_DURATION+2*time(PList.get(0),PLocation.get(0),time.getTimeUnit()))));
+		          Package p =new Package(PList.get(0),PLocation.get(0),0,0,new TimeWindow(PTime.get(0), PTime.get(0)+SERVICE_DURATION),new TimeWindow(PTime.get(0)+time(PList.get(0),PLocation.get(0),time.getTimeUnit()), PTime.get(0)+SERVICE_DURATION+2*time(PList.get(0),PLocation.get(0),time.getTimeUnit())));
+		          InformationHandler.getInformationHandler().addPackage(p);
+		          simulator.register(p);
 		          PList.remove(0);
 		          PLocation.remove(0);
 		          PTime.remove(0);

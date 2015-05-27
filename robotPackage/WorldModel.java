@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import javax.measure.converter.UnitConverter;
 
 import world.ChargingStation;
-
+import world.Package;
 import com.github.rinde.rinsim.core.TimeLapse;
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.Message;
-import com.github.rinde.rinsim.core.model.pdp.Parcel;
+
 import com.github.rinde.rinsim.core.model.road.RoadUnits;
 import com.github.rinde.rinsim.geom.Point;
 import com.google.common.collect.ImmutableList;
@@ -23,7 +23,7 @@ public class WorldModel {
 	ArrayList<Point> Robots = new ArrayList<Point>();
 	long battery = getMaxBattery();
 	ChargingStation ChargingStation;
-	world.Package Carried=null;
+	Package Carried=null;
 	private ArrayList<Message> messages= new ArrayList<Message>();
 	private Point coordinates;
 	private double speed;
@@ -32,7 +32,7 @@ public class WorldModel {
 
 
 
-	private boolean reserveChargingStation = true;
+	private boolean reserveChargingStation = false;
 	public UnitConverter getDistanceConverter() {
 		return DistanceConverter;
 	}
@@ -85,7 +85,7 @@ public class WorldModel {
 		battery= Math.min(battery+d, getMaxBattery());
 
 	}
-	public Parcel getCarriedPackage() {
+	public Package getCarriedPackage() {
 		// TODO Auto-generated method stub
 		return Carried;
 	}

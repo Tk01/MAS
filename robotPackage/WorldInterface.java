@@ -18,6 +18,7 @@ import com.github.rinde.rinsim.geom.Point;
 import com.google.common.base.Optional;
 
 import world.ChargingStation;
+import world.InformationHandler;
 import world.Package;
 public class WorldInterface {
 
@@ -54,6 +55,7 @@ public class WorldInterface {
 			this.gatherInfo(time);
 			bbc.run();
 		}else{
+			InformationHandler.getInformationHandler().batteryEmpty(robot,time.getTime());
 			time.consumeAll();
 		}
 	}
@@ -97,6 +99,7 @@ public class WorldInterface {
 	public void drop() {
 		try{
 		pdpModel.get().deliver(robot, model.getCarriedPackage(), model.getTime());
+		model.getCarriedPackage().deliver();
 		model.dropPackage();
 		model.getTime().consume(0);
 		}
@@ -125,8 +128,9 @@ public class WorldInterface {
 		}
 		
 	}
-	public void waitMoment() {
+	public void waitMoment(boolean b) {
 		//model.batteryDrop(model.getTime().getTimeLeft()*SpendingRate);
+		InformationHandler.getInformationHandler().addTime(model.getTime().getTimeLeft());
 		model.getTime().consumeAll();;
 
 	}

@@ -59,7 +59,12 @@ public class BBC {
 				this.worldInterface.MoveTo(new Point(5,4));
 				return;
 			}
-			worldInterface.waitMoment();
+			if(!model.coordinates().equals(new Point(5,4))){
+				goal = new Goal(new Point(5,4),"MoveTo" , TimeWindow.ALWAYS);
+				this.worldInterface.MoveTo(new Point(5,4));
+				return;
+			}
+			worldInterface.waitMoment(true);
 			return;
 		}
 		if(goal.type().equals("charging") && chargeTaken()){
@@ -71,7 +76,10 @@ public class BBC {
 				this.worldInterface.MoveTo(new Point(5,4.9));
 				return;	
 			}
-			this.worldInterface.waitMoment();
+			boolean b = false;
+			if(model.isReserveChargingStation())b=true;
+			if(model.battery() >0.1*model.getMaxBattery())b=true;
+			this.worldInterface.waitMoment(b);
 			return;
 		}
 		
@@ -80,7 +88,7 @@ public class BBC {
 			return;
 		}
 		if(goal.getStartWindow() >= model.time.getTime() ){
-			worldInterface.waitMoment();
+			worldInterface.waitMoment(true);
 			return;
 		}
 		if(goal.type().equals("MoveTo")){
@@ -96,12 +104,13 @@ public class BBC {
 		if(goal.type().equals("pickup")){
 			try{
 				worldInterface.pickup();
+				done =true;
+				return;
 			}catch(NoSuchElementException e){
 				pbc.failPickUp();
 			}
 			
-			done =true;
-			return;
+			
 		}
 		
 		
@@ -202,6 +211,11 @@ public boolean chargeTaken() {
 
 public void sendNegotiationReplyMessage(CommUser jPlanAgent) {
 	this.worldInterface.sendMessage(new NegotiationReplyMessageContent(jPlanAgent, true));
+	
+}
+
+public void sendCancelReservationMessage(long start, long end) {
+	this.worldInterface.sendMessage( new ChargeMessageContent(model.ChargingStation,start, end, "delete"));
 	
 }
 }

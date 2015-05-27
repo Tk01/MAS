@@ -49,6 +49,10 @@ import com.google.common.collect.ImmutableList;
 		Optional<CommDevice> translator;
 		private int stage =0;
 		RoadModel roadModel;
+		private boolean isDeliverd = false;
+		public void deliver(){
+			isDeliverd =true;
+		}
 		Package(Point startPosition, Point pDestination,
 				long pLoadingDuration, long pUnloadingDuration, TimeWindow timeWindow, TimeWindow timeWindow2) {
 			super(pDestination, pLoadingDuration, timeWindow,
@@ -76,12 +80,12 @@ import com.google.common.collect.ImmutableList;
 
 		@Override
 		public void tick(TimeLapse time) {
-			if(super.getPickupTimeWindow().isAfterEnd(time.getTime()) && this.isCarried() == null){
+			if(super.getPickupTimeWindow().isAfterEnd(time.getTime()) && !this.isDeliverd && this.isCarried() == null){
 				this.pdpModel.unregister(this);
 				this.roadModel.unregister(this);
 				stage = 404;
 			}
-			if(super.getDeliveryTimeWindow().isAfterEnd(time.getTime()) && super.isRegistered()){
+			if(super.getDeliveryTimeWindow().isAfterEnd(time.getTime()) && !this.isDeliverd){
 				this.pdpModel.unregister(this);
 				this.roadModel.unregister(this);
 				stage = 404;
@@ -204,6 +208,11 @@ import com.google.common.collect.ImmutableList;
 		public Boolean canBePickedUp(Vehicle v, Long t){
 			return super.getPickupTimeWindow().isIn(t);
 			
+		}
+
+		public int getStage() {
+			// TODO Auto-generated method stub
+			return stage;
 		}
 		
 
