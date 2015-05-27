@@ -41,7 +41,7 @@ import com.google.common.collect.ImmutableList;
 	public class Package extends Parcel implements CommUser,TickListener {
 		private PDPModel pdpModel;
 		static int contractId =0;
-		Long delay = /*3000l*/ 20000l;
+		Long delay;
 		Long timeLastAction;
 		int mycontractId ;
 		Point start;
@@ -54,7 +54,7 @@ import com.google.common.collect.ImmutableList;
 			isDeliverd =true;
 		}
 		Package(Point startPosition, Point pDestination,
-				long pLoadingDuration, long pUnloadingDuration, TimeWindow timeWindow, TimeWindow timeWindow2) {
+				long pLoadingDuration, long pUnloadingDuration, TimeWindow timeWindow, TimeWindow timeWindow2,long delay) {
 			super(pDestination, pLoadingDuration, timeWindow,
 					pUnloadingDuration, timeWindow2, 1);
 			start =startPosition;
@@ -62,6 +62,7 @@ import com.google.common.collect.ImmutableList;
 			end = pDestination;
 			mycontractId=contractId;
 			contractId++;
+			this.delay= delay;
 		}
 
 		public void setStart(Point start) {

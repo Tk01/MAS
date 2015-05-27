@@ -16,10 +16,11 @@ import com.google.common.base.Optional;
 public class Robot extends Vehicle implements CommUser{
 	WorldInterface inter;
 	WorldModel model;
-	public Robot(Point location, ChargingStation chargingStation, double speed){
+
+	public Robot(Point location, ChargingStation chargingStation, double speed, long batterySize, long chargeRate, boolean reserveChargingStation){
 		setStartPosition(location);
 		setCapacity(1);
-		inter = new WorldInterface(this, location, chargingStation, speed);
+		inter = new WorldInterface(this, location, chargingStation, speed, batterySize, chargeRate, reserveChargingStation);
 		model = inter.getModel();
 	}
 	@Override
@@ -60,6 +61,5 @@ public class Robot extends Vehicle implements CommUser{
 		// TODO Auto-generated method stub
 		return model.battery();
 	}
-	
 
 }

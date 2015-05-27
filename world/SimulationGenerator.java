@@ -21,22 +21,25 @@ public class SimulationGenerator {
 	final ArrayList<Long> PTime = new ArrayList<Long>();
 	final long SERVICE_DURATION =30*60*1000;
 	final long endTime = 24*60*60*1000;
+	final long delay =20000;
+	final long batterySize = 3*60*60*1000;
+	final long chargeRate = 5;
 	public  SimulationGenerator(String filename) throws IOException{
 		BufferedReader in = new BufferedReader(new FileReader(filename));
 		String[] robots = in.readLine().split(";");
 		for(String r:robots){
 			String[] split = r.split(",");
-			RList.add(new Point(Integer.parseInt(split[0]),Integer.parseInt(split[1])));
+			RList.add(new Point(Double.parseDouble(split[0]),Double.parseDouble(split[1])));
 		}
 		String[] Packages = in.readLine().split(";");
 		for(String r:Packages){
 			String[] split = r.split(",");
-			PList.add(new Point(Integer.parseInt(split[0]),Integer.parseInt(split[1])));
+			PList.add(new Point(Double.parseDouble(split[0]),Double.parseDouble(split[1])));
 		}
 		String[] Destinations = in.readLine().split(";");
 		for(String r:Destinations){
 			String[] split = r.split(",");
-			PLocation.add(new Point(Integer.parseInt(split[0]),Integer.parseInt(split[1])));
+			PLocation.add(new Point(Double.parseDouble(split[0]),Double.parseDouble(split[1])));
 		}
 		String[] times = in.readLine().split(";");
 		for(String r:times){
@@ -107,5 +110,14 @@ public class SimulationGenerator {
 	}
 	public long getEndTime() {
 		return endTime;
+	}
+	public long getDelay() {
+		return delay ;
+	}
+	public long getBatterySize() {
+		return batterySize ;
+	}
+	public long getChargeRateSize() {
+		return chargeRate ;
 	}
 }

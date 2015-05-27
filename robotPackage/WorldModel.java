@@ -2,8 +2,6 @@ package robotPackage;
 
 import java.util.ArrayList;
 
-import javax.measure.converter.UnitConverter;
-
 import world.ChargingStation;
 import world.Package;
 import com.github.rinde.rinsim.core.TimeLapse;
@@ -19,7 +17,7 @@ public class WorldModel {
 
 	int maxTask=3;
 	TimeLapse time =null;
-
+	long chargeRate;
 	ArrayList<Point> Robots = new ArrayList<Point>();
 	long battery = getMaxBattery();
 	ChargingStation ChargingStation;
@@ -28,26 +26,24 @@ public class WorldModel {
 	private Point coordinates;
 	private double speed;
 	ArrayList<Point> ChargingStations;
+	long BatterySize;
+
+
+
+	private final boolean reserveChargingStation ;
+
 	
-
-
-
-	private boolean reserveChargingStation = false;
-	public UnitConverter getDistanceConverter() {
-		return DistanceConverter;
-	}
-	public UnitConverter getSpeedConverter() {
-		return SpeedConverter;
-	}
-	private UnitConverter DistanceConverter;
-	private UnitConverter SpeedConverter;
 	private RoadUnits RoadUnits;
 
 
-	public WorldModel(Point p,ChargingStation c, double s ) {
+	public WorldModel(Point p,ChargingStation c, double s,long BatterySize, long chargeRate, boolean reserveChargingStation ) {
 		coordinates =p;
 		ChargingStation=c;
 		speed =s;
+		this.BatterySize = BatterySize;
+		battery=BatterySize;
+		this.chargeRate=chargeRate;
+		this.reserveChargingStation =reserveChargingStation;
 	}
 	public ArrayList<Point> getRobots() {
 
@@ -68,16 +64,11 @@ public class WorldModel {
 
 		return battery;
 	}
-	public void moveTo(Point coordinates) {
-		// TODO Auto-generated method stub
 
-	}
 	public ArrayList<Message> messages() {
-		// TODO Auto-generated method stub
 		return messages;
 	}
 	public Point coordinates() {
-		// TODO Auto-generated method stub
 		return coordinates;
 	}
 	
@@ -86,7 +77,6 @@ public class WorldModel {
 
 	}
 	public Package getCarriedPackage() {
-		// TODO Auto-generated method stub
 		return Carried;
 	}
 	public void pickupPackage(world.Package parcel) {
@@ -113,16 +103,13 @@ public class WorldModel {
 		this.time = time;
 	}
 	public double getSpeed() {
-		// TODO Auto-generated method stub
 		return speed;
 	}
 
 	public boolean isReserveChargingStation() {
 		return reserveChargingStation;
 	}
-	public void setReserveChargingStation(boolean reserveChargingStation) {
-		this.reserveChargingStation = reserveChargingStation;
-	}
+	
 	public void deletePreAssign(CommUser sender) {
 		for(Message m:this.messages()){
 			if(m.getSender()==sender && ((MessageContent) m.getContents()).getType().equals("PreAssignment") ){
@@ -133,30 +120,20 @@ public class WorldModel {
 
 
 	}
-	public void setDistanceConverter(UnitConverter converterTo) {
-		DistanceConverter = converterTo;
 
-	}
-	public void setSpeedConverter(UnitConverter converterTo) {
-		SpeedConverter = converterTo;
-
-	}
-	
 	public RoadUnits getRoadUnits() {
-		// TODO Auto-generated method stub
 		return RoadUnits;
 	}
-	public void setRoadUnits(RoadUnits roadUnits2) {
-		this.RoadUnits	=roadUnits2;
+	public void setRoadUnits(RoadUnits roadUnits) {
+		this.RoadUnits	=roadUnits;
 	}
-	public long getMaxBattery() {
-		// TODO Auto-generated method stub
-		return 1000l*10000l;
+	public long getMaxBattery() {		
+		return BatterySize;
 	}
 	public long calcTime(Point point, Point point2) {
-		;
-		// TODO Auto-generated method stub
-    	
 		return (long) RoadUnits.toExTime(RoadUnits.toInDist(Point.distance(point,point2))/RoadUnits.toInSpeed(speed),time.getTimeUnit());
+	}
+	public long getChargeRate() {
+		return this.chargeRate;
 	}
 }

@@ -3,7 +3,6 @@ package robotPackage;
 
 
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
@@ -30,8 +29,8 @@ public class WorldInterface {
 	private Optional<RoadModel> roadModel;
 	private Optional<PDPModel> pdpModel;
 	private Robot robot;
-	public WorldInterface(Robot robot, Point p, ChargingStation c, double s){
-		model = new WorldModel(p,c,s);
+	public WorldInterface(Robot robot, Point p, ChargingStation c, double s, long batterySize, long chargeRate, boolean reserveChargingStation){
+		model = new WorldModel(p,c,s, batterySize, chargeRate, reserveChargingStation);
 		bbc = new BBC(this,model,robot);
 		this.robot = robot;
 		roadModel= Optional.absent();
@@ -89,11 +88,11 @@ public class WorldInterface {
 
 	public void charge(long l) {
 		double toCharge = model.getMaxBattery()-model.battery();
-		long chargeRate = 6;
-		double chargeTime =(long) (toCharge/chargeRate);
+		
+		double chargeTime =(long) (toCharge/(model.getChargeRate()+1));
 		if(chargeTime ==0) chargeTime =1; 
 		long timeSpend = (long) Math.min(Math.min(chargeTime , model.getTime().getTimeLeft()), l-model.getTime().getTime());
-		model.charge(chargeRate*timeSpend);
+		model.charge((model.getChargeRate()+1)*timeSpend);
 		model.getTime().consume(timeSpend);
 	}
 	public void drop() {
@@ -130,7 +129,7 @@ public class WorldInterface {
 	}
 	public void waitMoment(boolean b) {
 		//model.batteryDrop(model.getTime().getTimeLeft()*SpendingRate);
-		InformationHandler.getInformationHandler().addTime(model.getTime().getTimeLeft());
+		InformationHandler.getInformationHandler().addTime(model.getTime().getTimeLeft(), robot);
 		model.getTime().consumeAll();;
 
 	}

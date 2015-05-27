@@ -2,19 +2,12 @@ package robotPackage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-
-import org.jscience.geography.coordinates.Coordinates;
-
-import com.github.rinde.rinsim.core.model.Model;
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.Message;
-import com.github.rinde.rinsim.core.model.pdp.Depot;
 import com.github.rinde.rinsim.core.model.road.RoadUnits;
 import com.github.rinde.rinsim.geom.Point;
 import com.github.rinde.rinsim.util.TimeWindow;
 
-import world.ChargingStation;
 import world.Package;
 import world.ReturnChargeContents;
 
@@ -294,11 +287,7 @@ public class PBC {
 	
 	
 
-	private Plan reserveSlotCharging(Plan plan){
-		Plan finalPlan= plan;
-		//TODO
-		return finalPlan;
-	}
+
 
 
 
@@ -313,7 +302,6 @@ public class PBC {
 				if(content.getType().equals("DeliverMessage")){
 	
 					DeliverPackageMessageContent callForBidContent = (DeliverPackageMessageContent) content;
-					int ID = callForBidContent.getContractID();
 					Package pack = callForBidContent.getPackageToDel();
 					Plan plan;
 					if(definitivebid!=null){
@@ -355,7 +343,7 @@ public class PBC {
 	
 			}
 			if(bestPlan!=null){
-				System.out.println(bestPlan.getPlan());
+				
 				
 				doDefBid(bestPlan, sender,time);
 			}

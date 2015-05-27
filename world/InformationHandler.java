@@ -6,14 +6,12 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.github.rinde.rinsim.geom.Point;
-
 import robotPackage.Robot;
 
 public class InformationHandler {
 	private static InformationHandler handler;
-	private long l=0;
-	private HashMap<Robot,Long> map= new HashMap<Robot,Long>();
+	private HashMap<Robot,Long> idleTimes = new HashMap<Robot,Long>();
+	private HashMap<Robot,Long> FailedTimes= new HashMap<Robot,Long>();
 	ArrayList<Package> packages = new ArrayList<Package>();
 	public static InformationHandler getInformationHandler(){
 		if (handler ==null) handler = new InformationHandler();
@@ -21,10 +19,9 @@ public class InformationHandler {
 		
 	}
 	public void finish(String string) throws FileNotFoundException, UnsupportedEncodingException {
-		// TODO Auto-generated method stub
 		PrintWriter writer = new PrintWriter(string, "UTF-8");
 		String line="failed RobotTimes: ";
-		for(long p:map.values()){
+		for(long p:FailedTimes.values()){
 			line+=p+", ";
 		}
 		writer.println(line);
@@ -33,21 +30,31 @@ public class InformationHandler {
 			if(p.getStage() == 404) i++;
 		}
 		writer.println("failed packages: "+i+";" +  (((double)i*100) / packages.size()) + "%;");
-		writer.println("Total Idle Time: "+l+";"+ (((double)l*100) /4/24/60/60/1000) + "%;");
+		line="Idle Times: ";
+		for(long p:idleTimes.values()){
+			line+=p+"("+((double)p/24d/60d/60d/1000d)+")"+", ";
+		}
+		writer.println(line);
 		writer.close();
 	}
-	public void addTime(long timeLeft) {
-		// TODO Auto-generated method stub
-		l+=timeLeft;
+	public void addTime(long timeLeft,Robot robot) {
+		if(!idleTimes.containsKey(robot)) idleTimes.put(robot, timeLeft);
+		else{
+			idleTimes.put(robot,idleTimes.get(robot)+timeLeft);
+		}
 		
 	}
 	public void batteryEmpty(Robot robot, long time) {
-		// TODO Auto-generated method stub
-		if(!map.containsKey(robot))map.put(robot, time);
+		if(!FailedTimes.containsKey(robot))FailedTimes.put(robot, time);
 		
 	}
 	public void addPackage(Package p) {
-		// TODO Auto-generated method stub
 		packages.add(p);
+	}
+	public void clear() {
+		idleTimes = new HashMap<Robot,Long>();
+		FailedTimes= new HashMap<Robot,Long>();
+		packages = new ArrayList<Package>();
+		
 	}
 }

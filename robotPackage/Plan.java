@@ -93,13 +93,13 @@ public class Plan {
 			battery-= timespend;
 			if(g.type().equals("charging")){
 				double batterydiff = model.getMaxBattery()-battery;
-				if(batterydiff/5==(long) (batterydiff/5)){
-					batterydiff=(long) (batterydiff/5);
+				if(batterydiff/model.getChargeRate()==(long) (batterydiff/model.getChargeRate())){
+					batterydiff=(long) (batterydiff/model.getChargeRate());
 				}else{
-					batterydiff=(long) (batterydiff/5)+1;
+					batterydiff=(long) (batterydiff/model.getChargeRate())+1;
 				}
 				time=(long) (time+Math.min(g.endWindow-time, batterydiff));
-				battery = battery + Math.min(g.endWindow-time, batterydiff)*5;
+				battery = battery + Math.min(g.endWindow-time, batterydiff)*model.getChargeRate();
 				}
 			curcor =g.point;
 		}
@@ -142,7 +142,6 @@ public class Plan {
 
 
 	private double calculateBattery(long l) {
-		ArrayList<Goal> result = (ArrayList<Goal>) goals.clone();
 		RoadUnits r = model.getRoadUnits();
 		long time = model.getTime().getTime();
 		double battery = model.battery();
@@ -161,15 +160,15 @@ public class Plan {
 			battery-= timespend;
 			if(g.type().equals("charging")){
 				double batterydiff = model.getMaxBattery()-battery;
-				if(batterydiff/5==(long) (batterydiff/5)){
-					batterydiff=(long) (batterydiff/5);
+				if(batterydiff/model.getChargeRate()==(long) (batterydiff/model.getChargeRate())){
+					batterydiff=(long) (batterydiff/model.getChargeRate());
 				}else{
-					batterydiff=(long) (batterydiff/5)+1;
+					batterydiff=(long) (batterydiff/model.getChargeRate())+1;
 				}
 				time=(long) (time+Math.min(g.endWindow-time, batterydiff));
-				battery = battery + Math.min(g.endWindow-time, batterydiff)*5;
+				battery = battery + Math.min(g.endWindow-time, batterydiff)*model.getChargeRate();
 				if(time>= l){
-					return battery+ 5*(l-(time-Math.min(g.endWindow-time, batterydiff))) -Math.min(g.endWindow-time, batterydiff)*5;
+					return battery+ model.getChargeRate()*(l-(time-Math.min(g.endWindow-time, batterydiff))) -Math.min(g.endWindow-time, batterydiff)*model.getChargeRate();
 				}
 				}
 			curcor =g.point;
@@ -180,7 +179,6 @@ public class Plan {
 	}
 
 	private Point calculatePosition(long l) {
-		ArrayList<Goal> result = (ArrayList<Goal>) goals.clone();
 		RoadUnits r = model.getRoadUnits();
 		long time = model.getTime().getTime();
 		double battery = model.battery();
@@ -198,13 +196,13 @@ public class Plan {
 			battery-= timespend;
 			if(g.type().equals("charging")){
 				double batterydiff = model.getMaxBattery()-battery;
-				if(batterydiff/5==(long) (batterydiff/5)){
-					batterydiff=(long) (batterydiff/5);
+				if(batterydiff/model.getChargeRate()==(long) (batterydiff/model.getChargeRate())){
+					batterydiff=(long) (batterydiff/model.getChargeRate());
 				}else{
-					batterydiff=(long) (batterydiff/5)+1;
+					batterydiff=(long) (batterydiff/model.getChargeRate())+1;
 				}
 				time=(long) (time+Math.min(g.endWindow-time, batterydiff));
-				battery = battery + Math.min(g.endWindow-time, batterydiff)*5;
+				battery = battery + Math.min(g.endWindow-time, batterydiff)*model.getChargeRate();
 				}
 			curcor =g.point;
 			if(time<l){
@@ -217,6 +215,7 @@ public class Plan {
 	}
 
 	private ArrayList<Goal> calculateGoals(long l) {
+		@SuppressWarnings("unchecked")
 		ArrayList<Goal> result = (ArrayList<Goal>) goals.clone();
 		RoadUnits r = model.getRoadUnits();
 		long time = model.getTime().getTime();
@@ -232,13 +231,13 @@ public class Plan {
 			battery-= timespend;
 			if(g.type().equals("charging")){
 				double batterydiff = model.getMaxBattery()-battery;
-				if(batterydiff/5==(long) (batterydiff/5)){
-					batterydiff=(long) (batterydiff/5);
+				if(batterydiff/model.getChargeRate()==(long) (batterydiff/model.getChargeRate())){
+					batterydiff=(long) (batterydiff/model.getChargeRate());
 				}else{
-					batterydiff=(long) (batterydiff/5)+1;
+					batterydiff=(long) (batterydiff/model.getChargeRate())+1;
 				}
 				time=(long) (time+Math.min(g.endWindow-time, batterydiff));
-				battery = battery + Math.min(g.endWindow-time, batterydiff)*5;
+				battery = battery + Math.min(g.endWindow-time, batterydiff)*model.getChargeRate();
 				}
 			curcor =g.point;
 			if(time<l){
@@ -251,6 +250,7 @@ public class Plan {
 		
 	}
 
+	@SuppressWarnings("unchecked")
 	private ArrayList<Goal> GenerateBestPlan(ArrayList<Goal> copyGoals,
 			ArrayList<Goal> newPlan, Goal charged, ArrayList<Goal> bestplan, ArrayList<TimeWindow> windows, Point temppos, double tempbat, long startTime) {
 		if(copyGoals.size() ==0){
@@ -273,6 +273,7 @@ public class Plan {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private ArrayList<Goal> addCharging(ArrayList<Goal> newPlan, Goal charged,
 			ArrayList<Goal> bestplan, ArrayList<TimeWindow> windows, Point temppos, double tempbat, long startTime) {
 		if(valid(newPlan,windows, startTime, temppos,  tempbat)){
@@ -316,13 +317,13 @@ public class Plan {
 			if(g.type().equals("charging")){
 				double batterydiff = model.getMaxBattery()-battery;
 				long timestart = time;
-				if(batterydiff/5==(long) (batterydiff/5)){
-					batterydiff=(long) (batterydiff/5);
+				if(batterydiff/model.getChargeRate()==(long) (batterydiff/model.getChargeRate())){
+					batterydiff=(long) (batterydiff/model.getChargeRate());
 				}else{
-					batterydiff=(long) (batterydiff/5)+1;
+					batterydiff=(long) (batterydiff/model.getChargeRate())+1;
 				}
 				time=(long) (time+Math.min(g.endWindow-time, batterydiff));
-				battery = battery + Math.min(g.endWindow-time, batterydiff)*5;
+				battery = battery + Math.min(g.endWindow-time, batterydiff)*model.getChargeRate();
 				if(time>g.endWindow)return false;
 				if(!((ChargeGoal)g).isReserved()){
 					if(!checkWindows(g,windows)) return false;
@@ -368,7 +369,8 @@ public class Plan {
 	}
 	
 	public Plan returnPlanWithoutCharging(){
-		ArrayList<Goal> goalsCopy = (ArrayList) goals.clone();
+		@SuppressWarnings("unchecked")
+		ArrayList<Goal> goalsCopy = (ArrayList<Goal>) goals.clone();
 		for(int i=0;i<goalsCopy.size();i++){
 			if(((Goal)goalsCopy.get(i)).type().equals("charging")){
 				goalsCopy.remove(goalsCopy.get(i));
@@ -385,7 +387,6 @@ public class Plan {
 	}
 
 	public ChargeGoal lostChargeGoal(Plan definitivebid) {
-		// TODO Auto-generated method stub
 		for( Goal g : goals){
 			if(g.type().equals("charging") && !definitivebid.getPlan().contains(g)) return (ChargeGoal) g;
 		}
