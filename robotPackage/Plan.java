@@ -104,14 +104,37 @@ public class Plan {
 			curcor =g.point;
 		}
 		long totalTimeSpend = time-model.getTime().getTime();
-		return totalTimeSpend+(1-battery)*r.toExTime(r.toInDist(distance(newPlan.get(newPlan.size()-1).coordinates(),model.ChargingStation.getPosition().get()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
+		return totalTimeSpend-value(newPlan,temppos)+((model.getMaxBattery()-battery)/model.getMaxBattery())*r.toExTime(r.toInDist(distance(newPlan.get(newPlan.size()-1).coordinates(),model.ChargingStation.getPosition().get()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
 	}
 
 
 
 
+	private long value(ArrayList<Goal> newPlan, Point temppos) {
+		@SuppressWarnings("unchecked")
+		ArrayList<Goal> newPlan2 = (ArrayList<Goal>) newPlan.clone();
+		for(Goal g:newPlan2){
+			if(g.type().equals("charging")){
+				newPlan2.remove(g);
+				break;
+			}
+		}
+		int h=0;
+		long val=0;
+		if(newPlan2.size() ==0)return 0;
+		if(newPlan2.get(0).type().equals("drop")){
+			val = model.calcTime(temppos, newPlan2.get(0).coordinates());
+			h++;
+		}
+		for(int i =h;i<newPlan2.size();i+=2){
+			val += model.calcTime(newPlan2.get(i).coordinates(), newPlan2.get(i+1).coordinates()); 
+		}
+		return val;
+	}
+
 	// check if the pack can be taken up in the plan by checking if in the specified timewindows it is possible to pick up the package.
 	public Plan isPossiblePlan(Goal pickupGoal, Goal dropGoal, ArrayList<TimeWindow> windows,long startTime){
+		
 		ArrayList<Goal> tempgoals = calculateGoals(startTime);
 		Point temppos = calculatePosition(startTime);
 		double tempbat = calculateBattery(startTime);
