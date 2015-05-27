@@ -24,13 +24,16 @@ public class ChargingStation extends Depot implements CommUser,TickListener{
 	Point pos;
 	Optional<CommDevice> device;
 	public ChargingStation(Point p) {
-		// TODO Auto-generated constructor stub
 		setStartPosition(p);
 		pos = p;
 	}
+	/**
+	 * implement a tick
+	 */
 	@Override
 	public void tick(TimeLapse timeLapse) {
 		ImmutableList<Message> list = this.device.get().getUnreadMessages();
+		//handle the delete messages
 		for (Message message : list){
 			MessageContent m = (MessageContent) message.getContents();
 			if(m.getType().equals("ChargeMessage")){
@@ -38,6 +41,7 @@ public class ChargingStation extends Depot implements CommUser,TickListener{
 				if(l.getMesType().equals("delete")) this.delete(l.getStart(),l.getEnd());
 			}
 		}
+		//handle the reservation messages
 		for (Message message : list){
 			MessageContent m = (MessageContent) message.getContents();
 			if(m.getType().equals("ChargeMessage")){
@@ -45,6 +49,7 @@ public class ChargingStation extends Depot implements CommUser,TickListener{
 				if(l.getMesType().equals("reserve")) this.reserve(l.getStart(),l.getEnd(),message.getSender());
 			}
 		}
+		//handle the check messages
 		for (Message message : list){
 			MessageContent m = (MessageContent) message.getContents();
 			if(m.getType().equals("ChargeMessage")){
@@ -54,6 +59,9 @@ public class ChargingStation extends Depot implements CommUser,TickListener{
 		}
 		
 	}
+	/**
+	 * delete a reserved slot.
+	 */
 	private void delete(long start, long end) {
 		for( Long[] slot:schedule){
 			if(start== slot[0] & end== slot[1]){
@@ -63,6 +71,9 @@ public class ChargingStation extends Depot implements CommUser,TickListener{
 		}
 		
 	}
+	/**
+	 * check if a slot is open for reservation and send a message to the sender with the result.
+	 */
 	private void check(long start, long end, CommUser sender) {
 		if(start>=end){
 			checkM(start,end,false,sender);
@@ -80,6 +91,9 @@ public class ChargingStation extends Depot implements CommUser,TickListener{
 		}
 		checkM(start,end,true,sender);
 	}
+	/**
+	 * try to reserve a slot and send a message to the sender with the result.
+	 */
 	private void reserve(long start, long end, CommUser sender) {
 		if(start>=end){
 			reserveM(start,end,false,sender);
@@ -110,12 +124,10 @@ public class ChargingStation extends Depot implements CommUser,TickListener{
 
 	@Override
 	public void afterTick(TimeLapse timeLapse) {
-		// TODO Auto-generated method stub
 		
 	}
 	@Override
 	public Optional<Point> getPosition() {
-		// TODO Auto-generated method stub
 		return Optional.of(pos);
 	}
 	@Override
@@ -129,9 +141,11 @@ public class ChargingStation extends Depot implements CommUser,TickListener{
 	}
 	@Override
 	public void initRoadPDP(RoadModel pRoadModel, PDPModel pPdpModel) {
-		// TODO Auto-generated method stub
 		
 	}
+	/**
+	 * find the timewindows which aren't reserved by robots.
+	 */
 	private ArrayList<TimeWindow> getFreeSlots() {
 		ArrayList<TimeWindow> freeSlots = new ArrayList<TimeWindow>();
 		freeSlots.add(new TimeWindow(0,Long.MAX_VALUE));
