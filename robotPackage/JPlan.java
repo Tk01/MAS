@@ -6,8 +6,8 @@ import com.github.rinde.rinsim.core.model.comm.CommUser;
 
 public class JPlan {
 	
-	Plan ownPlan;
-	Plan otherPlan;
+	ArrayList<Goal> ownPlan;
+	ArrayList<Goal> otherPlan;
 	
 	double ownValue;
 	double otherValue;
@@ -20,7 +20,7 @@ public class JPlan {
 		
 	}
 	
-	public JPlan(Plan ownPlan, Plan otherPlan){
+	public JPlan(ArrayList<Goal> ownPlan, ArrayList<Goal> otherPlan){
 		this.ownPlan = ownPlan;
 		this.otherPlan = otherPlan;
 		
@@ -52,19 +52,19 @@ public class JPlan {
 
 
 
-	public Plan getOwnPlan() {
+	public ArrayList<Goal> getOwnPlan() {
 		return ownPlan;
 	}
 
-	public void setOwnPlan(Plan ownPlan) {
+	public void setOwnPlan(ArrayList<Goal> ownPlan) {
 		this.ownPlan = ownPlan;
 	}
 
-	public Plan getOtherPlan() {
+	public ArrayList<Goal> getOtherPlan() {
 		return otherPlan;
 	}
 
-	public void setOtherPlan(Plan otherPlan) {
+	public void setOtherPlan(ArrayList<Goal> otherPlan) {
 		this.otherPlan = otherPlan;
 	}
 

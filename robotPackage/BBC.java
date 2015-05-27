@@ -188,8 +188,8 @@ public void sendNegotiationBidMessage(JPlan jointPlan, CommUser sender) {
 	
 }
 
-public void sendStartNegotiationMessage(Plan plan, long endTime) {
-	this.worldInterface.sendMessage(new StartNegotiationMessageContent(null,plan, endTime));
+public void sendStartNegotiationMessage(Point pos,ArrayList<Goal> plan,long battery, long endTime, double minValue) {
+	this.worldInterface.sendMessage(new StartNegotiationMessageContent(null,pos,plan,battery, endTime, minValue));
 	
 }
 

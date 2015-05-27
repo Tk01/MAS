@@ -26,6 +26,10 @@ public class Plan {
 	public ArrayList <Goal> getPlan(){
 		return goals;
 	}
+	
+	public void setPlan(ArrayList<Goal> goals){
+		this.goals=goals;
+	}
 
 	public double distance(Point point,Point point2 ){
 
@@ -62,15 +66,7 @@ public class Plan {
 			if(time<negotiationTime){
 				negotiationPlan.remove(goals.get(i));
 			}
-			else{ 
-				if(goals.get(i).type().equals("pickup")){
-					negotiationPlan.remove(goals.get(i+1));
-					break;
-				}
-				else{
-					break;
-				}
-			}
+			
 		}
 		
 		return negotiationPlan;
@@ -274,7 +270,7 @@ public class Plan {
 	}
 
 	@SuppressWarnings("unchecked")
-	private ArrayList<Goal> GenerateBestPlan(ArrayList<Goal> copyGoals,
+	public ArrayList<Goal> GenerateBestPlan(ArrayList<Goal> copyGoals,
 			ArrayList<Goal> newPlan, Goal charged, ArrayList<Goal> bestplan, ArrayList<TimeWindow> windows, Point temppos, long tempbat, long startTime) {
 		if(copyGoals.size() ==0){
 			bestplan = addCharging(newPlan, charged, bestplan,windows,  temppos, tempbat,startTime);
@@ -321,7 +317,7 @@ public class Plan {
 		}
 		return bestplan;
 	}
-	private boolean valid(ArrayList<Goal> newPlan, ArrayList<TimeWindow> windows, long startTime, Point temppos, double tempbat) {
+	public boolean valid(ArrayList<Goal> newPlan, ArrayList<TimeWindow> windows, long startTime, Point temppos, double tempbat) {
 		RoadUnits r = model.getRoadUnits();
 		long time = startTime;
 		double battery = tempbat;
@@ -391,18 +387,7 @@ public class Plan {
 		return this.goals.get(0);
 	}
 	
-	public Plan returnPlanWithoutCharging(){
-		@SuppressWarnings("unchecked")
-		ArrayList<Goal> goalsCopy = (ArrayList<Goal>) goals.clone();
-		for(int i=0;i<goalsCopy.size();i++){
-			if(((Goal)goalsCopy.get(i)).type().equals("charging")){
-				goalsCopy.remove(goalsCopy.get(i));
-			}
-			
-		}
-		return new Plan(goalsCopy,model);
-	}
-
+	
 	public double value(ArrayList<Goal> plan, long startTime) {
 		Point temppos = calculatePosition(startTime);
 		long tempbat = calculateBattery(startTime);

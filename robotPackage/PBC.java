@@ -353,12 +353,32 @@ public class PBC {
 	}
 
 	public void sendNegotiationBidMessage(JPlan jointPlan, CommUser sender) {
+		
+		ArrayList<Goal> ownGoals = jointPlan.getOwnPlan();
+		for(int i = 0; i<ownGoals.size();i++){
+			
+			if(ownGoals.get(i).type.equals("charging") && !((ChargeGoal)ownGoals.get(i)).isReserved() ){
+				bbc.sendReserveMessage(((ChargeGoal)ownGoals.get(i)).startWindow, ((ChargeGoal)ownGoals.get(i)).endWindow);
+				return;
+				
+			}
+		}
+		ArrayList<Goal> otherGoals = jointPlan.getOtherPlan();
+		for(int i = 0; i<otherGoals.size();i++){
+			
+			if(otherGoals.get(i).type.equals("charging") && !((ChargeGoal)otherGoals.get(i)).isReserved() ){
+				bbc.sendReserveMessage(((ChargeGoal)otherGoals.get(i)).startWindow, ((ChargeGoal)otherGoals.get(i)).endWindow);
+				return;
+				
+			}
+		}
+		
 		bbc.sendNegotiationBidMessage( jointPlan,  sender);
 
 	}
 
-	public void sendStartNegotiationMessage(Plan plan, long endTime) {
-		bbc.sendStartNegotiationMessage( plan, endTime);
+	public void sendStartNegotiationMessage(Point pos, ArrayList<Goal> goals, long battery, long endTime, double minValue) {
+		bbc.sendStartNegotiationMessage( pos, goals, battery, endTime, minValue);
 
 	}
 
@@ -421,6 +441,10 @@ public class PBC {
 		
 	}
 
+	public void setCurrentplan(ArrayList <Goal> goals) {
+		this.currentplan.setPlan(goals);;
+	}
+
 	/*
 	public void returnNegPlan(Plan negotiatedCCPlan) {
 		if(negotiatedCCPlan ==null && negotiating){
@@ -437,6 +461,8 @@ public class PBC {
 		
 	}
 	*/
+	
+	
 
 
 
