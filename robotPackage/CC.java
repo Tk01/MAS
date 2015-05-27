@@ -146,34 +146,27 @@ public class CC {
 	
 
 	
-	public JPlan bestJPlan(Plan ownPlan, Plan otherPlan){
-		Plan ownPlanNoCharging = ownPlan.returnPlanWithoutCharging();
-		Plan otherPlanNoCharging = otherPlan.returnPlanWithoutCharging();
-		
-		ArrayList<Goal> ownGoals = new ArrayList<Goal>();
-		ownGoals.add(ownPlanNoCharging.goals.get(0));
-		
-		ArrayList<Goal> allGoals = ownPlanNoCharging.goals;
-		allGoals.remove(0);
-		
-		ArrayList<Goal> otherGoals = new ArrayList<Goal>();
-		otherGoals.add(otherPlanNoCharging.goals.get(0));
-		
-		otherPlanNoCharging.goals.remove(0);
-		allGoals.addAll(otherPlanNoCharging.goals);
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		JPlan bestJPlan = getBestPlan(allGoals, ownGoals, otherGoals, ownPlanNoCharging.goals, otherPlanNoCharging.goals, 0, otherPlan.value(otherPlan.goals));
-		
-		return bestJPlan;
+	public JPlan bestJPlan( ArrayList<Goal> otherPlan, Point otherPos, long otherBat,long endtime,double minOtherValue ){
+		Point ownPos = pbc.getCurrentPlan().calculatePosition(endtime+1000);
+		long ownBat = pbc.getCurrentPlan().calculateBattery(endtime+1000);
+		ArrayList<Goal> ownPlan= (ArrayList<Goal>) pbc.getCurrentPlan().calculateGoals(endtime+1000).clone();
+		ArrayList<Goal> combGoals = new ArrayList<Goal>();
+		ChargeGoal ownCharge = removeCharge(ownPlan);
+		ChargeGoal otherCharge = removeCharge(otherPlan);
+		ArrayList<Goal> otherList = new ArrayList<Goal>();
+		ArrayList<Goal> ownList = new ArrayList<Goal>();
+		if(otherPlan.size()>0 && otherPlan.get(0).type().equals("drop") ){
+
+			otherList.add(otherPlan.remove(0));
+		}
+		if(ownPlan.size()>0 && ownPlan.get(0).type().equals("drop") ){
+
+			ownList.add(ownPlan.remove(0));
+		}
+		combGoals.addAll(ownPlan);
+		combGoals.addAll(otherPlan);
+		JPlan result = getBestPlan(combGoals,otherList ,otherPos, otherBat,ownList,ownPos,ownBat,null,minOtherValue);
+		return result;
 	}
 	
 	private JPlan getBestPlan(ArrayList<Goal> allGoals,

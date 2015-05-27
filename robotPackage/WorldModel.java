@@ -19,7 +19,7 @@ public class WorldModel {
 	TimeLapse time =null;
 	long chargeRate;
 	ArrayList<Point> Robots = new ArrayList<Point>();
-	long battery = getMaxBattery();
+	long battery;
 	ChargingStation ChargingStation;
 	Package Carried=null;
 	private ArrayList<Message> messages= new ArrayList<Message>();

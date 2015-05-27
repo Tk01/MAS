@@ -170,8 +170,8 @@ public class PBC {
 			
 			//cc.negotiationAbort();
 			definitivebid = null;
-			if(lostChargeGoal != null) bbc.sendCancelReservationMessage(lostChargeGoal.getStartWindow(),lostChargeGoal.getEndWindow());
-			this.worldModel.messages().removeAll(this.worldModel.messages());
+			if(worldModel.isReserveChargingStation() && lostChargeGoal != null) bbc.sendCancelReservationMessage(lostChargeGoal.getStartWindow(),lostChargeGoal.getEndWindow());
+			//this.worldModel.messages().removeAll(this.worldModel.messages());
 			
 			//Call CC to start negotiation
 			if(currentplan.getPlan().size()>3){

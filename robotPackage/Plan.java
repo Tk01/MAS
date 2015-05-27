@@ -164,7 +164,7 @@ public class Plan {
 
 
 
-	private long calculateBattery(long l) {
+	public long calculateBattery(long l) {
 		RoadUnits r = model.getRoadUnits();
 		long time = model.getTime().getTime();
 		long battery = model.battery();
@@ -201,7 +201,7 @@ public class Plan {
 		
 	}
 
-	private Point calculatePosition(long l) {
+	public Point calculatePosition(long l) {
 		RoadUnits r = model.getRoadUnits();
 		long time = model.getTime().getTime();
 		double battery = model.battery();
@@ -237,7 +237,7 @@ public class Plan {
 		return curcor;
 	}
 
-	private ArrayList<Goal> calculateGoals(long l) {
+	public ArrayList<Goal> calculateGoals(long l) {
 		@SuppressWarnings("unchecked")
 		ArrayList<Goal> result = (ArrayList<Goal>) goals.clone();
 		RoadUnits r = model.getRoadUnits();
