@@ -186,9 +186,9 @@ public class PBC {
 			//this.worldModel.messages().removeAll(this.worldModel.messages());
 			
 			//Call CC to start negotiation
-			/*if(currentplan.getPlan().size()>3){*/
+			if(currentplan.getPlan().size()>3){
 				cc.startNegotiation(currentplan);
-			/*}*/
+			}
 
 		}
 		else{
