@@ -16,9 +16,6 @@ public class Plan {
 	WorldModel model;
 
 	public Plan(ArrayList <Goal> goals, WorldModel model){
-		if (goals ==null){
-			this.goals = null;
-		}
 		this.goals =goals;
 
 		this.model =model;
@@ -29,9 +26,6 @@ public class Plan {
 	}
 	
 	public void setPlan(ArrayList<Goal> goals){
-		if (goals ==null){
-			this.goals = null;
-		}
 		this.goals=goals;
 	}
 
@@ -144,7 +138,7 @@ public class Plan {
 		ArrayList<Goal> tempgoals = calculateGoals(startTime);
 		Point temppos = calculatePosition(startTime);
 		long tempbat = calculateBattery(startTime);
-		if(goals.size() > 7) return null;
+		//if(goals.size() > 7) return null;
 
 		@SuppressWarnings("unchecked")
 		ArrayList <Goal> copyGoals = (ArrayList<Goal>) tempgoals.clone();

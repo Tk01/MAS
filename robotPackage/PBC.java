@@ -95,7 +95,8 @@ public class PBC {
 
 		//preAssignment(messages);
 
-		if(definitivebid == null)callForBids(messages);
+		if(definitivebid == null)
+			callForBids(messages);
 
 
 
@@ -112,7 +113,7 @@ public class PBC {
 					i--;
 				}
 				else{
-					if(((MessageContent) messages.get(i).getContents()).getType().equals("StartNegotiationMessage") && ((StartNegotiationMessageContent)messages.get(i).getContents()).getEndTime() <= worldModel.getTime().getEndTime()){
+					if(((MessageContent) messages.get(i).getContents()).getType().equals("StartNegotiation") && ((StartNegotiationMessageContent)messages.get(i).getContents()).getEndTime() <= worldModel.getTime().getEndTime()){
 						messages.remove(i);
 						i--;
 					}
@@ -185,9 +186,9 @@ public class PBC {
 			//this.worldModel.messages().removeAll(this.worldModel.messages());
 			
 			//Call CC to start negotiation
-			if(currentplan.getPlan().size()>3){
+			/*if(currentplan.getPlan().size()>3){*/
 				cc.startNegotiation(currentplan);
-			}
+			/*}*/
 
 		}
 		else{
