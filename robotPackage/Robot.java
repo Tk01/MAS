@@ -17,10 +17,10 @@ public class Robot extends Vehicle implements CommUser{
 	WorldInterface inter;
 	WorldModel model;
 
-	public Robot(Point location, ChargingStation chargingStation, double speed, long batterySize, long chargeRate, boolean reserveChargingStation){
+	public Robot(Point location, ChargingStation chargingStation, double speed, long batterySize, long chargeRate, boolean reserveChargingStation, long delay){
 		setStartPosition(location);
 		setCapacity(1);
-		inter = new WorldInterface(this, location, chargingStation, speed, batterySize, chargeRate, reserveChargingStation);
+		inter = new WorldInterface(this, location, chargingStation, speed, batterySize, chargeRate, reserveChargingStation,delay);
 		model = inter.getModel();
 	}
 	@Override

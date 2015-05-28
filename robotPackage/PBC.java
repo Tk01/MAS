@@ -28,10 +28,10 @@ public class PBC {
 
 	boolean ccOnHold = false;
 
-	public PBC(BBC bbc){
+	public PBC(BBC bbc, long delay){
 		this.bbc=bbc;
 		worldModel = bbc.getWorldModel();
-		cc = new CC(this);
+		cc = new CC(this,delay);
 		currentplan = new Plan(new ArrayList<Goal>(), worldModel);
 		windows = new ArrayList<TimeWindow>();
 		windows.add(TimeWindow.ALWAYS);
@@ -434,18 +434,17 @@ public class PBC {
 	}
 
 	public void failPickUp() {
-		return;
-		/*
-		currentplan.goals.remove(0);
+		
+		currentplan.getPlan().remove(0);
 	
-		for(Goal goal:currentplan.goals){
+		for(Goal goal:currentplan.getPlan()){
 			if(goal.type().equals("drop")){
-				currentplan.goals.remove(goal);
+				currentplan.getPlan().remove(goal);
 				bbc.setGoal(getCurrentPlan().getNextgoal());
 				return;
 			}
 		}
-		*/
+		
 	}
 
 	public void checkNegotiation() {

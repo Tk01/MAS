@@ -120,4 +120,8 @@ public class SimulationGenerator {
 	public long getChargeRateSize() {
 		return chargeRate ;
 	}
+	public long getContractNetDelay(boolean reserveChargingStation) {
+		if(reserveChargingStation) return 5000;
+		return 3000;
+	}
 }

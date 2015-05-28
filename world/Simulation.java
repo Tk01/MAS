@@ -49,7 +49,7 @@ public class Simulation {
 	
 
 	public static void main(@Nullable String[] args) throws IOException {
-		SimulationGenerator gen = new SimulationGenerator("sim1.txt");
+		SimulationGenerator gen = new SimulationGenerator("sim_10.txt");
 		final Point MIN_POINT = gen.getMIN_POINT();
 		final Point MAX_POINT = gen.getMAX_POINT();
 		final double VEHICLE_SPEED_KMH = gen.getVEHICLE_SPEED_KMH();
@@ -61,7 +61,8 @@ public class Simulation {
 		final long SERVICE_DURATION =gen.getSERVICE_DURATION();
 		final long endTime = gen.getEndTime();
 		final long delay = gen.getDelay();
-		final boolean reserveChargingStation = false;
+		final boolean reserveChargingStation = true;
+		long contractNetDelay = gen.getContractNetDelay(reserveChargingStation);
 		final RoadModel roadModel =  PlaneRoadModel.builder()
 				.setMinPoint(MIN_POINT)
 				.setMaxPoint(MAX_POINT)
@@ -82,7 +83,8 @@ public class Simulation {
 		simulator.register(chargingStation);
 
 		for (Point p:RList) {
-			Robot rob = new Robot(p, chargingStation, VEHICLE_SPEED_KMH, gen.getBatterySize(), gen.getChargeRateSize(), reserveChargingStation);
+			
+			Robot rob = new Robot(p, chargingStation, VEHICLE_SPEED_KMH, gen.getBatterySize(), gen.getChargeRateSize(), reserveChargingStation, contractNetDelay);
 			simulator.register(rob);
 		}
 
@@ -102,7 +104,7 @@ public class Simulation {
 					}
 					
 				} else while (!PTime.isEmpty() && time.getTime() >= PTime.get(0)) {
-					Package p =new Package(PList.get(0),PLocation.get(0),0,0,new TimeWindow(PTime.get(0), PTime.get(0)+SERVICE_DURATION),new TimeWindow(PTime.get(0)+time(PList.get(0),PLocation.get(0),time.getTimeUnit()), PTime.get(0)+SERVICE_DURATION+2*time(PList.get(0),PLocation.get(0),time.getTimeUnit())), delay);
+					Package p =new Package(PList.get(0),PLocation.get(0),0,0,new TimeWindow(PTime.get(0), PTime.get(0)+SERVICE_DURATION),new TimeWindow(PTime.get(0)+time(PList.get(0),PLocation.get(0),time.getTimeUnit()), PTime.get(0)+2*SERVICE_DURATION+time(PList.get(0),PLocation.get(0),time.getTimeUnit())), delay);
 					InformationHandler.getInformationHandler().addPackage(p);
 					simulator.register(p);
 					PList.remove(0);
@@ -157,6 +159,7 @@ public class Simulation {
 		final long SERVICE_DURATION =gen.getSERVICE_DURATION();
 		final long endTime = gen.getEndTime();
 		final long delay = gen.getDelay();
+		long contractNetDelay = gen.getContractNetDelay(reserveChargingStation);
 		final RoadModel roadModel =  PlaneRoadModel.builder()
 				.setMinPoint(MIN_POINT)
 				.setMaxPoint(MAX_POINT)
@@ -176,7 +179,7 @@ public class Simulation {
 		simulator.register(chargingStation);
 		
 		for (Point p:RList) {
-			Robot rob = new Robot(p, chargingStation, VEHICLE_SPEED_KMH, gen.getBatterySize(), gen.getChargeRateSize(), reserveChargingStation);
+			Robot rob = new Robot(p, chargingStation, VEHICLE_SPEED_KMH, gen.getBatterySize(), gen.getChargeRateSize(), reserveChargingStation,contractNetDelay);
 			simulator.register(rob);
 		}
 

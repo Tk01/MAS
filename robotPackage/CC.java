@@ -14,7 +14,7 @@ public class CC {
 	
 	private PBC pbc;
 	
-	private long delay = 3000;
+	private long delay;
 	
 	private Long timeLastAction;
 	
@@ -25,9 +25,9 @@ public class CC {
 	 boolean startedNegotiating = false;
 	
 	
-	public CC(PBC pbc){
+	public CC(PBC pbc, long delay){
 		this.pbc = pbc;
-		
+		this.delay=delay;
 		
 		
 	}
@@ -37,7 +37,8 @@ public class CC {
 		/*correct?*/ bidding =false;
 		Plan negotiationPlan = getNegotiationPlan(plan);
 		jplan = new JPlan();
-		jplan.setOwnPlan(negotiationPlan.getPlan());
+		jplan.setOwnPlan(new ArrayList<Goal>());
+		jplan.setOtherPlan(negotiationPlan.getPlan());
 		long currentTime = pbc.worldModel.getTime().getTime();
 		long timeEndNegotiation = currentTime+delay;
 		Point pos = pbc.currentplan.calculatePosition(timeEndNegotiation);
@@ -79,11 +80,11 @@ public class CC {
 			ProcessStartNegotiation(message);
 			
 		}
-		if(type.equals("negotiationBid")){
+		if(type.equals("NegotiationBidMessage")){
 			processNegotiationBid(message);
 			//jplans.add(((NegotiationBidMessageContent)messageContent).getJointPlan());			
 		}
-		if(type.equals("negotiationReply")){
+		if(type.equals("NegotiationReply")){
 			processNegotiationReply(message);
 			
 			
@@ -147,14 +148,15 @@ public class CC {
 					
 				
 				JPlan jointPlan = bestJPlan(otherNegotiationPlan, otherPos, otherBat, endTime, minOtherValue);
+				/*jointPlan.setJPlanAgent(message.getSender());*/
 				
 				
-				
-				if(jointPlan!=null && jointPlan.getOtherPlan()!= null){
+				if(jointPlan!=null && jointPlan.getOtherPlan()!= null && jointPlan.getOwnPlan()!= null ){
 					bidding = true;
 					timeLastAction = lastTime - delay; 
 					
-					//jplans.add(jointPlan);
+					jplan = jointPlan;
+					jplan.setJPlanAgent(message.getSender());
 					pbc.sendNegotiationBidMessage(jointPlan, message.getSender());
 				}
 			}
@@ -168,7 +170,7 @@ public class CC {
 		NegotiationBidMessageContent messageContent = (NegotiationBidMessageContent) message.getContents();
 		
 		JPlan receivedJPlan = messageContent.getJointPlan();
-		if(new Plan(null, pbc.worldModel).value(receivedJPlan.getOtherPlan(),timeLastAction+delay)<new Plan(null, pbc.worldModel).value(this.jplan.getOtherPlan(), timeLastAction+delay)){
+		if(pbc.getCurrentPlan().value(receivedJPlan.getOtherPlan(),timeLastAction+delay)<pbc.getCurrentPlan().value(this.jplan.getOtherPlan(), timeLastAction+delay)){
 			jplan = receivedJPlan;
 		}
 		
@@ -176,12 +178,16 @@ public class CC {
 	
 	private void processNegotiationReply(Message message){
 		NegotiationReplyMessageContent messageContent = (NegotiationReplyMessageContent) message.getContents();
-		if(messageContent.isAccepted()){
-			pbc.currentplan.setPlan(jplan.getOtherPlan());
+		if(messageContent.isAccepted() && startedNegotiating){
+			if(jplan.getOwnPlan()==null){
+				pbc.currentplan.setPlan(null);
+			}
+			pbc.currentplan.setPlan(jplan.getOwnPlan());
 			pbc.bbc.setGoal(pbc.currentplan.getNextgoal());
 		}else{
 			
 		}
+		jplan =null;
 		startedNegotiating = false;
 		bidding = false;
 		this.pbc.worldModel.messages().remove(message);
@@ -196,14 +202,16 @@ public class CC {
 	
 	
 	public void sendBestNegMessage(){
-		if(pbc.worldModel.time.getStartTime()>timeLastAction+delay && jplan.JPlanAgent!= null ){
+		if(pbc.worldModel.time.getStartTime()>timeLastAction+delay  ){
+			if( jplan.JPlanAgent!= null){
 			pbc.sendNegotiationReplyMessage(jplan.JPlanAgent);
 			pbc.setCurrentplan(jplan.getOtherPlan());
 			pbc.bbc.setGoal(pbc.currentplan.getNextgoal());
-			
+			}
+			startedNegotiating = false;
 			
 		}
-		startedNegotiating = false;
+		
 		
 		
 		

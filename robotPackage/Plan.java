@@ -74,11 +74,12 @@ public class Plan {
 	 * Return the time you're not moving packages of the plan. Is used to compare tasks that are added to the current plan. The lower the better
 	 */
 	public double value(ArrayList<Goal> newPlan, long planTime, Point temppos, long tempbat){
-		if(newPlan.size() ==0) return 0;
+		
 		RoadUnits r = model.getRoadUnits();
 		long time = planTime;
 		double battery = tempbat;
 		Point curcor = temppos;
+		if(newPlan ==null || newPlan.size() ==0) return ((model.getMaxBattery()-battery)/model.getMaxBattery())*r.toExTime(r.toInDist(distance(curcor,model.ChargingStation.getPosition().get()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
 		for(Goal g:newPlan){
 			long timespend = (long) r.toExTime(r.toInDist(distance(curcor,g.coordinates()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
 			time = time+ timespend;
@@ -100,7 +101,7 @@ public class Plan {
 			curcor =g.point;
 		}
 		long totalTimeSpend = time-model.getTime().getTime();
-		return totalTimeSpend-TimeDelivering(newPlan,temppos)+((model.getMaxBattery()-battery)/model.getMaxBattery())*r.toExTime(r.toInDist(distance(newPlan.get(newPlan.size()-1).coordinates(),model.ChargingStation.getPosition().get()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
+		return totalTimeSpend-TimeDelivering(newPlan,temppos)+((model.getMaxBattery()-battery)/model.getMaxBattery())*r.toExTime(r.toInDist(distance(curcor,model.ChargingStation.getPosition().get()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
 	}
 
 
@@ -167,6 +168,7 @@ public class Plan {
 	 * Calculates how much battery you have at time l according to the plan
 	 */
 	public long calculateBattery(long l) {
+		if(goals ==null) return model.battery();
 		RoadUnits r = model.getRoadUnits();
 		long time = model.getTime().getTime();
 		long battery = model.battery();
@@ -206,10 +208,12 @@ public class Plan {
 	 * Calculates which position you have at time l according to the plan
 	 */
 	public Point calculatePosition(long l) {
+		if(goals == null) return model.coordinates();
 		RoadUnits r = model.getRoadUnits();
 		long time = model.getTime().getTime();
 		double battery = model.battery();
 		Point curcor = model.coordinates();
+		
 		for(Goal g:goals){
 			long timespend = (long) r.toExTime(r.toInDist(distance(curcor,g.coordinates()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
 			time = time+ timespend;
@@ -244,6 +248,8 @@ public class Plan {
 	 * Calculates which goals you have at time l according to the plan
 	 */
 	public ArrayList<Goal> calculateGoals(long l) {
+		
+		if(this.goals == null) return new ArrayList<Goal>();
 		@SuppressWarnings("unchecked")
 		ArrayList<Goal> result = (ArrayList<Goal>) goals.clone();
 		RoadUnits r = model.getRoadUnits();
@@ -423,6 +429,7 @@ public class Plan {
 	}
 
 	public ChargeGoal lostChargeGoal(Plan definitivebid) {
+		if(goals == null) return null;
 		for( Goal g : goals){
 			if(g.type().equals("charging") && !definitivebid.getPlan().contains(g)) return (ChargeGoal) g;
 		}

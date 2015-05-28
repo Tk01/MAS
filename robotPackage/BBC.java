@@ -25,11 +25,11 @@ public class BBC {
 
 
 
-	public BBC(WorldInterface worldInterface, WorldModel model, Robot robot) {
+	public BBC(WorldInterface worldInterface, WorldModel model, Robot robot, long delay) {
 		thisRobot = robot;
 		this.model = model;
 		this.worldInterface =worldInterface;
-		pbc= new PBC(this);
+		pbc= new PBC(this,delay);
 	}
 
 	public void msg(Message message) {
@@ -210,6 +210,9 @@ public boolean chargeTaken() {
 }
 
 public void sendNegotiationReplyMessage(CommUser jPlanAgent) {
+	if(jPlanAgent == null){
+		return;
+	}
 	this.worldInterface.sendMessage(new NegotiationReplyMessageContent(jPlanAgent, true));
 	
 }

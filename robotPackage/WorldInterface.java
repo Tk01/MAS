@@ -29,9 +29,9 @@ public class WorldInterface {
 	private Optional<RoadModel> roadModel;
 	private Optional<PDPModel> pdpModel;
 	private Robot robot;
-	public WorldInterface(Robot robot, Point p, ChargingStation c, double s, long batterySize, long chargeRate, boolean reserveChargingStation){
+	public WorldInterface(Robot robot, Point p, ChargingStation c, double s, long batterySize, long chargeRate, boolean reserveChargingStation, long delay){
 		model = new WorldModel(p,c,s, batterySize, chargeRate, reserveChargingStation);
-		bbc = new BBC(this,model,robot);
+		bbc = new BBC(this,model,robot,delay);
 		this.robot = robot;
 		roadModel= Optional.absent();
 		pdpModel= Optional.absent();
