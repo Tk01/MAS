@@ -180,9 +180,10 @@ public class CC {
 			pbc.currentplan.setPlan(jplan.getOtherPlan());
 			pbc.bbc.setGoal(pbc.currentplan.getNextgoal());
 		}else{
-			startedNegotiating = false;
-			bidding = false;
+			
 		}
+		startedNegotiating = false;
+		bidding = false;
 		this.pbc.worldModel.messages().remove(message);
 	}
 	
