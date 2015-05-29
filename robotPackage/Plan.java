@@ -15,9 +15,14 @@ public class Plan {
 
 	WorldModel model;
 
+
+	private static double limit;
+	public static void setLimit(double d){
+		limit = d;
+	}
 	public Plan(ArrayList <Goal> goals, WorldModel model){
 		this.goals =goals;
-
+		
 		this.model =model;
 	}
 
@@ -371,7 +376,7 @@ public class Plan {
 				time=g.getStartWindow();
 			}
 			battery-= timespend;
-			if(battery <=0.1*model.getMaxBattery()) return false;
+			if(battery <=limit*model.getMaxBattery()) return false;
 			if(g.type().equals("charging")){
 				double batterydiff = model.getMaxBattery()-battery;
 				long timestart = time;
@@ -399,7 +404,7 @@ public class Plan {
 			timespend2 = (long) timespend+1;
 		}
 		battery-= timespend2;
-		if(battery <=0.1*model.getMaxBattery()) return false;
+		if(battery <=limit*model.getMaxBattery()) return false;
 		return true;
 	}
 	/**
@@ -449,7 +454,9 @@ public class Plan {
 		return null;
 	}
 
-
+	public String toString(){
+		return goals.toString();
+	}
 
 
 

@@ -145,4 +145,7 @@ public class SimulationGenerator {
 	public RoadModel getRoadModel() {
 		return this.roadModel;
 	}
+	public double getLimit() {
+		return 0.1;
+	}
 }

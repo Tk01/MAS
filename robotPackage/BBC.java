@@ -40,16 +40,23 @@ public class BBC {
 	public void placeGoal(Goal goal){
 		this.goal = goal;
 	}
+	boolean b= true;
 	public void run(){
+		
 		if(done){
 			pbc.done(goal);
 			done = false;
 		}
+		
 		pbc.checkNegotiation();
-		if( model.messages().size() !=0) 
+		
+		if( model.messages().size() !=0) {
+			
 			pbc.readMessages();
+			
+		}
 		RoadUnits r = model.getRoadUnits();
-		if(goal == null && model.battery()- r.toExTime(r.toInDist(distance(model.coordinates(),model.ChargingStation.getPosition().get()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit()) < model.getMaxBattery()*0.90){
+		if(this.goal ==null && model.battery()- r.toExTime(r.toInDist(distance(model.coordinates(),model.ChargingStation.getPosition().get()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit()) < model.getMaxBattery()*0.90){
 			pbc.placeCharge();
 		}
 		
@@ -87,6 +94,7 @@ public class BBC {
 			worldInterface.MoveTo(goal.coordinates());
 			return;
 		}
+		
 		if(goal.getStartWindow() >= model.time.getTime() ){
 			worldInterface.waitMoment(true);
 			return;
@@ -183,6 +191,9 @@ public void sendReserveMessage(long startWindow, long endWindow) {
 }
 
 public void sendNegotiationBidMessage(JPlan jointPlan, CommUser sender) {
+	if(!pbc.cc.bidding){
+		throw new IllegalArgumentException();
+	}
 	jointPlan.setJPlanAgent(thisRobot);
 	this.worldInterface.sendMessage(new NegotiationBidMessageContent(sender,jointPlan));
 	
@@ -197,7 +208,6 @@ public void sendStartNegotiationMessage(Point pos,ArrayList<Goal> plan,long batt
 public boolean chargeTaken() {
 	if(((ChargeGoal)this.goal).isReserved() && ((ChargeGoal)this.goal).getStartWindow() <= model.getTime().getTime()+ model.calcTime(model.coordinates(),new Point(5,5)) && ((ChargeGoal)this.goal).getEndWindow() >= model.getTime().getTime()+ model.calcTime(model.coordinates(),new Point(5,5))) return false;
 	if(((ChargeGoal)this.goal).isReserved() && !(((ChargeGoal)this.goal).getStartWindow() <= model.getTime().getTime()+ model.calcTime(model.coordinates(),new Point(5,5)) && ((ChargeGoal)this.goal).getEndWindow() >= model.getTime().getTime()+ model.calcTime(model.coordinates(),new Point(5,5)))) return true;
-	// TODO Auto-generated method stub
 	for(Point r:model.Robots){
 		if(r.equals(new Point(5,5)))return true;
 		if(Point.distance(r, new Point(5,5)) <= 0.1 && Point.distance(r, new Point(5,5))  <= Point.distance(model.coordinates(), new Point(5,5))){
@@ -210,15 +220,17 @@ public boolean chargeTaken() {
 }
 
 public void sendNegotiationReplyMessage(CommUser jPlanAgent) {
-	if(jPlanAgent == null){
-		return;
-	}
 	this.worldInterface.sendMessage(new NegotiationReplyMessageContent(jPlanAgent, true));
 	
 }
 
 public void sendCancelReservationMessage(long start, long end) {
 	this.worldInterface.sendMessage( new ChargeMessageContent(model.ChargingStation,start, end, "delete"));
+	
+}
+
+public void sendNegativeNegotiationReplyMessage(CommUser l) {
+	this.worldInterface.sendMessage(new NegotiationReplyMessageContent(l, false));
 	
 }
 }

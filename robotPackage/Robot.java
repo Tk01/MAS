@@ -4,6 +4,7 @@ import world.ChargingStation;
 
 
 
+
 import com.github.rinde.rinsim.core.TimeLapse;
 import com.github.rinde.rinsim.core.model.comm.CommDeviceBuilder;
 import com.github.rinde.rinsim.core.model.comm.CommUser;
@@ -60,6 +61,11 @@ public class Robot extends Vehicle implements CommUser{
 	public long getBattery() {
 		// TODO Auto-generated method stub
 		return model.battery();
+	}
+	public String getPlan() {
+		// TODO Auto-generated method stub
+		if(inter.bbc.pbc.currentplan ==null) return "";
+		return "\n"+inter.bbc.pbc.currentplan.toString();
 	}
 
 }

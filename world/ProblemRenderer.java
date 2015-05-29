@@ -53,7 +53,6 @@ public class ProblemRenderer implements ModelRenderer{
 		        String text= "";
 		        if(vs !=null) text+=	vs.toString()+";";
 		         text = text +"b=" + t.getBattery();
-
 		        if (text != null) {
 		          final org.eclipse.swt.graphics.Point extent = gc.textExtent(text);
 
