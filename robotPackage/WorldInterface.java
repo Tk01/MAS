@@ -103,7 +103,7 @@ public class WorldInterface {
 		model.getTime().consume(0);
 		}
 		catch(IllegalArgumentException e){
-			
+			throw e;
 		}
 	}
 	public void pickup() throws NoSuchElementException{
@@ -113,7 +113,7 @@ public class WorldInterface {
 		model.pickupPackage(parcel);
 		model.getTime().consume(0);}
 		catch(IllegalArgumentException e){
-			
+			throw e;
 		}
 		catch(NoSuchElementException e){
 			throw e;

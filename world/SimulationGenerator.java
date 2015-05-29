@@ -8,6 +8,11 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
+import org.apache.commons.math3.random.MersenneTwister;
+import org.apache.commons.math3.random.RandomGenerator;
+
+import com.github.rinde.rinsim.core.model.road.PlaneRoadModel;
+import com.github.rinde.rinsim.core.model.road.RoadModel;
 import com.github.rinde.rinsim.geom.Point;
 
 public class SimulationGenerator {
@@ -24,6 +29,9 @@ public class SimulationGenerator {
 	final long delay =20000;
 	final long batterySize = 3*60*60*1000;
 	final long chargeRate = 5;
+	final RandomGenerator rng = new MersenneTwister();
+	final RoadModel roadModel;
+	
 	public  SimulationGenerator(String filename) throws IOException{
 		BufferedReader in = new BufferedReader(new FileReader(filename));
 		String[] robots = in.readLine().split(";");
@@ -46,15 +54,25 @@ public class SimulationGenerator {
 			PTime.add(Long.parseLong(r));
 		}
 		in.close();
+		roadModel=  PlaneRoadModel.builder()
+				.setMinPoint(MIN_POINT)
+				.setMaxPoint(MAX_POINT)
+				.setMaxSpeed(VEHICLE_SPEED_KMH)
+				.build();
 	}
 	public  SimulationGenerator(String filename, int nbRobots, double spawnchance) throws FileNotFoundException, UnsupportedEncodingException{
+		roadModel=  PlaneRoadModel.builder()
+				.setMinPoint(MIN_POINT)
+				.setMaxPoint(MAX_POINT)
+				.setMaxSpeed(VEHICLE_SPEED_KMH)
+				.build();
 		for(int i=0;i<nbRobots;i++){
-			RList.add(new Point(Math.random()*this.MAX_POINT.x,Math.random()*this.MAX_POINT.y));
+			RList.add(roadModel.getRandomPosition(rng));
 		}
 		for(long i=0;i<endTime;i=i+1000){
 			if(Math.random()<=spawnchance){
-				PList.add(new Point(Math.random()*this.MAX_POINT.x,Math.random()*this.MAX_POINT.y));
-				PLocation.add(new Point(Math.random()*this.MAX_POINT.x,Math.random()*this.MAX_POINT.y));
+				PList.add(roadModel.getRandomPosition(rng));
+				PLocation.add(roadModel.getRandomPosition(rng));
 				PTime.add( i);
 			}
 		}
@@ -123,5 +141,8 @@ public class SimulationGenerator {
 	public long getContractNetDelay(boolean reserveChargingStation) {
 		if(reserveChargingStation) return 5000;
 		return 3000;
+	}
+	public RoadModel getRoadModel() {
+		return this.roadModel;
 	}
 }

@@ -22,6 +22,8 @@ import java.util.ArrayList;
 
 
 
+
+
 import robotPackage.*;
 
 import javax.annotation.Nullable;
@@ -49,9 +51,8 @@ public class Simulation {
 	
 
 	public static void main(@Nullable String[] args) throws IOException {
-		SimulationGenerator gen = new SimulationGenerator("sim_10.txt");
-		final Point MIN_POINT = gen.getMIN_POINT();
-		final Point MAX_POINT = gen.getMAX_POINT();
+		
+		SimulationGenerator gen = new SimulationGenerator("sim_58.txt");
 		final double VEHICLE_SPEED_KMH = gen.getVEHICLE_SPEED_KMH();
 		final ArrayList<Point> RList = gen.getRList();
 		Point Cloc = gen.getChargeStation();
@@ -63,11 +64,8 @@ public class Simulation {
 		final long delay = gen.getDelay();
 		final boolean reserveChargingStation = true;
 		long contractNetDelay = gen.getContractNetDelay(reserveChargingStation);
-		final RoadModel roadModel =  PlaneRoadModel.builder()
-				.setMinPoint(MIN_POINT)
-				.setMaxPoint(MAX_POINT)
-				.setMaxSpeed(VEHICLE_SPEED_KMH)
-				.build();
+		final RoadModel roadModel = gen.getRoadModel();
+		
 		final DefaultPDPModel pdpModel = DefaultPDPModel.create();
 
 		final Simulator simulator = Simulator.builder()
@@ -77,7 +75,7 @@ public class Simulation {
 						.build())
 						.build();
 
-
+		;
 
 		ChargingStation chargingStation = new ChargingStation(Cloc);
 		simulator.register(chargingStation);

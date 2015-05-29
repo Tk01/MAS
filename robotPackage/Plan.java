@@ -52,7 +52,7 @@ public class Plan {
 	public Plan getNegotiationPlan(long negotiationTime){
 
 		RoadUnits roadUnits = model.getRoadUnits();
-		Plan negotiationPlan = new Plan(goals, model);
+		Plan negotiationPlan = new Plan((ArrayList<Goal>) (goals.clone()), model);
 
 		long time = 0;
 
@@ -215,7 +215,13 @@ public class Plan {
 		Point curcor = model.coordinates();
 		
 		for(Goal g:goals){
-			long timespend = (long) r.toExTime(r.toInDist(distance(curcor,g.coordinates()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
+			long timespend;
+			if( r.toExTime(r.toInDist(distance(curcor,g.coordinates()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit()) == (long) r.toExTime(r.toInDist(distance(curcor,g.coordinates()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit())){
+				timespend = (long) r.toExTime(r.toInDist(distance(curcor,g.coordinates()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
+			}else{
+				timespend = (long) r.toExTime(r.toInDist(distance(curcor,g.coordinates()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit())+1;
+			}
+			
 			time = time+ timespend;
 			if(time>= l){
 				return new Point(curcor.x+(g.coordinates().x-curcor.x)*(l-(time-timespend))/timespend,curcor.y+(g.coordinates().y-curcor.y)*(l-(time-timespend))/timespend);
@@ -257,7 +263,13 @@ public class Plan {
 		double battery = model.battery();
 		Point curcor = model.coordinates();
 		for(Goal g:goals){
-			long timespend = (long) r.toExTime(r.toInDist(distance(curcor,g.coordinates()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
+			long timespend;
+			if( r.toExTime(r.toInDist(distance(curcor,g.coordinates()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit()) == (double)(long) r.toExTime(r.toInDist(distance(curcor,g.coordinates()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit())){
+				timespend = (long) r.toExTime(r.toInDist(Point.distance(curcor,g.coordinates()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
+			}else{
+				timespend = (long) r.toExTime(r.toInDist(Point.distance(curcor,g.coordinates()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit())+1;
+			}
+			
 			time = time+ timespend;
 			if(!g.type().equals("charging") && time<g.getStartWindow()){
 				timespend = g.getStartWindow()-time+timespend;
@@ -292,6 +304,7 @@ public class Plan {
 			ArrayList<Goal> newPlan, Goal charged, ArrayList<Goal> bestplan, ArrayList<TimeWindow> windows, Point temppos, long tempbat, long startTime) {
 		if(copyGoals.size() ==0){
 			bestplan = addCharging(newPlan, charged, bestplan,windows,  temppos, tempbat,startTime);
+			bestplan = addCharging(newPlan, null, bestplan,windows,  temppos, tempbat,startTime);
 			return bestplan;
 		}
 		else{
@@ -428,10 +441,10 @@ public class Plan {
 		return value(plan,startTime,temppos,tempbat);
 	}
 
-	public ChargeGoal lostChargeGoal(Plan definitivebid) {
+	public ChargeGoal lostChargeGoal(ArrayList<Goal> arrayList) {
 		if(goals == null) return null;
-		for( Goal g : goals){
-			if(g.type().equals("charging") && !definitivebid.getPlan().contains(g)) return (ChargeGoal) g;
+		for( Goal g : arrayList){
+			if(g.type().equals("charging") && !arrayList.contains(g)) return (ChargeGoal) g;
 		}
 		return null;
 	}
