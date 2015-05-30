@@ -23,6 +23,7 @@ public class ChargingStation extends Depot implements CommUser,TickListener{
 	ArrayList<Long[]> schedule = new ArrayList<Long[]>();
 	Point pos;
 	Optional<CommDevice> device;
+	private TimeLapse timeLapse;
 	public ChargingStation(Point p) {
 		setStartPosition(p);
 		pos = p;
@@ -32,6 +33,7 @@ public class ChargingStation extends Depot implements CommUser,TickListener{
 	 */
 	@Override
 	public void tick(TimeLapse timeLapse) {
+		this.timeLapse = timeLapse;
 		ImmutableList<Message> list = this.device.get().getUnreadMessages();
 		//handle the delete messages
 		for (Message message : list){
@@ -151,7 +153,7 @@ public class ChargingStation extends Depot implements CommUser,TickListener{
 		freeSlots.add(new TimeWindow(0,Long.MAX_VALUE));
 		for(Long[] slot:schedule){
 			for(TimeWindow freeslot:freeSlots){
-				if(freeslot.isIn(slot[0]) ){
+				if(freeslot.isIn(slot[0]) && freeslot.isBeforeStart(timeLapse.getStartTime()) ){
 					freeSlots.remove(freeslot);
 					TimeWindow w1 = new TimeWindow(freeslot.begin,slot[0]);
 					TimeWindow w2 = new TimeWindow(slot[1],freeslot.end);

@@ -358,13 +358,13 @@ public class Plan {
 	/**
 	 * checks if a plan can be executed
 	 */
-	public boolean valid(ArrayList<Goal> newPlan, ArrayList<TimeWindow> windows, long startTime, Point temppos, double tempbat) {
+	public boolean valid(ArrayList<Goal> newPlan, ArrayList<TimeWindow> windows, long startTime, Point temppos, long tempbat) {
 		if(newPlan.size() == 0) return true;
 
 
 		RoadUnits r = model.getRoadUnits();
 		long time = startTime;
-		double battery = tempbat;
+		long battery =  tempbat;
 		Point curcor = temppos;
 		for(Goal g:newPlan){
 			long timespend = (long) r.toExTime(r.toInDist(distance(curcor,g.coordinates()))/r.toInSpeed(model.getSpeed()),model.getTime().getTimeUnit());
@@ -378,20 +378,20 @@ public class Plan {
 			battery-= timespend;
 			if(battery <=limit*model.getMaxBattery()) return false;
 			if(g.type().equals("charging")){
-				double batterydiff = model.getMaxBattery()-battery;
+				long batterydiff = model.getMaxBattery()-battery;
 				long timestart = time;
 				if(batterydiff/model.getChargeRate()==(long) (batterydiff/model.getChargeRate())){
 					batterydiff=(long) (batterydiff/model.getChargeRate());
 				}else{
 					batterydiff=(long) (batterydiff/model.getChargeRate())+1;
 				}
-				time=(long) (time+Math.min(g.endWindow-time, batterydiff));
-				battery = battery + Math.min(g.endWindow-time, batterydiff)*model.getChargeRate();
-				if(time>g.endWindow)return false;
+				TimeWindow timewindow = findBestTimeWindow(time,battery,batterydiff,goals,(ChargeGoal) g,windows);
+				if(timewindow== null)return false;
+				time=timewindow.end;
+				battery = battery + (timewindow.end-timewindow.begin)*model.getChargeRate();
 				if(!((ChargeGoal)g).isReserved()){
-					if(!checkWindows(g,windows)) return false;
-					g.setEndWindow(time);
-					g.setStartWindow(timestart);					
+					g.setEndWindow(timewindow.end);
+					g.setStartWindow(timewindow.begin);					
 				}
 
 			}
@@ -406,6 +406,35 @@ public class Plan {
 		battery-= timespend2;
 		if(battery <=limit*model.getMaxBattery()) return false;
 		return true;
+	}
+	private TimeWindow findBestTimeWindow(long time, long battery, long batterydiff, ArrayList<Goal> goals2,
+			ChargeGoal g, ArrayList<TimeWindow> windows) {
+		if(g.isReserved())return new TimeWindow(g.startWindow,g.endWindow);
+		TimeWindow best =null;
+		if(goals2.indexOf(g) == goals2.size()-1){
+			for(TimeWindow w:windows){
+				if(w.begin>=time ){
+					if( w.begin >= time+battery)break;
+					long startTime = Math.max(w.begin,time);
+					if(w.end>=batterydiff+startTime) return new TimeWindow(startTime,batterydiff+startTime);
+					if(best == null || best.length() > w.end - startTime) best = new TimeWindow(startTime,w.end);
+				}
+			}
+			return best;
+		}else{
+			Goal g2 = goals2.get(goals2.indexOf(g)+1);
+			for(TimeWindow w:windows){
+				long end2ndgoal = g2.endWindow+model.calcTime(new Point(5,5), g2.coordinates());
+				if(w.begin>=time ){
+					if( w.begin >= time+battery || w.begin >= end2ndgoal)break;
+					long startTime = Math.max(w.begin,time);
+					long endTime = Math.min(g2.endWindow,w.end);
+					if(endTime>=batterydiff+startTime) return new TimeWindow(startTime,batterydiff+startTime);
+					if(best == null || best.length() > w.end - startTime) best = new TimeWindow(startTime,Math.min(startTime,endTime));
+				}
+			}
+		}
+		return best;
 	}
 	/**
 	 * checks if there is a timewindow in windows which contains the start and end time of a goal

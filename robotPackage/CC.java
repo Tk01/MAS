@@ -200,7 +200,11 @@ public class CC {
 			pbc.currentplan.setPlan(jplan.getOwnPlan());
 			pbc.bbc.setGoal(pbc.currentplan.getNextgoal());
 		}else{
-
+			for(Goal g:jplan.ownPlan){
+				if(g.type().equals("charging")){
+					pbc.bbc.deleteChargeReservation(g.startWindow, g.endWindow);
+				}
+			}
 		}
 		jplan =null;
 		bidding = false;
