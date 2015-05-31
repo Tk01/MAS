@@ -21,14 +21,13 @@ import world.InformationHandler;
 import world.Package;
 public class WorldInterface {
 
-	Optional<CommDevice> translator;
-	Point moveTo;
-	BBC bbc;
-	WorldModel model;
-	
+	private Optional<CommDevice> translator;
+	private BBC bbc;
+	private WorldModel model;
 	private Optional<RoadModel> roadModel;
 	private Optional<PDPModel> pdpModel;
 	private Robot robot;
+	
 	public WorldInterface(Robot robot, Point p, ChargingStation c, double s, long batterySize, long chargeRate, boolean reserveChargingStation, long delay){
 		model = new WorldModel(p,c,s, batterySize, chargeRate, reserveChargingStation);
 		bbc = new BBC(this,model,robot,delay);
@@ -148,6 +147,10 @@ public class WorldInterface {
 	}
 	public WorldModel getModel() {
 		return model;
+	}
+
+	public BBC getBBC() {
+		return bbc;
 	}
 
 

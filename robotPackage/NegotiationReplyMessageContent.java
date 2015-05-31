@@ -7,7 +7,7 @@ public class NegotiationReplyMessageContent extends NegotiationMessage{
 private boolean accepted;
 	
 	public NegotiationReplyMessageContent( CommUser receiver, boolean accepted){
-		super("NegotiationReply",receiver);
+		super(MessageTypes.NegotiationReplyMessage,receiver);
 		this.accepted = accepted;
 	}
 

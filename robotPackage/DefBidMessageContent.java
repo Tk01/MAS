@@ -12,7 +12,7 @@ public class DefBidMessageContent extends ContractNetMessageContent{
 	
 	
 	public DefBidMessageContent(CommUser sender, double bid){
-		super(sender,"DefBidMessage");
+		super(sender,MessageTypes.DefBidMessage);
 		this.bid = bid;
 
 		

@@ -16,7 +16,7 @@ public class DeliverPackageMessageContent extends ContractNetMessageContent{
 	}
 
 	public DeliverPackageMessageContent(CommUser receiver,Package packageToDeliver, int contractID, long endTime){
-	super(receiver,"DeliverMessage");
+	super(receiver,MessageTypes.DeliverMessage);
 	this.packageToDel = packageToDeliver;	
 	setContractID(contractID);
 	this.endTime = endTime;

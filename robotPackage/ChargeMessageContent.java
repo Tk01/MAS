@@ -11,7 +11,7 @@ public class ChargeMessageContent extends MessageContent {
 	private String mesType;
 
 	public ChargeMessageContent(CommUser receiver,long start, long end, String mesType){
-		super(receiver,"ChargeMessage");
+		super(receiver,MessageTypes.ChargeMessage);
 		this.start = start;
 		this.end = end;
 		this.mesType = mesType;

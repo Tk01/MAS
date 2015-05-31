@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import world.ChargingStation;
 import world.Package;
 import com.github.rinde.rinsim.core.TimeLapse;
-import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.Message;
 
 import com.github.rinde.rinsim.core.model.road.RoadUnits;
@@ -15,24 +14,17 @@ import com.google.common.collect.ImmutableList;
 public class WorldModel {
 
 
-	int maxTask=3;
-	TimeLapse time =null;
-	long chargeRate;
-	ArrayList<Point> Robots = new ArrayList<Point>();
-	long battery;
-	ChargingStation ChargingStation;
-	Package Carried=null;
+	private TimeLapse time =null;
+	private long chargeRate;
+	private ArrayList<Point> Robots = new ArrayList<Point>();
+	private long battery;
+	private ChargingStation ChargingStation;
+	private Package Carried=null;
 	private ArrayList<Message> messages= new ArrayList<Message>();
 	private Point coordinates;
 	private double speed;
-	ArrayList<Point> ChargingStations;
-	long BatterySize;
-
-
-
+	private long BatterySize;
 	private final boolean reserveChargingStation ;
-
-	
 	private RoadUnits RoadUnits;
 
 
@@ -109,23 +101,12 @@ public class WorldModel {
 	public boolean isReserveChargingStation() {
 		return reserveChargingStation;
 	}
-	
-	public void deletePreAssign(CommUser sender) {
-		for(Message m:this.messages()){
-			if(m.getSender()==sender && ((MessageContent) m.getContents()).getType().equals("PreAssignment") ){
-				this.messages.remove(m);
-				return;
-			}
-		}
-
-
-	}
 
 	public RoadUnits getRoadUnits() {
 		return RoadUnits;
 	}
 	public void setRoadUnits(RoadUnits roadUnits) {
-		this.RoadUnits	=roadUnits;
+		this.RoadUnits	= roadUnits;
 	}
 	public long getMaxBattery() {		
 		return BatterySize;
@@ -135,5 +116,8 @@ public class WorldModel {
 	}
 	public long getChargeRate() {
 		return this.chargeRate;
+	}
+	public ChargingStation getChargingStation() {
+		return ChargingStation;
 	}
 }

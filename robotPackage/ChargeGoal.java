@@ -7,8 +7,8 @@ public class ChargeGoal extends Goal{
 	
 	boolean reserved;
 	
-	public ChargeGoal(Point point, String string, TimeWindow timeWindow, boolean reserved){
-	super(point, string, timeWindow);
+	public ChargeGoal(Point point, TimeWindow timeWindow, boolean reserved){
+	super(point, GoalTypes.Charging, timeWindow);
 	this.reserved = reserved;
 	}
 	

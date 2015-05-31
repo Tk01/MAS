@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import robotPackage.ChargeMessageContent;
 import robotPackage.MessageContent;
+import robotPackage.MessageTypes;
 
 import com.github.rinde.rinsim.core.TickListener;
 import com.github.rinde.rinsim.core.TimeLapse;
@@ -38,7 +39,7 @@ public class ChargingStation extends Depot implements CommUser,TickListener{
 		//handle the delete messages
 		for (Message message : list){
 			MessageContent m = (MessageContent) message.getContents();
-			if(m.getType().equals("ChargeMessage")){
+			if(m.getType() == MessageTypes.ChargeMessage){
 				ChargeMessageContent l =(ChargeMessageContent) m;
 				if(l.getMesType().equals("delete")) this.delete(l.getStart(),l.getEnd());
 			}
@@ -46,7 +47,7 @@ public class ChargingStation extends Depot implements CommUser,TickListener{
 		//handle the reservation messages
 		for (Message message : list){
 			MessageContent m = (MessageContent) message.getContents();
-			if(m.getType().equals("ChargeMessage")){
+			if(m.getType() == MessageTypes.ChargeMessage){
 				ChargeMessageContent l =(ChargeMessageContent) m;
 				if(l.getMesType().equals("reserve")) this.reserve(l.getStart(),l.getEnd(),message.getSender());
 			}
@@ -54,7 +55,7 @@ public class ChargingStation extends Depot implements CommUser,TickListener{
 		//handle the check messages
 		for (Message message : list){
 			MessageContent m = (MessageContent) message.getContents();
-			if(m.getType().equals("ChargeMessage")){
+			if(m.getType() == MessageTypes.ChargeMessage){
 				ChargeMessageContent l =(ChargeMessageContent) m;
 				if(l.getMesType().equals("check")) this.check(l.getStart(),l.getEnd(),message.getSender());
 			}
@@ -115,12 +116,12 @@ public class ChargingStation extends Depot implements CommUser,TickListener{
 		this.schedule.add(new Long[]{start,end});
 	}
 	private void reserveM(long start, long end, boolean b, CommUser sender) {
-		this.device.get().send(new ReturnChargeContents(sender,start,end,b,true,getFreeSlots()), sender);
+		this.device.get().send(new ReturnChargestationMessageContents(sender,start,end,b,true,getFreeSlots()), sender);
 		
 	}
 
 	private void checkM(long start, long end, boolean b, CommUser sender) {
-		this.device.get().send(new ReturnChargeContents(sender,start,end,b,false,getFreeSlots()), sender);
+		this.device.get().send(new ReturnChargestationMessageContents(sender,start,end,b,false,getFreeSlots()), sender);
 		
 	}
 

@@ -15,8 +15,8 @@ import com.github.rinde.rinsim.geom.Point;
 import com.google.common.base.Optional;
 
 public class Robot extends Vehicle implements CommUser{
-	WorldInterface inter;
-	WorldModel model;
+	private WorldInterface inter;
+	private WorldModel model;
 
 	public Robot(Point location, ChargingStation chargingStation, double speed, long batterySize, long chargeRate, boolean reserveChargingStation, long delay){
 		setStartPosition(location);
@@ -26,7 +26,6 @@ public class Robot extends Vehicle implements CommUser{
 	}
 	@Override
 	public double getSpeed() {
-		// TODO Auto-generated method stub
 		return this.model.getSpeed();
 	}
 
@@ -36,7 +35,6 @@ public class Robot extends Vehicle implements CommUser{
 			this.inter.run(arg0);
 		}
 		this.model.batteryDrop(arg0.getTimeStep());
-		//System.out.println(this.model.battery);
 	}
 
 	@Override
@@ -50,22 +48,14 @@ public class Robot extends Vehicle implements CommUser{
 	}
 	@Override
 	public void setCommDevice(CommDeviceBuilder builder) {
-		// TODO Auto-generated method stub
 		this.inter.setCommDevice(builder);
 	}
 	
 	public Goal getGoal() {
-		// TODO Auto-generated method stub
-		return inter.bbc.goal;
+		return inter.getBBC().getGoal();
 	}
 	public long getBattery() {
-		// TODO Auto-generated method stub
 		return model.battery();
-	}
-	public String getPlan() {
-		// TODO Auto-generated method stub
-		if(inter.bbc.pbc.currentplan ==null) return "";
-		return "\n"+inter.bbc.pbc.currentplan.toString();
 	}
 
 }

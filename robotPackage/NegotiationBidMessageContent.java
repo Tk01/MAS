@@ -10,7 +10,7 @@ public class NegotiationBidMessageContent extends NegotiationMessage{
 	
 	
 	public NegotiationBidMessageContent(CommUser receiver, JPlan jointPlan){
-		super("NegotiationBidMessage",receiver);
+		super(MessageTypes.NegotiationBidMessage,receiver);
 		this.jointPlan=jointPlan;
 	}
 

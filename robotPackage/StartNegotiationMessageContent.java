@@ -19,7 +19,7 @@ public class StartNegotiationMessageContent extends NegotiationMessage{
 
 	
 	public StartNegotiationMessageContent(CommUser receiver,Point pos,  ArrayList<Goal> plan,long battery, long endTime, double minValue){
-		super("StartNegotiation",receiver);
+		super(MessageTypes.StartNegotiationMessage,receiver);
 		this.plan = plan;
 		this.endTime = endTime;
 		this.position = pos;

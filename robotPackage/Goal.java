@@ -4,25 +4,24 @@ import com.github.rinde.rinsim.geom.Point;
 import com.github.rinde.rinsim.util.TimeWindow;
 
 public class Goal {
-	Point point;
-	String type;
+	private Point point;
+	private GoalTypes type;
 	
-	long startWindow;
+	private long startWindow;
 
-	long endWindow;
+	private long endWindow;
 	
-	public Goal(Point coordinates, String type, TimeWindow window){
+	public Goal(Point coordinates, GoalTypes type, TimeWindow window){
 		point = coordinates;
 		this.type = type;
 		startWindow=window.begin;
 		endWindow= window.end;
 	}
 	public Point coordinates() {
-		// TODO Auto-generated method stub
 		return point;
 	}
-	public String type() {
-		// TODO Auto-generated method stub
+	
+	public GoalTypes type() {
 		return type;
 	}
 	

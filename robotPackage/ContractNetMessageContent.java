@@ -2,11 +2,11 @@ package robotPackage;
 
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 
-public class ContractNetMessageContent extends MessageContent{
+	abstract class ContractNetMessageContent extends MessageContent{
 	
 	int contractID;
 	
-	public ContractNetMessageContent(CommUser receiver, String string){
+	public ContractNetMessageContent(CommUser receiver, MessageTypes string){
 		super(receiver,string);
 		
 	}

@@ -10,11 +10,14 @@ import java.util.ArrayList;
 
 
 
+
+import robotPackage.MessageTypes;
 import robotPackage.Robot;
 import robotPackage.DefAssignmentMessageContent;
 import robotPackage.DefBidMessageContent;
 import robotPackage.MessageContent;
 import robotPackage.DeliverPackageMessageContent;
+
 import com.github.rinde.rinsim.core.TickListener;
 import com.github.rinde.rinsim.core.TimeLapse;
 import com.github.rinde.rinsim.core.model.comm.CommDevice;
@@ -107,7 +110,7 @@ import com.google.common.collect.ImmutableList;
 					double bid = Double.MAX_VALUE;
 					CommUser bestUser = null;
 					for(Message m:list){
-						if(((MessageContent) m.getContents()).getType().equals("DefBidMessage")){
+						if(((MessageContent) m.getContents()).getType() == MessageTypes.DefBidMessage){
 							DefBidList.add( m);
 							if(((DefBidMessageContent) m.getContents()).getBid()<bid){
 								bid = ((DefBidMessageContent) m.getContents()).getBid();

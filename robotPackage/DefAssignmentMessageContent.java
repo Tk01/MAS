@@ -15,7 +15,7 @@ public class DefAssignmentMessageContent extends ContractNetMessageContent {
 
 	
 	public DefAssignmentMessageContent(CommUser sender, double bid, boolean assigned, int contractID){
-		super(sender,"DefAssignment");
+		super(sender,MessageTypes.DefAssignmentMessage);
 		this.bid = bid;
 		this.assigned = assigned;
 		setContractID(contractID);
