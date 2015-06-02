@@ -6,6 +6,11 @@ import com.github.rinde.rinsim.core.model.comm.CommUser;
 	
 	int contractID;
 	
+	/**
+	 * The general content for a contract net message. The message will have an ID so it is known for which package the message is.
+	 * @param receiver: the receiver of the message
+	 * @param string: the type of the message
+	 */
 	public ContractNetMessageContent(CommUser receiver, MessageTypes string){
 		super(receiver,string);
 		

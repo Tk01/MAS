@@ -19,7 +19,11 @@ public class JPlan {
 	public JPlan(){
 		
 	}
-	
+	/**
+	 * The jointplan consists of 2 sets of goals which will be used for negotiation
+	 * @param ownPlan
+	 * @param otherPlan
+	 */
 	public JPlan(ArrayList<Goal> ownPlan, ArrayList<Goal> otherPlan){
 		this.ownPlan = ownPlan;
 		this.otherPlan = otherPlan;

@@ -52,7 +52,7 @@ public class Simulation {
 
 	public static void main(@Nullable String[] args) throws IOException {
 		
-		SimulationGenerator gen = new SimulationGenerator("sim_1.txt");
+		SimulationGenerator gen = new SimulationGenerator("sim1.txt");
 		final double VEHICLE_SPEED_KMH = gen.getVEHICLE_SPEED_KMH();
 		final ArrayList<Point> RList = gen.getRList();
 		Point Cloc = gen.getChargeStation();

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 import com.github.rinde.rinsim.core.model.comm.CommUser;
-import com.github.rinde.rinsim.core.model.comm.Message;
 import com.github.rinde.rinsim.geom.Point;
 import com.github.rinde.rinsim.util.TimeWindow;
 
@@ -15,11 +14,17 @@ public class BBC {
 	private Robot thisRobot;
 	private PBC pbc ;
 
-	private ArrayList<Message> messages = new ArrayList<Message>();
+	
 	private WorldInterface worldInterface;
 
 
-
+	/**
+	 * Constructor of the Behaviour based component
+	 * @param worldInterface: the link to the worldinterface
+	 * @param model: the worldmodel
+	 * @param robot: the robot for which the BBC is set up
+	 * @param delay: the delay for the communication comopnent
+	 */
 	public BBC(WorldInterface worldInterface, WorldModel model, Robot robot, long delay) {
 		thisRobot = robot;
 		this.model = model;
@@ -27,14 +32,15 @@ public class BBC {
 		pbc= new PBC(this,delay);
 	}
 
-	public void msg(Message message) {
-		messages.add(message);
+	
 
-	}
 
-	public void placeGoal(Goal goal){
-		this.goal = goal;
-	}
+	/**
+	 * Each tick the run method is called to do the following things
+	 * - Check if the current goal is done and in case yes set a new goal
+	 * - Check if an ongoing negotiation is finished
+	 * - Check if the ongoing goal is finished	
+	 */
 	public void run(){
 		
 		if(done){
@@ -122,82 +128,128 @@ public class BBC {
 			}
 			return;
 		}
-		/*
-		if(goal.type().equals("doBid")){
-
-			BidMessage bidmessage = new BidMessage(goal.getReceiver(), goal.getBid(), goal.getPackage());
-			if(model.battery() == 1) done =true;
-			return;
-		}
-		 */
+	
 	}
-public WorldModel getWorldModel(){
-	return model;
-}
-
-public void setGoal(Goal nextgoal) {
-	this.goal =nextgoal;	
-}
-
-public void sendDefBidMessage(CommUser sender, double bid) {
-	this.worldInterface.sendMessage(new DefBidMessageContent(sender, bid));
 	
-
-}
-
-
-
-public void deleteChargeReservation(long startWindow, long endWindow) {
-	this.worldInterface.sendMessage(new ChargeMessageContent(this.model.getChargingStation(), startWindow, startWindow, "delete"));
-	
-}
-
-public void sendReserveMessage(long startWindow, long endWindow) {
-	this.worldInterface.sendMessage(new ChargeMessageContent(this.model.getChargingStation(), startWindow, endWindow, "reserve"));	
-}
-
-public void sendNegotiationBidMessage(JPlan jointPlan, CommUser sender) {
-	jointPlan.setJPlanAgent(thisRobot);
-	this.worldInterface.sendMessage(new NegotiationBidMessageContent(sender,jointPlan));
-	
-}
-
-public void sendStartNegotiationMessage(Point pos,ArrayList<Goal> plan,long battery, long endTime, double minValue) {
-	this.worldInterface.sendMessage(new StartNegotiationMessageContent(null,pos,plan,battery, endTime, minValue));
-	
-}
-
-
-public boolean chargeTaken() {
-	if(((ChargeGoal)this.goal).isReserved() && ((ChargeGoal)this.goal).getStartWindow() <= model.getTime().getTime()+ model.calcTime(model.coordinates(),model.getChargingStation().getPosition().get()) && ((ChargeGoal)this.goal).getEndWindow() >= model.getTime().getTime()+ model.calcTime(model.coordinates(),model.getChargingStation().getPosition().get())) return false;
-	if(((ChargeGoal)this.goal).isReserved() && !(((ChargeGoal)this.goal).getStartWindow() <= model.getTime().getTime()+ model.calcTime(model.coordinates(),model.getChargingStation().getPosition().get()) && ((ChargeGoal)this.goal).getEndWindow() >= model.getTime().getTime()+ model.calcTime(model.coordinates(),model.getChargingStation().getPosition().get()))) return true;
-	for(Point r:model.getRobots()){
-		if(r.equals(new Point(5,5)))return true;
-		if(Point.distance(r, model.getChargingStation().getPosition().get()) <= 0.1 && Point.distance(r, model.getChargingStation().getPosition().get())  <= Point.distance(model.coordinates(), new Point(5,5))){
-		if(Point.distance(r, model.getChargingStation().getPosition().get())  < Point.distance(model.coordinates(), model.getChargingStation().getPosition().get()))return true;
-		if(r.x> model.coordinates().x)return true;
-		if(r.x== model.coordinates().x && true)return true;
-		}
+	/**
+	 * Returns the worldmodel
+	 * 
+	 */
+	public WorldModel getWorldModel(){
+		return model;
 	}
-	return false;
-}
-
-public void sendNegotiationReplyMessage(CommUser jPlanAgent) {
-	this.worldInterface.sendMessage(new NegotiationReplyMessageContent(jPlanAgent, true));
 	
-}
-
-public void sendCancelReservationMessage(long start, long end) {
-	this.worldInterface.sendMessage( new ChargeMessageContent(model.getChargingStation(),start, end, "delete"));
+	/**
+	 * Sets the current goal of the BBC
+	 * @param nextgoal: the goal to be set
+	 */
+	public void setGoal(Goal nextgoal) {
+		this.goal =nextgoal;	
+	}
 	
-}
-
-public void sendNegativeNegotiationReplyMessage(CommUser l) {
-	this.worldInterface.sendMessage(new NegotiationReplyMessageContent(l, false));
+	/**
+	 * Sends a definitive bid message received from the PBC and send to the worldinterface
+	 * @param sender: the sender of the request (the package)
+	 * @param bid: the bid of the bid message
+	 */
+	public void sendDefBidMessage(CommUser sender, double bid) {
+		this.worldInterface.sendMessage(new DefBidMessageContent(sender, bid));
+		
 	
-}
-
-public Goal getGoal() {
-	return goal;
-}
+	}
+	
+	
+	/**
+	 * Sends a delete of a charging reservation with the timewindows
+	 * @param startWindow: startwindow of the reservation
+	 * @param endWindow: endwindow of the reservation
+	 */
+	public void deleteChargeReservation(long startWindow, long endWindow) {
+		this.worldInterface.sendMessage(new ChargeMessageContent(this.model.getChargingStation(), startWindow, startWindow, "delete"));
+		
+	}
+	
+	
+	/**
+	 * Send a reservation message to the charging station
+	 * @param startWindow: the startwindow of the reservation
+	 * @param endWindow: the endwindow of the reservation
+	 */
+	public void sendReserveMessage(long startWindow, long endWindow) {
+		this.worldInterface.sendMessage(new ChargeMessageContent(this.model.getChargingStation(), startWindow, endWindow, "reserve"));	
+	}
+	
+	/**
+	 * Send a bid for a negotiation
+	 * @param jointPlan: the plans that are in the bid
+	 * @param sender: the sender of the request
+	 */
+	public void sendNegotiationBidMessage(JPlan jointPlan, CommUser sender) {
+		jointPlan.setJPlanAgent(thisRobot);
+		this.worldInterface.sendMessage(new NegotiationBidMessageContent(sender,jointPlan));
+		
+	}
+	
+	/**
+	 * Set up a request to start a negotiation
+	 *
+	 */
+	public void sendStartNegotiationMessage(Point pos,ArrayList<Goal> plan,long battery, long endTime, double minValue) {
+		this.worldInterface.sendMessage(new StartNegotiationMessageContent(null,pos,plan,battery, endTime, minValue));
+		
+	}
+	
+	/**
+	 * Checks if the charging station is available.
+	 * This is dependent on the fact if reservation is needed or not
+	 * @return: return true if taken
+	 */
+	public boolean chargeTaken() {
+		if(((ChargeGoal)this.goal).isReserved() && ((ChargeGoal)this.goal).getStartWindow() <= model.getTime().getTime()+ model.calcTime(model.coordinates(),model.getChargingStation().getPosition().get()) && ((ChargeGoal)this.goal).getEndWindow() >= model.getTime().getTime()+ model.calcTime(model.coordinates(),model.getChargingStation().getPosition().get())) return false;
+		if(((ChargeGoal)this.goal).isReserved() && !(((ChargeGoal)this.goal).getStartWindow() <= model.getTime().getTime()+ model.calcTime(model.coordinates(),model.getChargingStation().getPosition().get()) && ((ChargeGoal)this.goal).getEndWindow() >= model.getTime().getTime()+ model.calcTime(model.coordinates(),model.getChargingStation().getPosition().get()))) return true;
+		for(Point r:model.getRobots()){
+			if(r.equals(new Point(5,5)))return true;
+			if(Point.distance(r, model.getChargingStation().getPosition().get()) <= 0.1 && Point.distance(r, model.getChargingStation().getPosition().get())  <= Point.distance(model.coordinates(), new Point(5,5))){
+			if(Point.distance(r, model.getChargingStation().getPosition().get())  < Point.distance(model.coordinates(), model.getChargingStation().getPosition().get()))return true;
+			if(r.x> model.coordinates().x)return true;
+			if(r.x== model.coordinates().x && true)return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Sets up a positive reply to an agent who did a negotiation bid 
+	 * @param agent: the agent to send the message to
+	 */
+	public void sendNegotiationReplyMessage(CommUser agent) {
+		this.worldInterface.sendMessage(new NegotiationReplyMessageContent(agent, true));
+		
+	}
+	
+	/**
+	 * Send a cancel message for a reservation of the charging station
+	 * @param start: start of the timewindow which wanted to be reserved
+	 * @param end: end of the timewindow which wanted to be reserved
+	 */
+	public void sendCancelReservationMessage(long start, long end) {
+		this.worldInterface.sendMessage( new ChargeMessageContent(model.getChargingStation(),start, end, "delete"));
+		
+	}
+	
+	/**
+	 * Sets up a negative reply to an agent who did a negotiation bid 
+	 * @param agent: the agent to send the message to
+	 */
+	public void sendNegativeNegotiationReplyMessage(CommUser agent) {
+		this.worldInterface.sendMessage(new NegotiationReplyMessageContent(agent, false));
+		
+	}
+	
+	/**
+	 * returns the current goal of the BBC
+	 */
+	public Goal getGoal() {
+		return goal;
+	}
 }
