@@ -11,6 +11,12 @@ public class Goal {
 
 	private long endWindow;
 	
+	/**
+	 * A goal of a drone which is taken up in a plan
+	 * @param coordinates/ the location of the goal
+	 * @param type: the type of goal
+	 * @param window: a timewindow in case this is needed
+	 */
 	public Goal(Point coordinates, GoalTypes type, TimeWindow window){
 		point = coordinates;
 		this.type = type;

@@ -7,6 +7,12 @@ public class MessageContent implements MessageContents{
 	
 	private MessageTypes type;
 	private CommUser user;
+	
+	/**
+	 * The messagecontent will
+	 * @param user
+	 * @param type
+	 */
 	public MessageContent(CommUser user, MessageTypes type){
 		this.user = user;
 		this.type=type;

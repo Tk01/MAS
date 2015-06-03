@@ -9,7 +9,14 @@ public class ChargeMessageContent extends MessageContent {
 
 	private long end;
 	private String mesType;
-
+	
+	/**
+	 * This is the content of a charge message.
+	 * @param receiver: the receiver of the message
+	 * @param start: the start of the charging
+	 * @param end: the end of the charge window
+	 * @param mesType: the type of the message
+	 */
 	public ChargeMessageContent(CommUser receiver,long start, long end, String mesType){
 		super(receiver,MessageTypes.ChargeMessage);
 		this.start = start;

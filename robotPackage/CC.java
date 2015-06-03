@@ -27,7 +27,16 @@ public class CC {
 	private ArrayList<CommUser> losers;
 	private WorldModel model;
 
+
 	private ArrayList<ChargeGoal> chargedList;
+
+	
+	/**
+	 * The constructor of the CC
+	 * @param pbc: The link to the PBC
+	 * @param delay: the delay is the time the negotiation will wait for bids of other agents
+	 * @param model: the worldmodel
+	 */
 
 	public CC(PBC pbc, long delay, WorldModel model){
 		this.pbc = pbc;
@@ -35,6 +44,7 @@ public class CC {
 		this.model = model;
 
 	}
+
 	/**
 	 * start negotiating
 	 */
@@ -51,7 +61,7 @@ public class CC {
 		jplan = new JPlan();
 		jplan.setOwnPlan(new ArrayList<Goal>());
 		jplan.setOtherPlan( negotiationPlan.getPlan());
-		//calculate the minimum value a plan has to have befor you accept it
+		//calculate the minimum value a plan has to have before you accept it
 		double minValue = pbc.getCurrentPlan().value(pbc.getCurrentPlan().getPlan(), timeEndNegotiation);
 		//send the negotiation start message
 		pbc.sendStartNegotiationMessage(pos, negotiationPlan.getPlan(),battery, timeLastAction+delay, minValue);
@@ -87,8 +97,13 @@ public class CC {
 
 	}
 
+
+	
+	
 	/**
-	 * @param chargeContent
+	 * If the drone is bidding and reservation of the charging station is needed, the CC needs to process the reservation message.
+	 * If the reservation is seuccesfull, the drone can send a bid to the negotiation initiator.
+	 * @param chargeContent: the content of the reservation message
 	 */
 	public void chargeMessage(ReturnChargestationMessageContents chargeContent){
 		pbc.setWindows(chargeContent.getFreeSlots());
@@ -123,8 +138,12 @@ public class CC {
 		}
 	}
 
+
 	/**
-	 * process a StartNegotiation message
+	 * This method will process the message to start a negotiation.
+	 * It checks if there are packages to negotiate with and if no other negotiation is ongoing.
+	 * If this is ok he will check if there is a plan combination which is better for both which the drone can use for negotiation
+	 * @param message: the message from the initiator of the negotiation
 	 */
 	private void ProcessStartNegotiation(Message message){
 		StartNegotiationMessageContent messageContent = (StartNegotiationMessageContent) message.getContents();
@@ -155,7 +174,9 @@ public class CC {
 	}
 
 	/**
-	 * proccess a negotiationbid message
+	 * Process a bid from another drone
+	 * Best bet is the new joint plan
+	 * @param message: message with the bid of the other drone
 	 */
 	private void processNegotiationBid(Message message){
 		NegotiationBidMessageContent messageContent = (NegotiationBidMessageContent) message.getContents();
@@ -166,11 +187,14 @@ public class CC {
 			jplan = receivedJPlan;
 			
 		}
+		
 		this.model.messages().remove(message);
 
 	}
 	/**
-	 * proccess a negotiationbid message
+	 * Process the reply for a bid.
+	 * If the bid is accpeted the proposed plans are set up. If not the old plan stays and if a reservation for the charging station has been done it is cancelled.
+	 * @param message: the reply message
 	 */
 	private void processNegotiationReply(Message message){
 		NegotiationReplyMessageContent messageContent = (NegotiationReplyMessageContent) message.getContents();
@@ -187,8 +211,10 @@ public class CC {
 		bidding = false;
 		this.model.messages().remove(message);
 	}
+
 	/**
-	 * proccess a negotiationbid message
+	 * When the negotiation ends a message is send to all drones who did a bid. An accept to the best bid and a reject to the other bids.
+>>>>>>> origin/master
 	 */
 	public void sendBestNegMessage(){
 			if( jplan.JPlanAgent!= null){
@@ -227,7 +253,13 @@ public class CC {
 
 
 	/**
-	 * set up a best joint plan with the given parameters
+	 * Sets up the calculation for getting the best joint plan
+	 * @param otherPlan: the plan of the other drone
+	 * @param otherPos: the position of the other drone at the time of the negotiation end
+	 * @param otherBat: the battery life of the drone at the time of the negotiation end
+	 * @param endtime: the end time of the negotiation
+	 * @param minOtherValue: the value of the other plan
+	 * @return: Returns a best joint plan
 	 */
 	@SuppressWarnings("unchecked")
 	public JPlan bestJPlan( ArrayList<Goal> otherPlan, Point otherPos, long otherBat,long endtime,double minOtherValue ){
@@ -258,6 +290,7 @@ public class CC {
 
 		return result;
 	}
+
 	/**
 	 * divides the goals in all goals between the two agents and select the best combination
 	 */
@@ -281,18 +314,23 @@ public class CC {
 			ArrayList<Goal> tempOtherOwnGoals = Plan.GenerateBestPlan(otherGoals2, otherList, otherCharge, bestOther, pbc.getWindows(), otherPos, otherBat, endTime, model);
 
 
+
 			if(pbc.getCurrentPlan().value(tempBestOwnGoals, endTime+1000)<pbc.getCurrentPlan().value(bestOwn, endTime+1000) && Plan.value(tempOtherOwnGoals, tempOtherBattery,tempOtherPos, endTime, model)<=minOtherValue){
 				bestOwn=tempBestOwnGoals;
 				bestOther = tempOtherOwnGoals;
 			}
+
+		
 
 			tempBestOwnGoals = Plan.GenerateBestPlan(ownGoals2, ownList, otherCharge, bestOwn, pbc.getWindows(), ownPos, ownBat, endTime+1000, model);
 			tempOtherOwnGoals = Plan.GenerateBestPlan(otherGoals2, otherList, ownCharge, bestOther, pbc.getWindows(), otherPos, otherBat, endTime, model);
 
+
 			if(pbc.getCurrentPlan().value(tempBestOwnGoals, endTime+1000)<pbc.getCurrentPlan().value(bestOwn, endTime+1000) && Plan.value(tempOtherOwnGoals, tempOtherBattery,tempOtherPos, endTime, model)<=minOtherValue){
 				bestOwn=tempBestOwnGoals;
 				bestOther = tempOtherOwnGoals;
 			}
+
 			JPlan jplan = new JPlan();
 			jplan.setOwnPlan(bestOwn);
 			jplan.setOtherPlan(bestOther);
@@ -322,16 +360,20 @@ public class CC {
 
 	
 
+
 	 /**
 	  * Checks if it is time to end the bidding and if it is end the bidding
-	  */
+	 */
+
 	public void checkNegotiation() {
 		if(timeLastAction!= null && timeLastAction+delay<=model.getTime().getStartTime()){
+
 			if(startedNegotiating){
 				sendBestNegMessage();
 			}
 		}
 	}
+
 	/**
 	 * Set a new JointPlan as your current plan
 	 */
@@ -364,9 +406,19 @@ public class CC {
 			if(other)pbc.forcefullSetNewPlan(newPlan.getOwnPlan());
 		}
 	}
+	
+	/**
+	 * returns if a bid has been done for the negotiation
+	 * 
+	 */
 	public boolean IsBidding() {
 		return bidding;
 	}
+	
+	/** 
+	 * return if a negotiation has started 
+	 * 
+	 */
 	public boolean IsNegotiating() {
 		return startedNegotiating;
 	}
