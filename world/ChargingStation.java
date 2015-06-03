@@ -151,12 +151,12 @@ public class ChargingStation extends Depot implements CommUser,TickListener{
 	 */
 	private ArrayList<TimeWindow> getFreeSlots() {
 		ArrayList<TimeWindow> freeSlots = new ArrayList<TimeWindow>();
-		freeSlots.add(new TimeWindow(0,Long.MAX_VALUE));
+		freeSlots.add(new TimeWindow(timeLapse.getStartTime(),Long.MAX_VALUE));
 		for(Long[] slot:schedule){
 			for(TimeWindow freeslot:freeSlots){
-				if(freeslot.isIn(slot[0]) && freeslot.isBeforeStart(timeLapse.getStartTime()) ){
+				if(freeslot.isIn(slot[0]) && freeslot.isBeforeEnd(timeLapse.getStartTime()) ){
 					freeSlots.remove(freeslot);
-					TimeWindow w1 = new TimeWindow(freeslot.begin,slot[0]);
+					TimeWindow w1 = new TimeWindow(Math.max(timeLapse.getStartTime(),freeslot.begin),slot[0]);
 					TimeWindow w2 = new TimeWindow(slot[1],freeslot.end);
 					if(w1.length() !=0)freeSlots.add(w1);
 					if(w2.length() !=0)freeSlots.add(w2);

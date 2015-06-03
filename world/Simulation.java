@@ -51,8 +51,8 @@ public class Simulation {
 	
 
 	public static void main(@Nullable String[] args) throws IOException {
-		
-		SimulationGenerator gen = new SimulationGenerator("sim_1.txt");
+		InformationHandler.getInformationHandler().clear();
+		SimulationGenerator gen = new SimulationGenerator("sim45.txt",1,0);
 		final double VEHICLE_SPEED_KMH = gen.getVEHICLE_SPEED_KMH();
 		final ArrayList<Point> RList = gen.getRList();
 		Point Cloc = gen.getChargeStation();
@@ -140,6 +140,7 @@ public class Simulation {
 	}
 
 	public static void sim(String input,final String output,Boolean reserveChargingStation) throws IOException {
+		InformationHandler.getInformationHandler().clear();
 		SimulationGenerator gen;
 		if( new File(input).exists()){
 			gen = new SimulationGenerator(input);
@@ -189,7 +190,7 @@ public class Simulation {
 					simulator.stop();
 					try {
 						InformationHandler.getInformationHandler().finish(output);
-						InformationHandler.getInformationHandler().clear();
+						
 					} catch (FileNotFoundException e) {
 						e.printStackTrace();
 					} catch (UnsupportedEncodingException e) {

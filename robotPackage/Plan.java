@@ -33,26 +33,6 @@ public class Plan {
 		this.goals=goals;
 	}
 
-	public double distance(Point point,Point point2 ){
-
-
-
-		double startX = point.x;
-		double startY = point.y;
-
-		double endX = point2.x;
-		double endY = point2.y;
-
-
-		double xd = endX-startX;
-		double yd = endY- startY;
-		double distance = Math.sqrt(xd*xd + yd*yd);
-
-		return distance;
-
-
-	}
-
 	/**
 	 * Return the time you're not moving packages of the plan. Is used to compare tasks that are added to the current plan. The lower the better
 	 */
@@ -113,14 +93,13 @@ public class Plan {
 	}
 
 	/**
-	 *  check if the pack can be taken up in the plan by checking if in the specified timewindows it is possible to pick up the package.
+	 *Creates the best plan with the goals in goals,pickupGoal and dropGoal. null if such does not exist.
 	 */
 	public Plan isPossiblePlan(Goal pickupGoal, Goal dropGoal, ArrayList<TimeWindow> windows,long startTime){
 
 		ArrayList<Goal> tempgoals = calculateGoals(startTime);
 		Point temppos = calculatePosition(startTime);
 		long tempbat = calculateBattery(startTime);
-		//if(goals.size() > 7) return null;
 
 		@SuppressWarnings("unchecked")
 		ArrayList <Goal> copyGoals = (ArrayList<Goal>) tempgoals.clone();
@@ -139,7 +118,7 @@ public class Plan {
 
 			newPlan.add(copyGoals.remove(0));
 		}
-		ArrayList<Goal> result = GenerateBestPlan(copyGoals,newPlan,charged,null,windows,temppos,tempbat,startTime, model);
+		ArrayList<Goal> result = GenerateBestPlan(copyGoals,newPlan,(ChargeGoal) charged,null,windows,temppos,tempbat,startTime, model);
 		return new Plan(result,model);
 	}
 
@@ -269,9 +248,9 @@ public class Plan {
 	 */
 	@SuppressWarnings("unchecked") 
 	public static ArrayList<Goal> GenerateBestPlan(ArrayList<Goal> copyGoals,
-			ArrayList<Goal> newPlan, Goal charged, ArrayList<Goal> bestplan, ArrayList<TimeWindow> windows, Point temppos, long tempbat, long startTime, WorldModel model) {
+			ArrayList<Goal> newPlan, ChargeGoal charged, ArrayList<Goal> bestplan, ArrayList<TimeWindow> windows, Point temppos, long tempbat, long startTime, WorldModel model) {
 		if(copyGoals.size() ==0){
-			bestplan = addCharging(newPlan, charged, bestplan,windows,  temppos, tempbat,startTime, model);
+			if(charged !=null)bestplan = addCharging(newPlan, charged.clone(), bestplan,windows,  temppos, tempbat,startTime, model);
 			bestplan = addCharging(newPlan, null, bestplan,windows,  temppos, tempbat,startTime, model);
 			return bestplan;
 		}
@@ -294,7 +273,7 @@ public class Plan {
 	 * checks which place you best place charging.
 	 */
 	@SuppressWarnings("unchecked")
-	private static ArrayList<Goal> addCharging(ArrayList<Goal> newPlan, Goal charged,
+	private static ArrayList<Goal> addCharging(ArrayList<Goal> newPlan, ChargeGoal charged,
 			ArrayList<Goal> bestplan, ArrayList<TimeWindow> windows, Point temppos, long tempbat, long startTime,WorldModel model) {
 		if(valid(newPlan,windows, startTime, temppos,  tempbat, model)){
 			if(bestplan == null) bestplan = (ArrayList<Goal>) newPlan.clone();
@@ -365,6 +344,9 @@ public class Plan {
 		if(battery <=limit*model.getMaxBattery()) return false;
 		return true;
 	}
+	/**
+	 * find the best time window for a ChargeGoal
+	 */
 	private static TimeWindow findBestTimeWindow(long time, long battery, long batterydiff, ArrayList<Goal> goals2,
 			ChargeGoal g, ArrayList<TimeWindow> windows,WorldModel model) {
 		if(g.isReserved())return new TimeWindow(g.getStartWindow(),g.getEndWindow());
@@ -375,7 +357,7 @@ public class Plan {
 					if( w.begin >= time+battery)break;
 					long startTime = Math.max(w.begin,time);
 					if(w.end>=batterydiff+startTime) return new TimeWindow(startTime,batterydiff+startTime);
-					if(best == null || best.length() > w.end - startTime) best = new TimeWindow(startTime,w.end);
+					if(best == null || best.length() < w.end - startTime) best = new TimeWindow(startTime,w.end);
 				}
 			}
 			return best;
@@ -386,9 +368,9 @@ public class Plan {
 				if(w.begin>=time ){
 					if( w.begin >= time+battery || w.begin >= end2ndgoal)break;
 					long startTime = Math.max(w.begin,time);
-					long endTime = Math.min(g2.getEndWindow(),w.end);
+					long endTime = Math.min(end2ndgoal,w.end);
 					if(endTime>=batterydiff+startTime) return new TimeWindow(startTime,batterydiff+startTime);
-					if(best == null || best.length() > w.end - startTime) best = new TimeWindow(startTime,Math.min(startTime,endTime));
+					if(best == null || best.length() < endTime - startTime) best = new TimeWindow(startTime,endTime);
 				}
 			}
 		}
@@ -409,23 +391,32 @@ public class Plan {
 		if(this.goals == null || this.goals.isEmpty())return null;
 		return this.goals.get(0);
 	}
-
+	/**
+	 * calculate the value of  plan if it was placed at startTime
+	 */
 	public double value(ArrayList<Goal> plan, long startTime) {
 		Point temppos = calculatePosition(startTime);
 		long tempbat = calculateBattery(startTime);
 		return value(plan,startTime,temppos,tempbat, model);
 	}
-
+	/**
+	 * returns the first chargeGoal in goals that isn't in arrayList
+	 */
 	public ChargeGoal lostChargeGoal(ArrayList<Goal> arrayList) {
 		if(goals == null) return null;
-		for( Goal g : arrayList){
-			if(g.type() == GoalTypes.Charging && !arrayList.contains(g)) return (ChargeGoal) g;
+		for( Goal g : goals){
+			if(g.type() == GoalTypes.Charging && !arrayList.contains(g)){
+				return (ChargeGoal) g;
+			}
 		}
 		return null;
 	}
 
 	public String toString(){
 		return goals.toString();
+	}
+	public static double getLimit() {
+		return limit;
 	}
 
 

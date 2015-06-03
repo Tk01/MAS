@@ -43,4 +43,14 @@ public class Goal {
 		return type+":"+point.toString();
 		
 	}
+	public boolean equals(Object arg0){
+		if(arg0 == null) return false;
+		if(!(arg0 instanceof Goal)) return false;
+		Goal arg1 = (Goal) arg0;
+		if(!this.point.equals(arg1.coordinates()))return false;
+		if(this.type != arg1.type)return false;
+		if(this.startWindow != arg1.getStartWindow())return false;
+		if(this.endWindow != arg1.getEndWindow())return false;
+		return true;
+	}
 }

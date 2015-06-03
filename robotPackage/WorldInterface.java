@@ -35,11 +35,11 @@ public class WorldInterface {
 		roadModel= Optional.absent();
 		pdpModel= Optional.absent();
 	}
-
 	public void sendMessage( MessageContent MessageContent) {
 		if(MessageContent.getUser() ==null){
 			this.translator.get().broadcast(MessageContent);
 		}else{
+			if(MessageContent.getType() == MessageTypes.NegotiationReplyMessage && ((NegotiationReplyMessageContent)MessageContent).isAccepted())InformationHandler.getInformationHandler().completedNegatiation();
 			this.translator.get().send(MessageContent, MessageContent.getUser());
 		}
 	}
@@ -57,12 +57,15 @@ public class WorldInterface {
 			time.consumeAll();
 		}
 	}
+	/**
+	 * gather the information that the robot should be able to collect.
+	 */
 	private void gatherInfo(TimeLapse time) {
 		model.setCoordinates(this.roadModel.get().getPosition(robot));
 		model.addMessages(translator.get().getUnreadMessages());
 		ArrayList<Point> list = new ArrayList<Point>();
 		for(Robot r:roadModel.get().getObjectsOfType( Robot.class)){
-			if(!r.equals(this.robot) && distance(roadModel.get().getPosition(r),this.model.coordinates()) < 1){
+			if(!r.equals(this.robot) &&Point.distance(roadModel.get().getPosition(r),this.model.coordinates()) < 1){
 				list.add(roadModel.get().getPosition(r));
 			}
 		}
@@ -70,20 +73,7 @@ public class WorldInterface {
 		model.setRobots(list);
 		model.setTime(time);
 	}
-	private double distance(Point point, Point point2) {
-		double startX = point.x;
-		double startY = point.y;
-
-		double endX = point2.x;
-		double endY = point2.y;
-
-
-		double xd = endX-startX;
-		double yd = endY- startY;
-		double distance = Math.sqrt(xd*xd + yd*yd);
-
-		return distance;
-	}
+	
 
 	public void charge(long l) {
 		double toCharge = model.getMaxBattery()-model.battery();
@@ -118,6 +108,10 @@ public class WorldInterface {
 			throw e;
 		}
 	}
+	/**
+	 * returns the first package at the location of robot
+	 * @throws NoSuchElementException
+	 */
 	private Package getPackageHere() throws NoSuchElementException{
 		try{
 			return roadModel.get().getObjectsAt(robot, world.Package.class).iterator().next();

@@ -17,10 +17,11 @@ import com.google.common.base.Optional;
 public class Robot extends Vehicle implements CommUser{
 	private WorldInterface inter;
 	private WorldModel model;
-
+	private Point Startlocation;
 	public Robot(Point location, ChargingStation chargingStation, double speed, long batterySize, long chargeRate, boolean reserveChargingStation, long delay){
 		setStartPosition(location);
 		setCapacity(1);
+		Startlocation = location;
 		inter = new WorldInterface(this, location, chargingStation, speed, batterySize, chargeRate, reserveChargingStation,delay);
 		model = inter.getModel();
 	}
@@ -56,6 +57,9 @@ public class Robot extends Vehicle implements CommUser{
 	}
 	public long getBattery() {
 		return model.battery();
+	}
+	public Point getStartLocation() {
+		return this.Startlocation;
 	}
 
 }

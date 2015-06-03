@@ -19,5 +19,12 @@ public class ChargeGoal extends Goal{
 	public void setReserved(boolean reserved){
 		this.reserved = reserved;
 	}
-
+	public ChargeGoal clone(){
+		return new ChargeGoal(super.coordinates(),new TimeWindow(super.getStartWindow(),super.getEndWindow()),reserved);
+	}
+	public boolean equals(Object arg0){
+		if(!super.equals(arg0)) return false;
+		if(((ChargeGoal) arg0).isReserved() != this.reserved) return false;
+		return true;
+	}
 }

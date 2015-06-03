@@ -111,6 +111,10 @@ public class WorldModel {
 	public long getMaxBattery() {		
 		return BatterySize;
 	}
+	/**
+	 * calculates how long it takes to move from point to point2
+	 * @note this method is not 100% accurate
+	 */
 	public long calcTime(Point point, Point point2) {
 		return (long) RoadUnits.toExTime(RoadUnits.toInDist(Point.distance(point,point2))/RoadUnits.toInSpeed(speed),time.getTimeUnit());
 	}
