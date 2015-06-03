@@ -8,7 +8,11 @@ public class NegotiationBidMessageContent extends NegotiationMessage{
 
 	private JPlan jointPlan;
 	
-	
+	/**
+	 * This is the message used to do a bif for a negotiation
+	 * @param receiver
+	 * @param jointPlan
+	 */
 	public NegotiationBidMessageContent(CommUser receiver, JPlan jointPlan){
 		super(MessageTypes.NegotiationBidMessage,receiver);
 		this.jointPlan=jointPlan;
