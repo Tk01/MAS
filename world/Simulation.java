@@ -52,7 +52,7 @@ public class Simulation {
 
 	public static void main(@Nullable String[] args) throws IOException {
 		InformationHandler.getInformationHandler().clear();
-		SimulationGenerator gen = new SimulationGenerator("sim45.txt",1,0);
+		SimulationGenerator gen = new SimulationGenerator("sim_0.txt");
 		final double VEHICLE_SPEED_KMH = gen.getVEHICLE_SPEED_KMH();
 		final ArrayList<Point> RList = gen.getRList();
 		Point Cloc = gen.getChargeStation();
@@ -62,7 +62,7 @@ public class Simulation {
 		final long SERVICE_DURATION =gen.getSERVICE_DURATION();
 		final long endTime = gen.getEndTime();
 		final long delay = gen.getDelay();
-		final boolean reserveChargingStation = true;
+		final boolean reserveChargingStation = false;
 		long contractNetDelay = gen.getContractNetDelay(reserveChargingStation);
 		final RoadModel roadModel = gen.getRoadModel();
 		Plan.setLimit(gen.getLimit());
@@ -92,7 +92,7 @@ public class Simulation {
 				if (time.getStartTime() > endTime) {
 					simulator.stop();
 					try {
-						InformationHandler.getInformationHandler().finish("sim1_result.txt");
+						InformationHandler.getInformationHandler().finish("testje2.txt");
 					} catch (FileNotFoundException e) {
 
 						e.printStackTrace();

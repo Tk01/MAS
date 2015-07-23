@@ -16,7 +16,7 @@ public class FullSetup {
 
 	public static void main(String[] args) throws IOException, RowsExceededException, WriteException {
 		WritableWorkbook wworkbook;
-		wworkbook = Workbook.createWorkbook(new File("output.xls"));
+		wworkbook = Workbook.createWorkbook(new File("output2.xls"));
 	      WritableSheet wsheet = wworkbook.createSheet("First Sheet", 0);
 	      Label label = new Label(0, 0, "Testnr.");
 	      Label label1 = new Label(1, 0, "FailedNonRes");
@@ -56,7 +56,7 @@ public class FullSetup {
 			System.out.println("sim "+i+" started.");
 			Number number = new Number(0, i+1, i);
 			wsheet.addCell(number);
-			Simulation.sim("sim_"+i+".txt", "sim_"+i+"_noRes_result.txt", false);
+			Simulation.sim("sim_"+i+".txt", "sim_"+i+"_noRes_result_neg2.txt", false);
 			Number number2 = new Number(1, i+1, InformationHandler.getInformationHandler().failed());
 			Number number4 = new Number(3, i+1, InformationHandler.getInformationHandler().failedPackages());
 			wsheet.addCell(number4);
@@ -74,7 +74,7 @@ public class FullSetup {
 			wsheet.addCell(number14);
 			Number number16 = new Number(15, i+1,InformationHandler.getInformationHandler().getlostcharge() );
 			wsheet.addCell(number16);
-			Simulation.sim("sim_"+i+".txt", "sim_"+i+"_Res_result.txt", true);
+			Simulation.sim("sim_"+i+".txt", "sim_"+i+"_Res_result_neg2.txt", true);
 			System.out.println("sim "+i+" done.");
 			Number number3 = new Number(2, i+1, InformationHandler.getInformationHandler().failed());
 		    wsheet.addCell(number3);

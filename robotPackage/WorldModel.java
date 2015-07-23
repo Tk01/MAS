@@ -4,9 +4,10 @@ import java.util.ArrayList;
 
 import world.ChargingStation;
 import world.Package;
-import com.github.rinde.rinsim.core.TimeLapse;
-import com.github.rinde.rinsim.core.model.comm.Message;
 
+import com.github.rinde.rinsim.core.TimeLapse;
+import com.github.rinde.rinsim.core.model.comm.CommUser;
+import com.github.rinde.rinsim.core.model.comm.Message;
 import com.github.rinde.rinsim.core.model.road.RoadUnits;
 import com.github.rinde.rinsim.geom.Point;
 import com.google.common.collect.ImmutableList;
@@ -14,6 +15,7 @@ import com.google.common.collect.ImmutableList;
 public class WorldModel {
 
 
+	private Robot robot;
 	private TimeLapse time =null;
 	private long chargeRate;
 	private ArrayList<Point> Robots = new ArrayList<Point>();
@@ -28,7 +30,8 @@ public class WorldModel {
 	private RoadUnits RoadUnits;
 
 
-	public WorldModel(Point p,ChargingStation c, double s,long BatterySize, long chargeRate, boolean reserveChargingStation ) {
+	public WorldModel(Point p,ChargingStation c, double s,long BatterySize, long chargeRate, boolean reserveChargingStation, Robot robot ) {
+		this.robot = robot;
 		coordinates =p;
 		ChargingStation=c;
 		speed =s;
@@ -123,5 +126,8 @@ public class WorldModel {
 	}
 	public ChargingStation getChargingStation() {
 		return ChargingStation;
+	}
+	public CommUser getThisRobot() {
+		return robot;
 	}
 }

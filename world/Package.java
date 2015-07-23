@@ -125,7 +125,7 @@ import com.google.common.collect.ImmutableList;
 							this.translator.get().send(new DefAssignmentMessageContent(bestUser, bid, false , mycontractId), m.getSender());
 						}
 					}
-					if(!list.isEmpty()){
+					if(!DefBidList.isEmpty()){
 						stage++;
 					}
 					else{

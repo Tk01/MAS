@@ -29,7 +29,7 @@ public class WorldInterface {
 	private Robot robot;
 	
 	public WorldInterface(Robot robot, Point p, ChargingStation c, double s, long batterySize, long chargeRate, boolean reserveChargingStation, long delay){
-		model = new WorldModel(p,c,s, batterySize, chargeRate, reserveChargingStation);
+		model = new WorldModel(p,c,s, batterySize, chargeRate, reserveChargingStation,robot);
 		bbc = new BBC(this,model,robot,delay);
 		this.robot = robot;
 		roadModel= Optional.absent();
@@ -39,7 +39,9 @@ public class WorldInterface {
 		if(MessageContent.getUser() ==null){
 			this.translator.get().broadcast(MessageContent);
 		}else{
-			if(MessageContent.getType() == MessageTypes.NegotiationReplyMessage && ((NegotiationReplyMessageContent)MessageContent).isAccepted())InformationHandler.getInformationHandler().completedNegatiation();
+			if(MessageContent.getType() == MessageTypes.NegotiationReplyMessage 
+					&& ((NegotiationReplyMessageContent)MessageContent).isAccepted())
+				InformationHandler.getInformationHandler().completedNegatiation();
 			this.translator.get().send(MessageContent, MessageContent.getUser());
 		}
 	}

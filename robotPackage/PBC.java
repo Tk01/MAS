@@ -268,8 +268,9 @@ public class PBC {
 
 	}
 
-	public void sendNegotiationBidMessage(JPlan jointPlan, CommUser sender) {
 
+	public void sendNegotiationBidMessage(JPlan jointPlan, CommUser sender) {
+	
 		ArrayList<Goal> ownGoals = jointPlan.getOwnPlan();
 		for(int i = 0; i<ownGoals.size();i++){
 			if(ownGoals.get(i).type() == GoalTypes.Charging && !((ChargeGoal)ownGoals.get(i)).isReserved() ){
@@ -286,7 +287,6 @@ public class PBC {
 		}
 		bbc.sendNegotiationBidMessage( jointPlan,  sender);
 	}
-
 	public void sendStartNegotiationMessage(Point pos, ArrayList<Goal> goals, long battery, long endTime, double minValue) {
 		bbc.sendStartNegotiationMessage( pos, goals, battery, endTime, minValue);
 

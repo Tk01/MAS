@@ -148,7 +148,7 @@ public class CC {
 	private void ProcessStartNegotiation(Message message){
 		StartNegotiationMessageContent messageContent = (StartNegotiationMessageContent) message.getContents();
 		
-		if(pbc.getCurrentPlan().getPlan().size()>3 && !(bidding || startedNegotiating)){
+		if(pbc.getCurrentPlan().getPlan().size()> 3 && !(bidding || startedNegotiating)){
 			long lastTime = messageContent.getEndTime();
 			long currentTime = model.getTime().getTime();
 			if(currentTime<lastTime){
@@ -164,13 +164,14 @@ public class CC {
 					bidding = true;
 					timeLastAction = lastTime - delay; 
 					jplan = jointPlan;
-					jplan.setJPlanAgent(message.getSender());
+					jplan.setJPlanAgent(model.getThisRobot());
 					pbc.sendNegotiationBidMessage(jointPlan, message.getSender());
+					
 				}
 			}
-
+			
 		}
-
+		model.messages().remove(message);
 	}
 
 	/**
@@ -181,13 +182,15 @@ public class CC {
 	private void processNegotiationBid(Message message){
 		NegotiationBidMessageContent messageContent = (NegotiationBidMessageContent) message.getContents();
 		JPlan receivedJPlan = messageContent.getJointPlan();
-		if(startedNegotiating && jplan != null && pbc.getCurrentPlan().value(receivedJPlan.getOtherPlan(),timeLastAction+delay)<pbc.getCurrentPlan().value(this.jplan.getOtherPlan(), timeLastAction+delay)){
+		if(startedNegotiating && jplan != null && pbc.getCurrentPlan().value(receivedJPlan.getOtherPlan(),timeLastAction+delay)< pbc.getCurrentPlan().value(this.jplan.getOtherPlan(), timeLastAction+delay)){
 			//if the received joint plan is better then the current best received joint plan, store the owner of the current plan and set the new best joint plan with the given joint plan
 			if(jplan.JPlanAgent!=null)losers.add(jplan.JPlanAgent);
 			jplan = receivedJPlan;
 			
 		}
-		
+		else{
+			losers.add(receivedJPlan.JPlanAgent);
+		}
 		this.model.messages().remove(message);
 
 	}
@@ -299,6 +302,7 @@ public class CC {
 			ArrayList<Goal> otherGoals,Point otherPos, long otherBat, ArrayList<Goal> ownGoals, Point ownPos, long ownBat,
 			ArrayList<Goal> bestOwn, ArrayList<Goal> bestOther, double minOtherValue, ChargeGoal ownCharge, ChargeGoal otherCharge, long endTime, long tempOtherBattery, Point tempOtherPos) {
 		if(allGoals.size() ==0){
+			
 			//If the goals in allGoals are divided, divide the chargeGoals and if the plan is better then the currently best division
 			ArrayList<Goal> ownList =  new ArrayList<Goal>();
 			ArrayList<Goal> otherList =  new ArrayList<Goal>();
@@ -310,23 +314,22 @@ public class CC {
 			if(otherGoals2 .size()>0 && otherGoals2.get(0).type() == GoalTypes.Drop ){
 				otherList.add(otherGoals2.remove(0));
 			}
-			ArrayList<Goal> tempBestOwnGoals = Plan.GenerateBestPlan(ownGoals2,ownList , ownCharge, bestOwn, pbc.getWindows(), ownPos, ownBat, endTime+1000, model);
-			ArrayList<Goal> tempOtherOwnGoals = Plan.GenerateBestPlan(otherGoals2, otherList, otherCharge, bestOther, pbc.getWindows(), otherPos, otherBat, endTime, model);
+			ArrayList<Goal> tempBestOwnGoals = Plan.GenerateBestPlan(ownGoals2,ownList , ownCharge, null, pbc.getWindows(), ownPos, ownBat, endTime+1000, model);
+			ArrayList<Goal> tempOtherOwnGoals = Plan.GenerateBestPlan(otherGoals2, otherList, otherCharge, null, pbc.getWindows(), otherPos, otherBat, endTime, model);
 
-
-
-			if(pbc.getCurrentPlan().value(tempBestOwnGoals, endTime+1000)<pbc.getCurrentPlan().value(bestOwn, endTime+1000) && Plan.value(tempOtherOwnGoals, tempOtherBattery,tempOtherPos, endTime, model)<=minOtherValue){
+			if(pbc.getCurrentPlan().value(tempBestOwnGoals, endTime+1000)<pbc.getCurrentPlan().value(bestOwn, endTime+1000) 
+					&& Plan.value(tempOtherOwnGoals, tempOtherBattery,tempOtherPos, endTime, model)<=minOtherValue){
 				bestOwn=tempBestOwnGoals;
 				bestOther = tempOtherOwnGoals;
 			}
 
 		
 
-			tempBestOwnGoals = Plan.GenerateBestPlan(ownGoals2, ownList, otherCharge, bestOwn, pbc.getWindows(), ownPos, ownBat, endTime+1000, model);
-			tempOtherOwnGoals = Plan.GenerateBestPlan(otherGoals2, otherList, ownCharge, bestOther, pbc.getWindows(), otherPos, otherBat, endTime, model);
+			tempBestOwnGoals = Plan.GenerateBestPlan(ownGoals2, ownList, otherCharge, null, pbc.getWindows(), ownPos, ownBat, endTime+1000, model);
+			tempOtherOwnGoals = Plan.GenerateBestPlan(otherGoals2, otherList, ownCharge, null, pbc.getWindows(), otherPos, otherBat, endTime, model);
 
-
-			if(pbc.getCurrentPlan().value(tempBestOwnGoals, endTime+1000)<pbc.getCurrentPlan().value(bestOwn, endTime+1000) && Plan.value(tempOtherOwnGoals, tempOtherBattery,tempOtherPos, endTime, model)<=minOtherValue){
+			if(pbc.getCurrentPlan().value(tempBestOwnGoals, endTime+1000)<pbc.getCurrentPlan().value(bestOwn, endTime+1000) 
+					&& Plan.value(tempOtherOwnGoals, tempOtherBattery,tempOtherPos, endTime, model)<=minOtherValue){
 				bestOwn=tempBestOwnGoals;
 				bestOther = tempOtherOwnGoals;
 			}
@@ -387,7 +390,7 @@ public class CC {
 			ArrayList<Goal> comb = new ArrayList<Goal>();
 			comb.addAll(newPlan.getOwnPlan());
 			comb.addAll(newPlan.getOtherPlan());
-			if(!comb.contains(testplan.get(0))){
+			if(!testplan.isEmpty() && !comb.contains(testplan.get(0))){
 				newPlan.getOtherPlan().add(0,testplan.get(0));
 			}
 		}
@@ -401,9 +404,11 @@ public class CC {
 			pbc.sendCancelReservationMessage(lostChargeGoal2.getStartWindow(), lostChargeGoal2.getEndWindow());
 		}
 		//set the correct Plan of the joint plan as the current plan
-		if(other)pbc.forcefullSetNewPlan(newPlan.getOtherPlan());
+		if(other){
+			pbc.forcefullSetNewPlan(newPlan.getOtherPlan());
+		}
 		else{
-			if(other)pbc.forcefullSetNewPlan(newPlan.getOwnPlan());
+			pbc.forcefullSetNewPlan(newPlan.getOwnPlan());
 		}
 	}
 	
