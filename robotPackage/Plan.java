@@ -61,8 +61,12 @@ public class Plan {
 			}
 			curcor =g.coordinates();
 		}
-		long totalTimeSpend = time-model.getTime().getTime();
-		return totalTimeSpend-TimeDelivering(newPlan,temppos, model)+((model.getMaxBattery()-battery)/model.getMaxBattery())*model.calcTime(curcor,model.getChargingStation().getPosition().get());
+		long totalTimeSpend = time-planTime;
+		double value = totalTimeSpend-TimeDelivering(newPlan,temppos, model)+((model.getMaxBattery()-battery)/model.getMaxBattery())*model.calcTime(curcor,model.getChargingStation().getPosition().get());
+		
+		System.out.println("value " + value);
+		
+		return value;
 	}
 
 
