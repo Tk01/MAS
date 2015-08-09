@@ -7,8 +7,8 @@ import javax.annotation.Nullable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 
-import robotPackage.Goal;
-import robotPackage.Robot;
+import WorldModel.Goal;
+import WorldModel.Robot;
 
 import com.github.rinde.rinsim.core.model.ModelProvider;
 import com.github.rinde.rinsim.core.model.pdp.DefaultPDPModel;

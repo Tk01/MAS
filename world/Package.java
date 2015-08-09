@@ -11,12 +11,18 @@ import java.util.ArrayList;
 
 
 
-import robotPackage.MessageTypes;
-import robotPackage.Robot;
-import robotPackage.DefAssignmentMessageContent;
-import robotPackage.DefBidMessageContent;
-import robotPackage.MessageContent;
-import robotPackage.DeliverPackageMessageContent;
+
+
+
+
+
+
+import Messages.DefAssignmentMessageContent;
+import Messages.DefBidMessageContent;
+import Messages.DeliverPackageMessageContent;
+import Messages.MessageContent;
+import Messages.MessageTypes;
+import WorldModel.Robot;
 
 import com.github.rinde.rinsim.core.TickListener;
 import com.github.rinde.rinsim.core.TimeLapse;

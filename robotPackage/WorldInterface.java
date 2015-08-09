@@ -1,10 +1,16 @@
-package robotPackage;
+/**package robotPackage;
 
 
 
 
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
+
+import Messages.MessageContent;
+import Messages.MessageTypes;
+import Messages.NegotiationReplyMessageContent;
+import WorldModel.Robot;
+import WorldModel.WorldModel;
 
 import com.github.rinde.rinsim.core.TimeLapse;
 import com.github.rinde.rinsim.core.model.comm.CommDevice;
@@ -22,18 +28,20 @@ import world.Package;
 public class WorldInterface {
 
 	private Optional<CommDevice> translator;
-	private BBC bbc;
+	private GoalsToActions goalsToActions;
 	private WorldModel model;
 	private Optional<RoadModel> roadModel;
 	private Optional<PDPModel> pdpModel;
 	private Robot robot;
 	
 	public WorldInterface(Robot robot, Point p, ChargingStation c, double s, long batterySize, long chargeRate, boolean reserveChargingStation, long delay){
-		model = new WorldModel(p,c,s, batterySize, chargeRate, reserveChargingStation,robot);
-		bbc = new BBC(this,model,robot,delay);
-		this.robot = robot;
 		roadModel= Optional.absent();
 		pdpModel= Optional.absent();
+		model = new WorldModel(p,c,s, batterySize, chargeRate, reserveChargingStation,robot, roadModel, pdpModel);
+		goalsToActions = new GoalsToActions(this,model,robot,delay);
+		this.robot = robot;
+		
+		
 	}
 	public void sendMessage( MessageContent MessageContent) {
 		if(MessageContent.getUser() ==null){
@@ -53,15 +61,15 @@ public class WorldInterface {
 	public void run(TimeLapse time){
 		if(model.battery() > 0){
 			this.gatherInfo(time);
-			bbc.run();
+			goalsToActions.run();
 		}else{
 			InformationHandler.getInformationHandler().batteryEmpty(robot,time.getTime());
 			time.consumeAll();
 		}
 	}
-	/**
-	 * gather the information that the robot should be able to collect.
-	 */
+	
+	 //gather the information that the robot should be able to collect.
+	 
 	private void gatherInfo(TimeLapse time) {
 		model.setCoordinates(this.roadModel.get().getPosition(robot));
 		model.addMessages(translator.get().getUnreadMessages());
@@ -110,10 +118,10 @@ public class WorldInterface {
 			throw e;
 		}
 	}
-	/**
-	 * returns the first package at the location of robot
-	 * @throws NoSuchElementException
-	 */
+	
+	 //returns the first package at the location of robot
+	  //@throws NoSuchElementException
+	 
 	private Package getPackageHere() throws NoSuchElementException{
 		try{
 			return roadModel.get().getObjectsAt(robot, world.Package.class).iterator().next();
@@ -145,11 +153,11 @@ public class WorldInterface {
 		return model;
 	}
 
-	public BBC getBBC() {
-		return bbc;
+	public GoalsToActions getBBC() {
+		return goalsToActions;
 	}
 
 
 
 
-}
+}*/

@@ -2,8 +2,8 @@ package world;
 
 import java.util.ArrayList;
 
-import robotPackage.MessageContent;
-import robotPackage.MessageTypes;
+import Messages.MessageContent;
+import Messages.MessageTypes;
 
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.MessageContents;

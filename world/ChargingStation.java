@@ -2,9 +2,9 @@ package world;
 
 import java.util.ArrayList;
 
-import robotPackage.ChargeMessageContent;
-import robotPackage.MessageContent;
-import robotPackage.MessageTypes;
+import Messages.ChargeMessageContent;
+import Messages.MessageContent;
+import Messages.MessageTypes;
 
 import com.github.rinde.rinsim.core.TickListener;
 import com.github.rinde.rinsim.core.TimeLapse;
