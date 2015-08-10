@@ -67,17 +67,17 @@ public class GoalsToActions {
 		if( goal == null){
 			//if you have no goal and you're on the charging station leave the charging station
 			if(model.coordinates().equals(model.getChargingStation().getPosition().get())){
-				goal = new Goal(new Point(5,4), GoalTypes.MoveTo , TimeWindow.ALWAYS);
-				actions.MoveTo(new Point(5,4));
+				goal = new Goal(new Point(5,4.99), GoalTypes.MoveTo , TimeWindow.ALWAYS);
+				actions.MoveTo(new Point(5,4.99));
 				return;
 			}
-			//if you have no goal, move to point (5,4)
-			if(!model.coordinates().equals(new Point(5,4))){
-				goal = new Goal(new Point(5,4),GoalTypes.MoveTo , TimeWindow.ALWAYS);
-				actions.MoveTo(new Point(5,4));
+			//if you have no goal, move to point (5,4.99)
+			if(!model.coordinates().equals(new Point(5,4.99))){
+				goal = new Goal(new Point(5,4.99),GoalTypes.MoveTo , TimeWindow.ALWAYS);
+				actions.MoveTo(new Point(5,4.99));
 				return;
 			}
-			//if you have no goal and on point (5,4) wait.
+			//if you have no goal and on point (5,4.99) wait.
 			actions.waitMoment(true);
 			return;
 		}
@@ -87,9 +87,9 @@ public class GoalsToActions {
 				done = true;
 				return;
 			}
-			// if you're on the chargingstation while it is taken move to point (4,4.9)
+			// if you're on the chargingstation while it is taken move to point (5,4.99)
 			if(this.model.coordinates().equals(model.getChargingStation().getPosition().get()) ){
-				actions.MoveTo(new Point(5,4.9));
+				actions.MoveTo(new Point(5,4.99));
 				return;	
 			}
 			boolean b = false;
@@ -181,7 +181,7 @@ public class GoalsToActions {
 		if(((ChargeGoal)goal).isReserved() && !(((ChargeGoal)goal).getStartWindow() <= model.getTime().getTime()+ model.calcTime(model.coordinates(),model.getChargingStation().getPosition().get()) && ((ChargeGoal)goal).getEndWindow() >= model.getTime().getTime()+ model.calcTime(model.coordinates(),model.getChargingStation().getPosition().get()))) return true;
 		for(Point r:model.getRobots()){
 			if(r.equals(new Point(5,5)))return true;
-			if(Point.distance(r, model.getChargingStation().getPosition().get()) <= 0.1 && Point.distance(r, model.getChargingStation().getPosition().get())  <= Point.distance(model.coordinates(), new Point(5,5))){
+			if(Point.distance(r, model.getChargingStation().getPosition().get()) <= 0.03 && Point.distance(r, model.getChargingStation().getPosition().get())  <= Point.distance(model.coordinates(), new Point(5,5))){
 				if(Point.distance(r, model.getChargingStation().getPosition().get())  < Point.distance(model.coordinates(), model.getChargingStation().getPosition().get()))return true;
 				if(r.x> model.coordinates().x)return true;
 				if(r.x== model.coordinates().x && true)return true;

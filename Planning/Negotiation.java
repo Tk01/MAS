@@ -222,11 +222,12 @@ public class Negotiation {
 	public void sendBestNegMessage(){
 			if( jplan.JPlanAgent!= null){
 				//inform the agents who bid whether they won the bid or not. 
-				for(CommUser l:losers){
-					pbc.sendNegativeNegotiationReplyMessage(l);
-				}
+				
 				this.setNewJointPlan(jplan,true);
 				pbc.sendNegotiationReplyMessage(jplan.JPlanAgent);
+			}
+			for(CommUser l:losers){
+				pbc.sendNegativeNegotiationReplyMessage(l);
 			}
 			losers =null;
 			jplan = null;
