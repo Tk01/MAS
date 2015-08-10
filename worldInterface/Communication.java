@@ -18,6 +18,7 @@ import com.github.rinde.rinsim.core.model.comm.CommDevice;
 import com.github.rinde.rinsim.core.model.comm.CommDeviceBuilder;
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.geom.Point;
+import com.github.rinde.rinsim.util.TimeWindow;
 import com.google.common.base.Optional;
 
 public class Communication {
@@ -60,23 +61,13 @@ public class Communication {
 
 	}
 
-	/**
-	 * Sends a delete of a charging reservation with the timewindows
-	 * @param startWindow: startwindow of the reservation
-	 * @param endWindow: endwindow of the reservation
-	 */
-	public void deleteChargeReservation(long startWindow, long endWindow) {
-		sendMessage(new ChargeMessageContent(this.model.getChargingStation(), startWindow, startWindow, "delete"));
-
-	}
-
 
 	/**
 	 * Send a reservation message to the charging station
 	 * @param startWindow: the startwindow of the reservation
 	 * @param endWindow: the endwindow of the reservation
 	 */
-	public void sendReserveMessage(long startWindow, long endWindow) {
+	public void sendReserveMessage(ArrayList<TimeWindow> toBeDeleted,ArrayList<TimeWindow> toBePlaced) {
 		sendMessage(new ChargeMessageContent(this.model.getChargingStation(), startWindow, endWindow, "reserve"));	
 	}
 
