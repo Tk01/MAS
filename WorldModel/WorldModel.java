@@ -12,6 +12,7 @@ import com.github.rinde.rinsim.core.model.pdp.PDPModel;
 import com.github.rinde.rinsim.core.model.road.RoadModel;
 import com.github.rinde.rinsim.core.model.road.RoadUnits;
 import com.github.rinde.rinsim.geom.Point;
+import com.github.rinde.rinsim.util.TimeWindow;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
@@ -35,6 +36,8 @@ public class WorldModel {
 	private Optional<PDPModel> pdpModel;
 	private Plan currentPlan;
 	
+	private ArrayList<TimeWindow> windows;
+	
 	private Goal currentGoal;
 
 
@@ -50,6 +53,10 @@ public class WorldModel {
 		this.roadModel=(Optional<RoadModel>) roadModel;
 		this.pdpModel=(Optional<PDPModel>) pdpModel;
 		currentPlan = new Plan(new ArrayList<Goal>(), this);
+		
+		 ArrayList<TimeWindow> windows =  new ArrayList<TimeWindow>();
+	     windows.add(TimeWindow.ALWAYS);
+	     setWindows(windows);
 	}
 	public ArrayList<Point> getRobots() {
 
@@ -61,6 +68,12 @@ public class WorldModel {
 
 	
 
+	public ArrayList<TimeWindow> getWindows() {
+		return windows;
+	}
+	public void setWindows(ArrayList<TimeWindow> windows) {
+		this.windows = windows;
+	}
 	public Goal getCurrentGoal() {
 		return currentGoal;
 	}

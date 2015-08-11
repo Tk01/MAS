@@ -10,7 +10,7 @@ public class DefAssignmentMessageContent extends ContractNetMessageContent {
 	
 
 	
-	boolean assigned;
+	public boolean assigned;
 	
 
 	/**

@@ -10,7 +10,9 @@ import Messages.MessageTypes;
 import Messages.NegotiationBidMessageContent;
 import Messages.NegotiationReplyMessageContent;
 import Messages.StartNegotiationMessageContent;
+import WorldModel.ChargeGoal;
 import WorldModel.Goal;
+import WorldModel.GoalTypes;
 import WorldModel.JPlan;
 import WorldModel.WorldModel;
 
@@ -98,5 +100,23 @@ public class Communication {
 				.setReliability(1)
 				.build());	
 	}
+	
+	 public void sendNegotiationBidMessage(final JPlan jointPlan, final CommUser sender) {
+	        final ArrayList<Goal> ownGoals = (ArrayList<Goal>)jointPlan.getOwnPlan();
+	        for (int i = 0; i < ownGoals.size(); ++i) {
+	            if (ownGoals.get(i).type() == GoalTypes.Charging && !((ChargeGoal)ownGoals.get(i)).isReserved()) {
+	                sendReserveMessage(((ChargeGoal)ownGoals.get(i)).getStartWindow(), ((ChargeGoal)ownGoals.get(i)).getEndWindow());
+	                return;
+	            }
+	        }
+	        final ArrayList<Goal> otherGoals = (ArrayList<Goal>)jointPlan.getOtherPlan();
+	        for (int j = 0; j < otherGoals.size(); ++j) {
+	            if (otherGoals.get(j).type() == GoalTypes.Charging && !((ChargeGoal)otherGoals.get(j)).isReserved()) {
+	                sendReserveMessage(((ChargeGoal)otherGoals.get(j)).getStartWindow(), ((ChargeGoal)otherGoals.get(j)).getEndWindow());
+	                return;
+	            }
+	        }
+	        sendNegotiationBidMessage(jointPlan, sender);
+	    }
 	
 }

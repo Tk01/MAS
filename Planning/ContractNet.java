@@ -1,11 +1,17 @@
 package Planning;
 
 import com.github.rinde.rinsim.util.*;
+
+import world.ReturnChargestationMessageContents;
 import worldInterface.*;
+
 import com.github.rinde.rinsim.core.model.comm.*;
+
 import Messages.*;
 import WorldModel.*;
+
 import com.github.rinde.rinsim.geom.*;
+
 import java.util.*;
 
 public class ContractNet
@@ -13,56 +19,54 @@ public class ContractNet
     private long defTime;
     private Plan definitivebid;
     private CommUser defSender;
-    private WorldModel worldModel;
+    private WorldModel model;
     private boolean chargeGoal;
-    private ArrayList<TimeWindow> windows;
+    
     private Communication comm;
     
     public ContractNet(final WorldModel model, final Communication comm) {
         this.defTime = 0L;
         this.definitivebid = null;
         this.chargeGoal = false;
-        this.worldModel = model;
-        (this.windows = new ArrayList<TimeWindow>()).add(TimeWindow.ALWAYS);
+        this.model = model;
+       
+       
         this.comm = comm;
     }
     
-    private void reserveMessages(final ArrayList<Message> list) {
+    private void reserveMessages(final ArrayList<Message> messages) {
     	for(Message message:messages){
 			MessageContent content = (MessageContent) message.getContents();
 			if(content.getType() == MessageTypes.ReturnChargestationMessage){
 				ReturnChargestationMessageContents chargeContent  = ((ReturnChargestationMessageContents) content);
-				//if cc is bidding let cc handle it
-				if(cc.IsBidding()){
-					cc.chargeMessage(chargeContent);
-					worldModel.messages().remove(message);
-					return;
-				}
-
+				
+				
 				if(this.chargeGoal){
 					if( chargeContent.hasSucceeded()){
 						// if this message is a response from a message created in placeCharge() set definitive bid as current plan
 						((ChargeGoal)this.definitivebid.getPlan().get(0)).setReserved(true);
-						this.SetNewPlan(definitivebid);
+						
+						//////////////////////this.SetNewPlan(definitivebid);
 					}
-					this.windows = chargeContent.getFreeSlots();
+					model.setWindows(chargeContent.getFreeSlots());
 					this.chargeGoal=false;
-					definitivebid= null;
+					//////////////////////////////definitivebid= null;
 					messages.remove(message);
 					return;	
 				}
+				
 				if(chargeContent.isReserved() && chargeContent.hasSucceeded()){
 					// set the first ChargeGoal as reserved and retry to place a definitive bid
 					for(int i =0; i<definitivebid.getPlan().size();i++){
 						Goal goal = definitivebid.getPlan().get(i);
 						GoalTypes type = goal.type();
-						if(type == GoalTypes.Charging && worldModel.isReserveChargingStation() && !((ChargeGoal)goal).isReserved()){
+						if(type == GoalTypes.Charging && model.isReserveChargingStation() && !((ChargeGoal)goal).isReserved()){
 							((ChargeGoal)goal).setReserved(true);
 							Plan plan = definitivebid;
 							definitivebid= null;
 							doDefBid(plan, defSender,defTime );
 							messages.remove(message);
-							this.windows = chargeContent.getFreeSlots();
+							
 							return;
 						}
 					}
@@ -71,20 +75,22 @@ public class ContractNet
 					//if the reservation has failed, set the definitve bid as null
 					definitivebid= null;
 					messages.remove(message);
-					this.windows = chargeContent.getFreeSlots();
+					
 					return;
 				}
-				this.windows = chargeContent.getFreeSlots();
+				model.setWindows(chargeContent.getFreeSlots());
 			}
+			
 		}
+    	
     }
     
-    public void defAssignment(final DefAssignmentMessageContent defAssignmentMessageContent) {
+    public void defAssignment(final DefAssignmentMessageContent content) {
     	if(content.assigned){
 			this.SetNewPlan(definitivebid);
 			definitivebid = null;
 			//Call CC to start negotiation
-			if(currentplan.getPlan().size()>3){
+			if(model.getCurrentPlan().getPlan().size()>3){
 				cc.startNegotiation();
 			}
 
@@ -110,7 +116,7 @@ public class ContractNet
 		for(int i =0; i<goals.size();i++){
 			Goal goal = goals.get(i);
 			GoalTypes type = goal.type();
-			if(type == GoalTypes.Charging && worldModel.isReserveChargingStation() && !((ChargeGoal)goal).isReserved()){
+			if(type == GoalTypes.Charging && model.isReserveChargingStation() && !((ChargeGoal)goal).isReserved()){
 				//if Chargoal have to be reserved send a reservation message first
 				bbc.sendReserveMessage(goal.getStartWindow(), goal.getEndWindow());
 				return;
@@ -186,15 +192,15 @@ public class ContractNet
     }
     
     public void placeCharge() {
-        if (!this.worldModel.isReserveChargingStation()) {
-            this.worldModel.setCurrentGoal((Goal)new ChargeGoal((Point)this.worldModel.getChargingStation().getPosition().get(), new TimeWindow(0L, Long.MAX_VALUE), false));
+        if (!this.model.isReserveChargingStation()) {
+            this.model.setCurrentGoal((Goal)new ChargeGoal((Point)this.model.getChargingStation().getPosition().get(), new TimeWindow(0L, Long.MAX_VALUE), false));
             return;
         }
         if (this.definitivebid == null) {
             for (final TimeWindow w : this.windows) {
-                final long start = this.worldModel.getTime().getTime() + this.worldModel.calcTime(this.worldModel.coordinates(), (Point)this.worldModel.getChargingStation().getPosition().get()) + 2000L;
+                final long start = this.model.getTime().getTime() + this.model.calcTime(this.model.coordinates(), (Point)this.model.getChargingStation().getPosition().get()) + 2000L;
                 if (w.isIn(start)) {
-                    double batterydiff = this.worldModel.getMaxBattery() - 2000L - this.worldModel.battery() - this.worldModel.calcTime(this.worldModel.coordinates(), (Point)this.worldModel.getChargingStation().getPosition().get());
+                    double batterydiff = this.model.getMaxBattery() - 2000L - this.model.battery() - this.model.calcTime(this.model.coordinates(), (Point)this.model.getChargingStation().getPosition().get());
                     if (batterydiff / 5.0 == (long)(batterydiff / 5.0)) {
                         batterydiff = (long)(batterydiff / 5.0);
                     }
@@ -202,11 +208,11 @@ public class ContractNet
                         batterydiff = (long)(batterydiff / 5.0) + 1L;
                     }
                     final long end = (long)Math.min(start + batterydiff, w.end);
-                    final Goal goal = (Goal)new ChargeGoal((Point)this.worldModel.getChargingStation().getPosition().get(), new TimeWindow(start, end), false);
+                    final Goal goal = (Goal)new ChargeGoal((Point)this.model.getChargingStation().getPosition().get(), new TimeWindow(start, end), false);
                     final ArrayList<Goal> list = new ArrayList<Goal>();
                     list.add(goal);
                     this.chargeGoal = true;
-                    this.definitivebid = new Plan((ArrayList)list, this.worldModel);
+                    this.definitivebid = new Plan((ArrayList)list, this.model);
                     this.comm.sendReserveMessage(goal.getStartWindow(), goal.getEndWindow());
                 }
             }
@@ -240,7 +246,7 @@ public class ContractNet
 		removeUnattainablePackages(getCurrentPlan());
 		bbc.setGoal(currentplan.getNextgoal());
 		// cancel reservations in chargingstones that aren't in the new plan anymore
-		if(worldModel.isReserveChargingStation() && lostChargeGoal != null) bbc.sendCancelReservationMessage(lostChargeGoal.getStartWindow(),lostChargeGoal.getEndWindow());
+		if(model.isReserveChargingStation() && lostChargeGoal != null) bbc.sendCancelReservationMessage(lostChargeGoal.getStartWindow(),lostChargeGoal.getEndWindow());
 	}
     
     public void forcefullSetNewPlan(final ArrayList<Goal> list) {
