@@ -1,9 +1,6 @@
-package world;
+package Messages;
 
 import java.util.ArrayList;
-
-import Messages.MessageContent;
-import Messages.MessageTypes;
 
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.MessageContents;

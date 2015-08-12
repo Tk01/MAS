@@ -3,7 +3,7 @@ package Planning;
 import java.util.ArrayList;
 
 import world.InformationHandler;
-import world.ReturnChargestationMessageContents;
+import Messages.ReturnChargestationMessageContents;
 
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.Message;

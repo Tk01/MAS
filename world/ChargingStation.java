@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import Messages.ChargeMessageContent;
 import Messages.MessageContent;
 import Messages.MessageTypes;
+import Messages.ReturnChargestationMessageContents;
 
 import com.github.rinde.rinsim.core.TickListener;
 import com.github.rinde.rinsim.core.TimeLapse;

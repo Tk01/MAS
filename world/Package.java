@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import Messages.DefAssignmentMessageContent;
 import Messages.DefBidMessageContent;
 import Messages.DeliverPackageMessageContent;
+import Messages.PackageReplyMessage;
 import Messages.MessageContent;
 import Messages.MessageTypes;
 import WorldModel.Robot;
@@ -107,46 +108,87 @@ import com.google.common.collect.ImmutableList;
 					time.consume(timeLastAction+delay-1-time.getStartTime());
 				}
 			}
+			
+			
+			
+			processMessages(time);
+			
+			
+		}
+		
+		// accept bids and select the best
+		private void processMessages(TimeLapse time){
 			ImmutableList<Message> list;
-			// accept bids and select the best
 			if(stage ==1 && time.getTimeLeft()>0){
 				if(time.getEndTime()>=timeLastAction+delay){
 					list = this.translator.get().getUnreadMessages();
-					ArrayList<Message> DefBidList = new ArrayList<Message>();
-					double bid = Double.MAX_VALUE;
-					CommUser bestUser = null;
-					for(Message m:list){
-						if(((MessageContent) m.getContents()).getType() == MessageTypes.DefBidMessage){
-							DefBidList.add( m);
-							if(((DefBidMessageContent) m.getContents()).getBid()<bid){
-								bid = ((DefBidMessageContent) m.getContents()).getBid();
-								bestUser = m.getSender();
-							}
-						}
-					}
-					for(Message m:DefBidList){
-						if(m.getSender()==bestUser){
-							this.translator.get().send(new DefAssignmentMessageContent(bestUser, bid, true , mycontractId), m.getSender());
-						}else{
-							this.translator.get().send(new DefAssignmentMessageContent(bestUser, bid, false , mycontractId), m.getSender());
-						}
-					}
-					if(!DefBidList.isEmpty()){
-						stage++;
-					}
-					else{
-						stage =0;
-						}
-					timeLastAction=time.getStartTime();
-					if(time.getEndTime()<timeLastAction+delay){
-						time.consumeAll();
-					}else{
-						time.consume(timeLastAction+delay-1-time.getStartTime());
-					}
+					
+					processBidMessages(list, time);
+					
+					processReplyMessages(list, time);
+					
 				}else{
 					
 					time.consumeAll();
 				}
+			}
+			
+		}
+		
+		private void processReplyMessages(ImmutableList<Message> list, TimeLapse time){
+			Message replyMessage = null;
+			for(Message m:list){
+				if(((MessageContent) m.getContents()).getType() == MessageTypes.PackageReplyMessage){
+					replyMessage = m;
+					
+				}
+			}
+			
+			if(replyMessage != null){
+				if(((PackageReplyMessage) replyMessage.getContents()).isAccepted()){
+					stage++;
+					
+				}
+				else{
+					stage =0;
+				}
+			}
+			
+			
+			
+		}
+		
+		private void processBidMessages(ImmutableList<Message> list, TimeLapse time){
+			ArrayList<Message> DefBidList = new ArrayList<Message>();
+			double bid = Double.MAX_VALUE;
+			CommUser bestUser = null;
+			for(Message m:list){
+				if(((MessageContent) m.getContents()).getType() == MessageTypes.DefBidMessage){
+					DefBidList.add( m);
+					if(((DefBidMessageContent) m.getContents()).getBid()<bid){
+						bid = ((DefBidMessageContent) m.getContents()).getBid();
+						bestUser = m.getSender();
+					}
+				}
+			}
+			for(Message m:DefBidList){
+				if(m.getSender()==bestUser){
+					this.translator.get().send(new DefAssignmentMessageContent(bestUser, bid, true , mycontractId), m.getSender());
+				}else{
+					this.translator.get().send(new DefAssignmentMessageContent(bestUser, bid, false , mycontractId), m.getSender());
+				}
+			}
+			if(!DefBidList.isEmpty()){
+				stage++;
+			}
+			else{
+				stage =0;
+				}
+			timeLastAction=time.getStartTime();
+			if(time.getEndTime()<timeLastAction+delay){
+				time.consumeAll();
+			}else{
+				time.consume(timeLastAction+delay-1-time.getStartTime());
 			}
 		}
 

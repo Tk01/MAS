@@ -9,6 +9,7 @@ import Messages.MessageContent;
 import Messages.MessageTypes;
 import Messages.NegotiationBidMessageContent;
 import Messages.NegotiationReplyMessageContent;
+import Messages.PackageReplyMessage;
 import Messages.StartNegotiationMessageContent;
 import WorldModel.ChargeGoal;
 import WorldModel.Goal;
@@ -61,6 +62,10 @@ public class Communication {
 	public void sendDefBidMessage(CommUser sender, double bid) {
 		sendMessage(new DefBidMessageContent(sender, bid));
 
+	}
+	
+	public void sendPackageReplyMessage(CommUser sender, boolean accepted){
+		sendMessage(new PackageReplyMessage(sender, accepted));
 	}
 
 

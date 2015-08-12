@@ -39,6 +39,10 @@ public class WorldModel {
 	private ArrayList<TimeWindow> windows;
 	
 	private Goal currentGoal;
+	
+	private ArrayList<Bid> bids;
+	
+	private ArrayList<Bid> wins;
 
 
 	public WorldModel(Point p,ChargingStation c, double s,long BatterySize, long chargeRate, boolean reserveChargingStation, Robot robot, Optional<RoadModel> roadModel, Optional<PDPModel> pdpModel ) {
@@ -53,11 +57,38 @@ public class WorldModel {
 		this.roadModel=(Optional<RoadModel>) roadModel;
 		this.pdpModel=(Optional<PDPModel>) pdpModel;
 		currentPlan = new Plan(new ArrayList<Goal>(), this);
+		bids = new ArrayList<Bid>();
+		wins = new ArrayList<Bid>();
 		
 		 ArrayList<TimeWindow> windows =  new ArrayList<TimeWindow>();
 	     windows.add(TimeWindow.ALWAYS);
 	     setWindows(windows);
 	}
+	
+	public boolean canBid(){
+		if(wins.isEmpty()){
+			return true;
+		}
+		else return false;
+	}
+	
+	public ArrayList<Bid> getBids(){
+		return bids;
+	}
+	
+	public void addBid(Bid bid){
+		bids.add(bid);
+	}
+	
+	public ArrayList<Bid> getWins(){
+		return bids;
+	}
+	
+	public void addWin(Bid bid){
+		bids.add(bid);
+	}
+	
+	
 	public ArrayList<Point> getRobots() {
 
 		return Robots;
