@@ -122,7 +122,10 @@ public class Plan {
 
 			newPlan.add(copyGoals.remove(0));
 		}
-		ArrayList<Goal> result = GenerateBestPlan(copyGoals,newPlan,(ChargeGoal) charged,null,windows,temppos,tempbat,startTime, model);
+		int i= windows.indexOf(charged);
+		addToTimeWindow(windows,charged);
+		ArrayList<Goal> result = GenerateBestPlan(copyGoals,newPlan,null,windows,temppos,tempbat,startTime, model);
+		removeFromTimeWindow(windows,charged);
 		return new Plan(result,model);
 	}
 
@@ -252,9 +255,8 @@ public class Plan {
 	 */
 	@SuppressWarnings("unchecked") 
 	public static ArrayList<Goal> GenerateBestPlan(ArrayList<Goal> copyGoals,
-			ArrayList<Goal> newPlan, ChargeGoal charged, ArrayList<Goal> bestplan, ArrayList<TimeWindow> windows, Point temppos, long tempbat, long startTime, WorldModel model) {
+			ArrayList<Goal> newPlan, ArrayList<Goal> bestplan, ArrayList<TimeWindow> windows, Point temppos, long tempbat, long startTime, WorldModel model) {
 		if(copyGoals.size() ==0){
-			if(charged !=null)bestplan = addCharging(newPlan, charged.clone(), bestplan,windows,  temppos, tempbat,startTime, model);
 			bestplan = addCharging(newPlan, null, bestplan,windows,  temppos, tempbat,startTime, model);
 			return bestplan;
 		}
@@ -268,7 +270,7 @@ public class Plan {
 
 				cnewPlan.add(ccopyGoals.remove(i));
 
-				bestplan=GenerateBestPlan(ccopyGoals,cnewPlan,charged,bestplan, windows,  temppos, tempbat,startTime, model);
+				bestplan=GenerateBestPlan(ccopyGoals,cnewPlan,bestplan, windows,  temppos, tempbat,startTime, model);
 			}
 			return bestplan;
 		}

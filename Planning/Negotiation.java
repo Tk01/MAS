@@ -3,7 +3,13 @@ package Planning;
 import java.util.ArrayList;
 
 import world.InformationHandler;
+import Messages.MessageContent;
+import Messages.MessageTypes;
+import Messages.NegotiationBidMessageContent;
 import Messages.ReturnChargestationMessageContents;
+import WorldModel.ChargeGoal;
+import WorldModel.JPlan;
+import WorldModel.WorldModel;
 
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.Message;
@@ -11,6 +17,38 @@ import com.github.rinde.rinsim.geom.Point;
 
 
 public class Negotiation {
+	
+	public void processNegotiationbid(){
+
+		
+		for(int i =0;i< model.messages().size();i++){
+			Message message = model.messages().get(i);
+			MessageContent messageContent = (MessageContent) message.getContents();
+			MessageTypes type = messageContent.getType();
+			if(type == MessageTypes.NegotiationBidMessage){
+				NegotiationBidMessageContent messageContent1 = (NegotiationBidMessageContent) message.getContents();
+				JPlan receivedJPlan = messageContent1.getJointPlan();
+				if(jplan != null && model.getCurrentPlan().value(receivedJPlan.getOtherPlan(),timeLastAction+delay)< model.getCurrentPlan().value(this.jplan.getOtherPlan(), timeLastAction+delay)){
+					//if the received joint plan is better then the current best received joint plan, store the owner of the current plan and set the new best joint plan with the given joint plan
+					if(jplan.getJPlanAgent()!=null)losers.add(jplan.getJPlanAgent());
+					jplan = receivedJPlan;
+					
+				}
+				else{
+					losers.add(receivedJPlan.getJPlanAgent());
+				}
+				this.model.messages().remove(message);
+				i--;
+			}			
+		}
+		
+
+
+		}
+	
+//	-	finishNegotiation: will check if an ongoing shortened negotiation is ended 
+//	-	answerNegotiation: this will process any bids from other AGVs on an initiated shortened negotiation
+//	-	negotiationRequest
 
 	private PBC pbc;
 
