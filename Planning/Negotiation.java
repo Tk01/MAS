@@ -132,7 +132,24 @@ public class Negotiation {
 				}
 			}
 		}
-//	-	negotiationRequest
+		public void negotiationRequest(){
+			timeLastAction = model.getTime().getTime();
+			//calculate the state the robot will be when it's finished negotiating
+			Plan negotiationPlan = new Plan(model.getCurrentPlan().calculateGoals(timeLastAction+delay+negExtend),model);
+			long timeEndNegotiation = timeLastAction+delay;
+			Point pos = model.getCurrentPlan().calculatePosition(timeEndNegotiation);
+			long battery = model.getCurrentPlan().calculateBattery(timeEndNegotiation);
+			chargedList=new ArrayList<ChargeGoal>();
+			losers =new ArrayList<CommUser>();
+			jplan = new JPlan();
+			jplan.setOwnPlan(new ArrayList<Goal>());
+			jplan.setOtherPlan( negotiationPlan.getPlan());
+			//calculate the minimum value a plan has to have before you accept it
+			double minValue = model.getCurrentPlan().value(model.getCurrentPlan().getPlan(), timeEndNegotiation);
+			//send the negotiation start message
+			communication.sendStartNegotiationMessage(pos, negotiationPlan.getPlan(),battery, timeLastAction+delay, minValue);
+
+		}
 // -    handle chargingReservationRequest
 
 	private PBC pbc;
@@ -461,6 +478,13 @@ public class Negotiation {
 			JPlan jplan = new JPlan();
 			jplan.setOwnPlan(bestOwn);
 			jplan.setOtherPlan(bestOther);
+			ArrayList<ChargeGoal> toBeDeleted = new ArrayList<ChargeGoal>();
+			for(Goal g : model.getCurrentPlan().getPlan()){
+				if(g.type() == GoalTypes.Charging){
+					toBeDeleted.add((ChargeGoal) g);
+				}
+			}
+			jplan.addTobeDeleted(toBeDeleted);
 			return jplan;
 		}else{
 			//remove the first two goals from allgoals and see which agent can make best use of them.

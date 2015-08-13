@@ -3,6 +3,7 @@ package WorldModel;
 import java.util.ArrayList;
 
 import com.github.rinde.rinsim.core.model.comm.CommUser;
+import com.github.rinde.rinsim.util.TimeWindow;
 
 public class JPlan {
 	
@@ -92,6 +93,10 @@ public class JPlan {
 	public ArrayList<ChargeGoal> ToBeDeleted() {
 		// TODO Auto-generated method stub
 		return ToBeDeleted;
+	}
+	public void addTobeDeleted(ArrayList<ChargeGoal> toBeDeleted2) {
+		ToBeDeleted=toBeDeleted2;
+		
 	}
 	
 	
