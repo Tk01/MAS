@@ -123,5 +123,10 @@ public class Communication {
 	        }
 	        sendNegotiationBidMessage(jointPlan, sender);
 	    }
+
+
+	public void sendNegotiationReplyMessage(CommUser jPlanAgent, boolean b) {
+		sendMessage(new NegotiationReplyMessageContent(jPlanAgent, b));
+	}
 	
 }

@@ -15,6 +15,7 @@ public class JPlan {
 	int negotiationID;
 	
 	CommUser JPlanAgent;
+	private ArrayList<ChargeGoal> ToBeDeleted;
 	
 	public JPlan(){
 		
@@ -23,11 +24,12 @@ public class JPlan {
 	 * The jointplan consists of 2 sets of goals which will be used for negotiation
 	 * @param ownPlan
 	 * @param otherPlan
+	 * @param ToBeDeleted 
 	 */
-	public JPlan(ArrayList<Goal> ownPlan, ArrayList<Goal> otherPlan){
+	public JPlan(ArrayList<Goal> ownPlan, ArrayList<Goal> otherPlan, ArrayList<ChargeGoal> ToBeDeleted){
 		this.ownPlan = ownPlan;
 		this.otherPlan = otherPlan;
-		
+		this.ToBeDeleted = ToBeDeleted;
 	}
 
 	
@@ -86,6 +88,10 @@ public class JPlan {
 
 	public void setJPlanAgent(CommUser jPlanAgent) {
 		JPlanAgent = jPlanAgent;
+	}
+	public ArrayList<ChargeGoal> ToBeDeleted() {
+		// TODO Auto-generated method stub
+		return ToBeDeleted;
 	}
 	
 	
