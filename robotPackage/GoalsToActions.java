@@ -2,7 +2,9 @@ package robotPackage;
 
 import java.util.ArrayList;
 
+import world.Robot;
 import worldInterface.Actions;
+import worldInterface.Communication;
 import Messages.ChargeMessageContent;
 import Messages.DefBidMessageContent;
 import Messages.NegotiationBidMessageContent;
@@ -14,7 +16,6 @@ import WorldModel.Goal;
 import WorldModel.GoalTypes;
 import WorldModel.JPlan;
 import WorldModel.Plan;
-import WorldModel.Robot;
 import WorldModel.WorldModel;
 
 import com.github.rinde.rinsim.core.model.comm.CommUser;
@@ -26,6 +27,8 @@ public class GoalsToActions {
 	private boolean done;
 	private WorldModel model;
 	private Actions actions;
+	
+	private Communication comm;
 	//private Robot thisRobot;
 	//private ContractNet pbc ;
 
@@ -39,8 +42,9 @@ public class GoalsToActions {
 	 * @param robot: the robot for which the BBC is set up
 	 * @param delay: the delay for the communication comopnent
 	 */
-	public GoalsToActions( WorldModel model, Actions actions) {
+	public GoalsToActions( WorldModel model, Actions actions, Communication comm) {
 		this.model = model;
+		this.comm = comm;
 	}
 		
 
@@ -60,7 +64,7 @@ public class GoalsToActions {
 		//if you have no goals and if you would go the charging station, you would have less then 90% of your battery on your arrival ask the pbc to plan a charging goal
 		//TO SEE WHERE THIS NEEDS to be done as this is planning and should be done in planning module
 		if(goal ==null && model.battery()- model.calcTime(model.coordinates(),model.getChargingStation().getPosition().get()) < model.getMaxBattery()*0.90){
-			pbc.placeCharge(); //This should be done in the planning
+			placeCharge(); //This should be done in the planning
 		}
 		
 
@@ -189,6 +193,35 @@ public class GoalsToActions {
 		}
 		return false;
 	}
+	
+	
+	 public void placeCharge() {
+	        if (!model.isReserveChargingStation()) {
+	            model.setCurrentGoal((Goal)new ChargeGoal((Point)this.model.getChargingStation().getPosition().get(), new TimeWindow(0L, Long.MAX_VALUE), false));
+	            return;
+	        }
+	        
+	            for (final TimeWindow w : model.getWindows()) {
+	                final long start = this.model.getTime().getTime() + this.model.calcTime(this.model.coordinates(), (Point)this.model.getChargingStation().getPosition().get()) + 2000L;
+	                if (w.isIn(start)) {
+	                    double batterydiff = this.model.getMaxBattery() - 2000L - this.model.battery() - this.model.calcTime(this.model.coordinates(), (Point)this.model.getChargingStation().getPosition().get());
+	                    if (batterydiff / 5.0 == (long)(batterydiff / 5.0)) {
+	                        batterydiff = (long)(batterydiff / 5.0);
+	                    }
+	                    else {
+	                        batterydiff = (long)(batterydiff / 5.0) + 1L;
+	                    }
+	                    final long end = (long)Math.min(start + batterydiff, w.end);
+	                    final Goal goal = (Goal)new ChargeGoal((Point)this.model.getChargingStation().getPosition().get(), new TimeWindow(start, end), false);
+	                    final ArrayList<Goal> list = new ArrayList<Goal>();
+	                    list.add(goal);
+	                    model.setChargingGoal(true);
+	                    
+	                    comm.sendReserveMessage(goal.getStartWindow(), goal.getEndWindow());
+	                }
+	            }
+	        
+	    }
 
 	
 

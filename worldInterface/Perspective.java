@@ -2,7 +2,7 @@ package worldInterface;
 
 import java.util.ArrayList;
 
-import WorldModel.Robot;
+import world.Robot;
 import WorldModel.WorldModel;
 
 import com.github.rinde.rinsim.core.TimeLapse;

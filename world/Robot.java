@@ -1,12 +1,14 @@
-package WorldModel;
+package world;
 
 import robotPackage.FlowControl;
-import world.ChargingStation;
 
 
 
 
 
+
+import WorldModel.Goal;
+import WorldModel.WorldModel;
 
 import com.github.rinde.rinsim.core.TimeLapse;
 import com.github.rinde.rinsim.core.model.comm.CommDeviceBuilder;
@@ -43,7 +45,7 @@ public class Robot extends Vehicle implements CommUser{
 
 	@Override
 	public void initRoadPDP(RoadModel arg0, PDPModel arg1) {
-		this.inter.initRoadPDP( arg0,  arg1);
+		model.initRoadPDP( arg0,  arg1);
 	}
 	@Override
 	public Optional<Point> getPosition() {
@@ -56,7 +58,7 @@ public class Robot extends Vehicle implements CommUser{
 	}
 	
 	public Goal getGoal() {
-		return flow.getBBC().getGoal();
+		return model.getCurrentGoal();
 	}
 	public long getBattery() {
 		return model.battery();

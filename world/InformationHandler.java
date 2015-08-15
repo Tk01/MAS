@@ -8,8 +8,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 
-import WorldModel.Robot;
-
 public class InformationHandler {
 	private static InformationHandler handler;
 	private int negotiation =0;

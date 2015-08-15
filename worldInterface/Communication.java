@@ -78,16 +78,7 @@ public class Communication {
 		sendMessage(new ChargeMessageContent(this.model.getChargingStation(), startWindow, endWindow, "reserve"));	
 	}
 
-	/**
-	 * Send a bid for a negotiation
-	 * @param jointPlan: the plans that are in the bid
-	 * @param sender: the sender of the request
-	 */
-	public void sendNegotiationBidMessage(JPlan jointPlan, CommUser sender) {
-		jointPlan.setJPlanAgent(model.getThisRobot());
-		sendMessage(new NegotiationBidMessageContent(sender,jointPlan));
-
-	}
+	
 
 	/**
 	 * Set up a request to start a negotiation

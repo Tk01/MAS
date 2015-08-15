@@ -17,13 +17,13 @@ import java.util.ArrayList;
 
 
 
+
 import Messages.DefAssignmentMessageContent;
 import Messages.DefBidMessageContent;
 import Messages.DeliverPackageMessageContent;
 import Messages.PackageReplyMessage;
 import Messages.MessageContent;
 import Messages.MessageTypes;
-import WorldModel.Robot;
 
 import com.github.rinde.rinsim.core.TickListener;
 import com.github.rinde.rinsim.core.TimeLapse;

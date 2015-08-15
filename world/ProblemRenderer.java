@@ -8,7 +8,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 
 import WorldModel.Goal;
-import WorldModel.Robot;
 
 import com.github.rinde.rinsim.core.model.ModelProvider;
 import com.github.rinde.rinsim.core.model.pdp.DefaultPDPModel;

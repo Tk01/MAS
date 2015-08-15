@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import world.ChargingStation;
 import world.Package;
+import world.Robot;
 
 import com.github.rinde.rinsim.core.TimeLapse;
 import com.github.rinde.rinsim.core.model.comm.CommUser;
@@ -35,14 +36,15 @@ public class WorldModel {
 	private Optional<RoadModel> roadModel;
 	private Optional<PDPModel> pdpModel;
 	private Plan currentPlan;
-	
 	private ArrayList<TimeWindow> windows;
-	
 	private Goal currentGoal;
-	
 	private ArrayList<Bid> bids;
-	
 	private ArrayList<Bid> wins;
+	private boolean negotiationOngoing;
+	
+	private boolean chargingGoal;
+	
+	private boolean chargeReservationNeeded = true;
 
 
 	public WorldModel(Point p,ChargingStation c, double s,long BatterySize, long chargeRate, boolean reserveChargingStation, Robot robot, Optional<RoadModel> roadModel, Optional<PDPModel> pdpModel ) {
@@ -65,6 +67,32 @@ public class WorldModel {
 	     setWindows(windows);
 	}
 	
+	
+	
+	public boolean isChargeReservationNeeded() {
+		return chargeReservationNeeded;
+	}
+
+
+
+	public boolean isNegotiationOngoing() {
+		return negotiationOngoing;
+	}
+
+
+
+	public void setCurrentPlan(Plan currentPlan) {
+		this.currentPlan = currentPlan;
+	}
+
+
+
+	public void setNegotiationOngoing(boolean negotiationOngoing) {
+		this.negotiationOngoing = negotiationOngoing;
+	}
+
+
+
 	public boolean canBid(){
 		if(wins.isEmpty()){
 			return true;
@@ -96,8 +124,22 @@ public class WorldModel {
 	public void setRobots(ArrayList<Point> robots) {
 		Robots = robots;
 	}
+	
+	
 
 	
+
+	public boolean isChargingGoal() {
+		return chargingGoal;
+	}
+
+
+
+	public void setChargingGoal(boolean chargingGoal) {
+		this.chargingGoal = chargingGoal;
+	}
+
+
 
 	public ArrayList<TimeWindow> getWindows() {
 		return windows;
@@ -198,5 +240,12 @@ public class WorldModel {
 	}
 	public Robot getThisRobot() {
 		return robot;
+	}
+	
+	public void initRoadPDP(RoadModel arg0, PDPModel arg1) {
+		roadModel = Optional.of(arg0);
+		pdpModel = Optional.of(arg1);
+		setRoadUnits(new RoadUnits(arg0.getDistanceUnit(),arg0.getSpeedUnit()));
+
 	}
 }

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 
 
 
+
 import robotPackage.*;
 
 import javax.annotation.Nullable;
@@ -33,7 +34,6 @@ import javax.measure.quantity.Duration;
 import javax.measure.unit.Unit;
 
 import WorldModel.Plan;
-import WorldModel.Robot;
 
 import com.github.rinde.rinsim.core.Simulator;
 import com.github.rinde.rinsim.core.TickListener;
