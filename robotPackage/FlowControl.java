@@ -108,7 +108,7 @@ public class FlowControl {
 			//If reservation for CNET is succesfull the currentplan is adapted with the new won package
 			//If then the negotiation is after the CNET the negotiation is started.
 			if(reservationSuccess && !negotiationDuringCNET){
-				negotiation.startNegotiation();
+				negotiation.negotiationRequest();
 				return;
 				
 			}
@@ -120,7 +120,7 @@ public class FlowControl {
 		//If negotiation is ongoing bids for the negotiation can be expected
 		if(model.isNegotiationOngoing()){
 			//Bids are processed
-			negotiation.processNegotiationBid();
+			negotiation.processNegotiationbid();
 			//Check is done if the negotiation is finished. If finished it should return the winning bid in case of negotiation during CNET
 			//In case no negotiation was succesful it should still return the winning bid so if a bid id returned it is clear negotiation during CNET has happened and finished
 			//If not finished yet it is returned null
@@ -145,7 +145,7 @@ public class FlowControl {
 		
 		// If all bids have a reply from the respective packages and a win is available and negotiation is done during CNET, the negotiation is started
 		if(model.getWins().size()>0 && model.getBids().size()==0 && negotiationDuringCNET){
-			negotiation.startNegotiation();
+			negotiation.negotiationRequest();
 		}
 		//if no negotiation during the CNET the CNET is ended when a win is available and no bids are left
 		else if(model.getWins().size()>0 && model.getBids().size()==0){
