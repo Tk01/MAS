@@ -33,7 +33,8 @@ public class ContractNet
         this.comm = comm;
     }
     
-    public boolean reserveMessages(final ArrayList<Message> messages) {
+    public boolean reserveMessages() {
+    	ArrayList<Message> messages = model.messages();
     	for(Message message:messages){
 			MessageContent content = (MessageContent) message.getContents();
 			if(content.getType() == MessageTypes.ReturnChargestationMessage){
@@ -160,7 +161,7 @@ public class ContractNet
     
     	ArrayList<Bid> wins = model.getWins();
     
-    	ArrayList<Goal> bidGoals = bidPlan.getPlan();
+    	ArrayList<Goal> bidGoals = plan.getPlan();
 		
 		
 		for(int i =0; i<bidGoals.size();i++){
@@ -190,8 +191,8 @@ public class ContractNet
     }
     
     //Done
-    public void packageWinLoss(ArrayList<Message> messages) {
-    	
+    public void packageWinLoss() {
+    	ArrayList<Message> messages = model.messages();
     	for(int i= 0;i<messages.size();i++){
 			Message message = messages.get(i);
 			MessageContent content = (MessageContent) message.getContents();
@@ -214,12 +215,13 @@ public class ContractNet
 			}
     	}
     	
-    	removeWinLossMessages(messages);
+    	removeWinLossMessages();
     	
     	
     }
     
-    private void removeWinLossMessages(ArrayList<Message> messages){
+    private void removeWinLossMessages(){
+    	ArrayList<Message> messages = model.messages();
     	for(int i= 0;i<messages.size();i++){
 			Message message = messages.get(i);
 			MessageContent content = (MessageContent) message.getContents();
@@ -247,7 +249,8 @@ public class ContractNet
     }
     
     //Done
-    public void packageRequests(ArrayList<Message> messages) {
+    public void packageRequests() {
+    	ArrayList<Message> messages = model.messages();
     	if(model.canBid()){
     	
 			
@@ -262,10 +265,10 @@ public class ContractNet
 				if(content.getType() == MessageTypes.DeliverMessage){
 					DeliverPackageMessageContent callForBidContent = (DeliverPackageMessageContent) content;
 					pack = callForBidContent.getPackageToDel();
-					Plan bidPlan = null;
+					
 					Goal pickupGoal = new Goal(pack.getStart(), GoalTypes.Pickup, pack.getPickupTimeWindow());
 					Goal dropGoal = new Goal(pack.getEnd(), GoalTypes.Drop, pack.getDeliveryTimeWindow());
-					bidPlan = model.getCurrentPlan().isPossiblePlan(pickupGoal,dropGoal,model.getWindows(),callForBidContent.getEndTime()+1000);
+					Plan bidPlan = model.getCurrentPlan().isPossiblePlan(pickupGoal,dropGoal,model.getWindows(),callForBidContent.getEndTime()+1000);
 					if(bidPlan !=null && bidPlan.getPlan() !=null){
 						
 						double bidValue = bidPlan.value(bidPlan.getPlan(),callForBidContent.getEndTime()+1000);

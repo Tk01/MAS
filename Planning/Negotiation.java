@@ -7,8 +7,10 @@ import worldInterface.Communication;
 import Messages.MessageContent;
 import Messages.MessageTypes;
 import Messages.NegotiationBidMessageContent;
+import Messages.NegotiationReplyMessageContent;
 import Messages.ReturnChargestationMessageContents;
 import Messages.StartNegotiationMessageContent;
+import WorldModel.Bid;
 import WorldModel.ChargeGoal;
 import WorldModel.Goal;
 import WorldModel.GoalTypes;
@@ -26,7 +28,24 @@ public class Negotiation {
 	
 	private Communication communication;
 	private long negExtend;
-
+	//NIEUWE METHODE TODO
+	public void processNegotiationReply(){
+		for(int i =0;i< model.messages().size();i++){
+			Message message = model.messages().get(i);
+			MessageContent messageContent = (MessageContent) message.getContents();
+			MessageTypes type = messageContent.getType();
+			if(type == MessageTypes.NegotiationReplyMessage){
+				if(((NegotiationReplyMessageContent )messageContent).isAccepted()){
+					this.setNewJointPlan(jplan, false);
+				}
+				model.setNegotiationOngoing(false);
+				jplan =null;
+				timeLastAction =null;
+				this.model.messages().remove(message);
+				i--;
+			}
+		}
+	}
 	public void processNegotiationbid(){
 		
 		
@@ -55,7 +74,7 @@ public class Negotiation {
 
 		}
 	
-		public void finishNegotiation(){
+		public Bid finishNegotiation(){
 			if(timeLastAction!= null && timeLastAction+delay<=model.getTime().getStartTime()){
 				if( jplan.getJPlanAgent()!= null){
 					ArrayList<TimeWindow> toBeDeleted = new ArrayList<TimeWindow>();
@@ -84,7 +103,10 @@ public class Negotiation {
 					}
 					else{
 						this.setNewJointPlan(jplan,true);
-						communication.sendNegotiationReplyMessage(jplan.getJPlanAgent(),true);
+						communication.sendNegotiationReplyMessage(jplan.getJPlanAgent(),false);
+						jplan =null;
+						timeLastAction =null;
+						model.setNegotiationOngoing(false);
 					}
 					
 				}
@@ -95,6 +117,7 @@ public class Negotiation {
 				losers =null;
 				jplan = null;
 			}
+			return null;
 		}
 		public void answerNegotiation(){
 			for(int i =0;i< model.messages().size();i++){
@@ -104,7 +127,7 @@ public class Negotiation {
 				if(type == MessageTypes.StartNegotiationMessage){
 					StartNegotiationMessageContent messageContent1 = (StartNegotiationMessageContent) message.getContents();
 					
-					if(model.getCurrentPlan().getPlan().size()> 3 && !(bidding || startedNegotiating)){
+					if(model.getCurrentPlan().getPlan().size()> 3){
 						long lastTime = messageContent1.getEndTime();
 						long currentTime = model.getTime().getTime();
 						if(currentTime<lastTime){
@@ -114,10 +137,10 @@ public class Negotiation {
 							long otherBat = messageContent1.getBattery();
 							long endTime = messageContent1.getEndTime();
 							double minOtherValue = messageContent1.getMinValue();
-							JPlan jointPlan = bestJPlan(otherNegotiationPlan, otherPos, otherBat, endTime, minOtherValue);
+							JPlan jointPlan = bestJPlan(messageContent1.getWins(),otherNegotiationPlan, otherPos, otherBat, endTime, minOtherValue);
 							if(jointPlan!=null && jointPlan.getOtherPlan()!= null && jointPlan.getOwnPlan()!= null ){
 								//if there exist a better plausible jointplan send a negotiationbidmessage
-								bidding = true;
+								model.setNegotiationOngoing(true);
 								timeLastAction = lastTime - delay; 
 								jplan = jointPlan;
 								jplan.setJPlanAgent(model.getThisRobot());
@@ -132,6 +155,8 @@ public class Negotiation {
 				}
 			}
 		}
+		
+
 		public void negotiationRequest(){
 			timeLastAction = model.getTime().getTime();
 			//calculate the state the robot will be when it's finished negotiating
@@ -139,20 +164,51 @@ public class Negotiation {
 			long timeEndNegotiation = timeLastAction+delay;
 			Point pos = model.getCurrentPlan().calculatePosition(timeEndNegotiation);
 			long battery = model.getCurrentPlan().calculateBattery(timeEndNegotiation);
-			chargedList=new ArrayList<ChargeGoal>();
+			
 			losers =new ArrayList<CommUser>();
 			jplan = new JPlan();
 			jplan.setOwnPlan(new ArrayList<Goal>());
 			jplan.setOtherPlan( negotiationPlan.getPlan());
+			model.setNegotiationOngoing(true);
 			//calculate the minimum value a plan has to have before you accept it
 			double minValue = model.getCurrentPlan().value(model.getCurrentPlan().getPlan(), timeEndNegotiation);
 			//send the negotiation start message
-			communication.sendStartNegotiationMessage(pos, negotiationPlan.getPlan(),battery, timeLastAction+delay, minValue);
+			communication.sendStartNegotiationMessage(pos,model.getWins(), negotiationPlan.getPlan(),battery, timeLastAction+delay, minValue);
 
 		}
-// -    handle chargingReservationRequest
+		public void reserveMessages(){
+			for(int i =0;i< model.messages().size();i++){
+				Message message = model.messages().get(i);
+				MessageContent messageContent = (MessageContent) message.getContents();
+				MessageTypes type = messageContent.getType();
+				if(type == MessageTypes.ReturnChargestationMessage){
+					if(((ReturnChargestationMessageContents) messageContent).hasSucceeded()){
+						this.setNewJointPlan(jplan,true);
+						communication.sendNegotiationReplyMessage(jplan.getJPlanAgent(),true);
+					}else{
+						communication.sendNegotiationReplyMessage(jplan.getJPlanAgent(),false);
+					}
+					jplan =null;
+					timeLastAction =null;
+					model.setNegotiationOngoing(false);
+					communication.sendNegotiationReplyMessage(jplan.getJPlanAgent(),true);	
+					this.model.messages().remove(message);
+					i--;
+				}
+				
+			}
+		}
 
-	private PBC pbc;
+
+	private void setNewJointPlan(JPlan jplan2, boolean b) {
+			if(b){
+				model.setCurrentPlan(new Plan(jplan2.getOtherPlan(), model));
+			}else{
+				model.setCurrentPlan(new Plan(jplan2.getOwnPlan(), model));
+			}
+			
+		}
+
 
 	private long delay;
 
@@ -161,219 +217,10 @@ public class Negotiation {
 	private JPlan jplan;
 
 
-	private boolean bidding = false;
-	private boolean startedNegotiating = false;
 
 	private ArrayList<CommUser> losers;
 	private WorldModel model;
 
-
-	private ArrayList<ChargeGoal> chargedList;
-
-	
-	/**
-	 * The constructor of the CC
-	 * @param pbc: The link to the PBC
-	 * @param delay: the delay is the time the negotiation will wait for bids of other agents
-	 * @param model: the worldmodel
-	 */
-
-	public CC(PBC pbc, long delay, WorldModel model){
-		this.pbc = pbc;
-		this.delay=delay;
-		this.model = model;
-
-	}
-
-	/**
-	 * start negotiating
-	 */
-	public void startNegotiation(){
-		timeLastAction = model.getTime().getTime();
-		startedNegotiating = true;
-		//calculate the state the robot will be when it's finished negotiating
-		Plan negotiationPlan = new Plan(pbc.getCurrentPlan().calculateGoals(timeLastAction+delay+negExtend),model);
-		long timeEndNegotiation = timeLastAction+delay;
-		Point pos = pbc.getCurrentPlan().calculatePosition(timeEndNegotiation);
-		long battery = pbc.getCurrentPlan().calculateBattery(timeEndNegotiation);
-		chargedList=new ArrayList<ChargeGoal>();
-		losers =new ArrayList<CommUser>();
-		jplan = new JPlan();
-		jplan.setOwnPlan(new ArrayList<Goal>());
-		jplan.setOtherPlan( negotiationPlan.getPlan());
-		//calculate the minimum value a plan has to have before you accept it
-		double minValue = pbc.getCurrentPlan().value(pbc.getCurrentPlan().getPlan(), timeEndNegotiation);
-		//send the negotiation start message
-		pbc.sendStartNegotiationMessage(pos, negotiationPlan.getPlan(),battery, timeLastAction+delay, minValue);
-
-
-
-	}
-	/**
-	 * process a message
-	 */
-	public void handleMessage(Message message){
-		
-
-
-		MessageContent messageContent = (MessageContent) message.getContents();
-		MessageTypes type = messageContent.getType();
-
-
-		if(type ==MessageTypes.StartNegotiationMessage ){
-			ProcessStartNegotiation(message);
-
-		}
-		if(type == MessageTypes.NegotiationBidMessage){
-			processNegotiationBid(message);		
-		}
-		if(type == MessageTypes.NegotiationReplyMessage){
-			processNegotiationReply(message);
-
-
-		}
-
-
-
-	}
-
-
-	
-	
-	/**
-	 * If the drone is bidding and reservation of the charging station is needed, the CC needs to process the reservation message.
-	 * If the reservation is seuccesfull, the drone can send a bid to the negotiation initiator.
-	 * @param chargeContent: the content of the reservation message
-	 */
-	public void chargeMessage(ReturnChargestationMessageContents chargeContent){
-		pbc.setWindows(chargeContent.getFreeSlots());
-		if(chargeContent.hasSucceeded() && timeLastAction+delay> model.getTime().getEndTime()){
-			//check joint plan for the first unreserved reservation and set it as reserved and retry to send a new negotiationbid
-			ArrayList<Goal> ownGoals = jplan.getOwnPlan();
-			for(int i = 0; i<ownGoals.size();i++){
-				if(ownGoals.get(i).type() == GoalTypes.Charging && !((ChargeGoal)ownGoals.get(i)).isReserved() ){
-					((ChargeGoal)ownGoals.get(i)).setReserved(true);
-					chargedList.add((ChargeGoal)ownGoals.get(i));
-					pbc.sendNegotiationBidMessage(jplan, jplan.JPlanAgent);
-					return;
-
-				}
-			}
-			ArrayList<Goal> otherGoals = jplan.getOtherPlan();
-			for(int i = 0; i<otherGoals.size();i++){
-
-				if(otherGoals.get(i).type() == GoalTypes.Charging && !((ChargeGoal)otherGoals.get(i)).isReserved() ){
-					((ChargeGoal)otherGoals.get(i)).setReserved(true);
-					chargedList.add((ChargeGoal)ownGoals.get(i));
-					pbc.sendNegotiationBidMessage(jplan, jplan.JPlanAgent);
-					return;
-
-				}
-			}
-		}
-		else{
-			//if the window you reserved for charging as taken end your bidding.
-			bidding= false;
-			jplan = null;
-		}
-	}
-
-
-	/**
-	 * This method will process the message to start a negotiation.
-	 * It checks if there are packages to negotiate with and if no other negotiation is ongoing.
-	 * If this is ok he will check if there is a plan combination which is better for both which the drone can use for negotiation
-	 * @param message: the message from the initiator of the negotiation
-	 */
-	private void ProcessStartNegotiation(Message message){
-		StartNegotiationMessageContent messageContent = (StartNegotiationMessageContent) message.getContents();
-		
-		if(pbc.getCurrentPlan().getPlan().size()> 3 && !(bidding || startedNegotiating)){
-			long lastTime = messageContent.getEndTime();
-			long currentTime = model.getTime().getTime();
-			if(currentTime<lastTime){
-				//calculate best plausible jointplan
-				ArrayList<Goal> otherNegotiationPlan = messageContent.getPlan();
-				Point otherPos = messageContent.getPosition();
-				long otherBat = messageContent.getBattery();
-				long endTime = messageContent.getEndTime();
-				double minOtherValue = messageContent.getMinValue();
-				JPlan jointPlan = bestJPlan(otherNegotiationPlan, otherPos, otherBat, endTime, minOtherValue);
-				if(jointPlan!=null && jointPlan.getOtherPlan()!= null && jointPlan.getOwnPlan()!= null ){
-					//if there exist a better plausible jointplan send a negotiationbidmessage
-					bidding = true;
-					timeLastAction = lastTime - delay; 
-					jplan = jointPlan;
-					jplan.setJPlanAgent(model.getThisRobot());
-					pbc.sendNegotiationBidMessage(jointPlan, message.getSender());
-					
-				}
-			}
-			
-		}
-		model.messages().remove(message);
-	}
-
-	/**
-	 * Process a bid from another drone
-	 * Best bet is the new joint plan
-	 * @param message: message with the bid of the other drone
-	 */
-	private void processNegotiationBid(Message message){
-		NegotiationBidMessageContent messageContent = (NegotiationBidMessageContent) message.getContents();
-		JPlan receivedJPlan = messageContent.getJointPlan();
-		if(startedNegotiating && jplan != null && pbc.getCurrentPlan().value(receivedJPlan.getOtherPlan(),timeLastAction+delay)< pbc.getCurrentPlan().value(this.jplan.getOtherPlan(), timeLastAction+delay)){
-			//if the received joint plan is better then the current best received joint plan, store the owner of the current plan and set the new best joint plan with the given joint plan
-			if(jplan.JPlanAgent!=null)losers.add(jplan.JPlanAgent);
-			jplan = receivedJPlan;
-			
-		}
-		else{
-			losers.add(receivedJPlan.JPlanAgent);
-		}
-		this.model.messages().remove(message);
-
-	}
-	/**
-	 * Process the reply for a bid.
-	 * If the bid is accpeted the proposed plans are set up. If not the old plan stays and if a reservation for the charging station has been done it is cancelled.
-	 * @param message: the reply message
-	 */
-	private void processNegotiationReply(Message message){
-		NegotiationReplyMessageContent messageContent = (NegotiationReplyMessageContent) message.getContents();
-		if(messageContent.isAccepted() && bidding){
-			//if you received a positive reply set your plan in the joint plan as the current plan.
-			this.setNewJointPlan(jplan, false);
-		}else{
-			//remove the made reservations in the charging station
-			for(Goal g:chargedList){
-					pbc.sendCancelReservationMessage(g.getStartWindow(), g.getEndWindow());
-			}
-		}
-		jplan =null;
-		bidding = false;
-		this.model.messages().remove(message);
-	}
-
-	/**
-	 * When the negotiation ends a message is send to all drones who did a bid. An accept to the best bid and a reject to the other bids.
->>>>>>> origin/master
-	 */
-	public void sendBestNegMessage(){
-			if( jplan.JPlanAgent!= null){
-				//inform the agents who bid whether they won the bid or not. 
-				
-				this.setNewJointPlan(jplan,true);
-				pbc.sendNegotiationReplyMessage(jplan.JPlanAgent);
-			}
-			for(CommUser l:losers){
-				pbc.sendNegativeNegotiationReplyMessage(l);
-			}
-			losers =null;
-			jplan = null;
-			startedNegotiating = false;
-
-		}
 
 
 
@@ -387,7 +234,6 @@ public class Negotiation {
 			if(((Goal)plan.get(i)).type() ==GoalTypes.Charging){
 				return (ChargeGoal) plan.remove(i);
 			}
-
 		}
 		return null;
 	}
@@ -434,7 +280,28 @@ public class Negotiation {
 
 		return result;
 	}
-
+	private JPlan bestJPlan(ArrayList<Bid> wins,
+			ArrayList<Goal> otherNegotiationPlan, Point otherPos,
+			long otherBat, long endTime, double minOtherValue) {
+		Double winValue = (double) 0;
+		JPlan best = null;
+		for(Bid win:wins){
+			Goal g1 = new Goal(win.getPackageToDeliver().getStart(), GoalTypes.Pickup, win.getPackageToDeliver().getPickupTimeWindow());
+			Goal g2 = new Goal(win.getPackageToDeliver().getEnd(), GoalTypes.Drop, win.getPackageToDeliver().getDeliveryTimeWindow());
+			@SuppressWarnings("unchecked")
+			ArrayList<Goal> temp = (ArrayList<Goal>) otherNegotiationPlan.clone();
+			temp.add(g1);
+			temp.add(g2);
+			
+			JPlan temPlan = bestJPlan(temp,  otherPos, otherBat,  endTime,  minOtherValue);
+			double tempVal = model.getCurrentPlan().value(temPlan.getOwnPlan(), endTime+negExtend);
+			if(temPlan!=null && temPlan.getOtherPlan()!= null && temPlan.getOwnPlan()!= null && (best== null || winValue < tempVal )){
+				best=temPlan;
+				winValue = tempVal;
+			}
+		}
+		return best;
+	}
 	/**
 	 * divides the goals in all goals between the two agents and select the best combination
 	 */
@@ -455,10 +322,10 @@ public class Negotiation {
 			if(otherGoals2 .size()>0 && otherGoals2.get(0).type() == GoalTypes.Drop ){
 				otherList.add(otherGoals2.remove(0));
 			}
-			ArrayList<Goal> tempBestOwnGoals = Plan.GenerateBestPlan(ownGoals2,ownList , ownCharge, null, pbc.getWindows(), ownPos, ownBat, endTime+negExtend, model);
-			ArrayList<Goal> tempOtherOwnGoals = Plan.GenerateBestPlan(otherGoals2, otherList, otherCharge, null, pbc.getWindows(), otherPos, otherBat, endTime, model);
+			ArrayList<Goal> tempBestOwnGoals = Plan.GenerateBestPlan(ownGoals2,ownList , null, model.getWindows(), ownPos, ownBat, endTime+negExtend, model);
+			ArrayList<Goal> tempOtherOwnGoals = Plan.GenerateBestPlan(otherGoals2, otherList, null, model.getWindows(), otherPos, otherBat, endTime, model);
 
-			if(pbc.getCurrentPlan().value(tempBestOwnGoals, endTime+negExtend)<pbc.getCurrentPlan().value(bestOwn, endTime+negExtend) 
+			if(model.getCurrentPlan().value(tempBestOwnGoals, endTime+negExtend)<model.getCurrentPlan().value(bestOwn, endTime+negExtend) 
 					&& Plan.value(tempOtherOwnGoals, tempOtherBattery,tempOtherPos, endTime, model)<=minOtherValue){
 				bestOwn=tempBestOwnGoals;
 				bestOther = tempOtherOwnGoals;
@@ -466,10 +333,10 @@ public class Negotiation {
 
 		
 
-			tempBestOwnGoals = Plan.GenerateBestPlan(ownGoals2, ownList, otherCharge, null, pbc.getWindows(), ownPos, ownBat, endTime+negExtend, model);
-			tempOtherOwnGoals = Plan.GenerateBestPlan(otherGoals2, otherList, ownCharge, null, pbc.getWindows(), otherPos, otherBat, endTime, model);
+			tempBestOwnGoals = Plan.GenerateBestPlan(ownGoals2, ownList, null, model.getWindows(), ownPos, ownBat, endTime+negExtend, model);
+			tempOtherOwnGoals = Plan.GenerateBestPlan(otherGoals2, otherList, null, model.getWindows(), otherPos, otherBat, endTime, model);
 
-			if(pbc.getCurrentPlan().value(tempBestOwnGoals, endTime+negExtend)<pbc.getCurrentPlan().value(bestOwn, endTime+negExtend) 
+			if(model.getCurrentPlan().value(tempBestOwnGoals, endTime+negExtend)<model.getCurrentPlan().value(bestOwn, endTime+negExtend) 
 					&& Plan.value(tempOtherOwnGoals, tempOtherBattery,tempOtherPos, endTime, model)<=minOtherValue){
 				bestOwn=tempBestOwnGoals;
 				bestOther = tempOtherOwnGoals;
@@ -509,72 +376,6 @@ public class Negotiation {
 
 	}
 
-	
-
-
-	 /**
-	  * Checks if it is time to end the bidding and if it is end the bidding
-	 */
-
-	public void checkNegotiation() {
-		if(timeLastAction!= null && timeLastAction+delay<=model.getTime().getStartTime()){
-
-			if(startedNegotiating){
-				sendBestNegMessage();
-			}
-		}
-	}
-
-	/**
-	 * Set a new JointPlan as your current plan
-	 */
-	private void setNewJointPlan(JPlan newPlan,boolean other){
-		
-		if(pbc.getCurrentPlan() !=null){
-			//this part is meant to correct errors made in the calculations of the plan.caulculateGoals()
-			@SuppressWarnings("unchecked")
-			ArrayList<Goal> testplan = (ArrayList<Goal>) pbc.getCurrentPlan().getPlan().clone();
-			removeCharge(testplan);
-			ArrayList<Goal> comb = new ArrayList<Goal>();
-			comb.addAll(newPlan.getOwnPlan());
-			comb.addAll(newPlan.getOtherPlan());
-			if(!testplan.isEmpty() && !comb.contains(testplan.get(0))){
-				newPlan.getOtherPlan().add(0,testplan.get(0));
-			}
-		}
-		//see if reservations for charging have to be cancelled
-		ChargeGoal lostChargeGoal1 = pbc.getCurrentPlan().lostChargeGoal(newPlan.getOwnPlan());
-		ChargeGoal lostChargeGoal2 = pbc.getCurrentPlan().lostChargeGoal(newPlan.getOtherPlan());
-		if(pbc.getGoal() != null && pbc.getGoal().type() == GoalTypes.Charging && !newPlan.getOwnPlan().contains(pbc.getGoal()) && !newPlan.getOtherPlan().contains(pbc.getGoal()) ){
-			InformationHandler.getInformationHandler().setlostcharge();
-		}
-		if(model.isReserveChargingStation() && lostChargeGoal2!=null && lostChargeGoal1!=null){
-			pbc.sendCancelReservationMessage(lostChargeGoal2.getStartWindow(), lostChargeGoal2.getEndWindow());
-		}
-		//set the correct Plan of the joint plan as the current plan
-		if(other){
-			pbc.forcefullSetNewPlan(newPlan.getOtherPlan());
-		}
-		else{
-			pbc.forcefullSetNewPlan(newPlan.getOwnPlan());
-		}
-	}
-	
-	/**
-	 * returns if a bid has been done for the negotiation
-	 * 
-	 */
-	public boolean IsBidding() {
-		return bidding;
-	}
-	
-	/** 
-	 * return if a negotiation has started 
-	 * 
-	 */
-	public boolean IsNegotiating() {
-		return startedNegotiating;
-	}
 
 
 }
